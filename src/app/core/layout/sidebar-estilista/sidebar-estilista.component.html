@@ -1,0 +1,113 @@
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full w-[240px] bg-surface border-r border-outline-variant z-40 pt-[64px]">
+  <!-- User Section -->
+  <div class="px-4 mb-4 flex items-center gap-3">
+    <div class="w-12 h-12 rounded-full bg-surface-container-high border border-outline-variant overflow-hidden flex items-center justify-center">
+      <span class="material-symbols-outlined text-2xl text-secondary">account_circle</span>
+    </div>
+    <div class="flex flex-col">
+      <span class="font-label-md text-on-surface">Estilista Name</span>
+      <span class="font-label-sm text-secondary">Estilista</span>
+    </div>
+  </div>
+
+  <!-- Availability Toggle -->
+  <div class="px-4 py-3 border-b border-outline-variant">
+    <div class="flex items-center justify-between">
+      <span class="font-label-sm text-secondary">Disponibilidad</span>
+      <div class="w-10 h-6 rounded-full bg-primary relative">
+        <div class="w-5 h-5 rounded-full bg-white shadow-sm absolute right-1 top-1"></div>
+      </div>
+    </div>
+    <div class="mt-2 text-center">
+      <span class="font-label-sm text-primary">En línea</span>
+    </div>
+  </div>
+
+  <!-- Nav Links -->
+  <nav class="flex-1 px-2 space-y-1 mt-4">
+    <a href="#/estilista/inicio"
+       [class.bg-secondary-fixed]="activeRoute === 'inicio'"
+       [class.text-primary]="activeRoute === 'inicio'"
+       [class.border-l-[3px]]="activeRoute === 'inicio'"
+       [class.border-primary]="activeRoute === 'inicio'"
+       [class.text-secondary]="activeRoute !== 'inicio'"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
+       [class.rounded-r-lg]="activeRoute === 'inicio'"
+       [class.opacity-90]="activeRoute === 'inicio'"
+       [class.hover:bg-surface-container-high]="activeRoute !== 'inicio'"
+       [class.hover:text-primary]="activeRoute !== 'inicio'">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="flex-1">Inicio</span>
+    </a>
+    <a href="#/estilista/agenda"
+       [class.bg-secondary-fixed]="activeRoute === 'agenda'"
+       [class.text-primary]="activeRoute === 'agenda'"
+       [class.border-l-[3px]]="activeRoute === 'agenda'"
+       [class.border-primary]="activeRoute === 'agenda'"
+       [class.text-secondary]="activeRoute !== 'agenda'"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
+       [class.rounded-r-lg]="activeRoute === 'agenda'"
+       [class.opacity-90]="activeRoute === 'agenda'"
+       [class.hover:bg-surface-container-high]="activeRoute !== 'agenda'"
+       [class.hover:text-primary]="activeRoute !== 'agenda'">
+      <span class="material-symbols-outlined">calendar_month</span>
+      <span class="flex-1">Mi Agenda</span>
+    </a>
+    <a href="#/estilista/clientes"
+       [class.bg-secondary-fixed]="activeRoute === 'clientes'"
+       [class.text-primary]="activeRoute === 'clientes'"
+       [class.border-l-[3px]]="activeRoute === 'clientes'"
+       [class.border-primary]="activeRoute === 'clientes'"
+       [class.text-secondary]="activeRoute !== 'clientes'"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
+       [class.rounded-r-lg]="activeRoute === 'clientes'"
+       [class.opacity-90]="activeRoute === 'clientes'"
+       [class.hover:bg-surface-container-high]="activeRoute !== 'clientes'"
+       [class.hover:text-primary]="activeRoute !== 'clientes'">
+      <span class="material-symbols-outlined">group</span>
+      <span class="flex-1">Mis Clientes</span>
+    </a>
+    <a href="#/estilista/reportar"
+       [class.bg-secondary-fixed]="activeRoute === 'reportar'"
+       [class.text-primary]="activeRoute === 'reportar'"
+       [class.border-l-[3px]]="activeRoute === 'reportar'"
+       [class.border-primary]="activeRoute === 'reportar'"
+       [class.text-secondary]="activeRoute !== 'reportar'"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
+       [class.rounded-r-lg]="activeRoute === 'reportar'"
+       [class.opacity-90]="activeRoute === 'reportar'"
+       [class.hover:bg-surface-container-high]="activeRoute !== 'reportar'"
+       [class.hover:text-primary]="activeRoute !== 'reportar'">
+      <span class="material-symbols-outlined">report_problem</span>
+      <span class="flex-1">Reportar Cliente</span>
+    </a>
+    <a href="#/estilista/perfil"
+       [class.bg-secondary-fixed]="activeRoute === 'perfil'"
+       [class.text-primary]="activeRoute === 'perfil'"
+       [class.border-l-[3px]]="activeRoute === 'perfil'"
+       [class.border-primary]="activeRoute === 'perfil'"
+       [class.text-secondary]="activeRoute !== 'perfil'"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
+       [class.rounded-r-lg]="activeRoute === 'perfil'"
+       [class.opacity-90]="activeRoute === 'perfil'"
+       [class.hover:bg-surface-container-high]="activeRoute !== 'perfil'"
+       [class.hover:text-primary]="activeRoute !== 'perfil'">
+      <span class="material-symbols-outlined">person</span>
+      <span class="flex-1">Mi Perfil</span>
+    </a>
+    <a href="#/estilista/notificaciones"
+       [class.bg-secondary-fixed]="activeRoute === 'notificaciones'"
+       [class.text-primary]="activeRoute === 'notificaciones'"
+       [class.border-l-[3px]]="activeRoute === 'notificaciones'"
+       [class.border-primary]="activeRoute === 'notificaciones'"
+       [class.text-secondary]="activeRoute !== 'notificaciones'"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
+       [class.rounded-r-lg]="activeRoute === 'notificaciones'"
+       [class.opacity-90]="activeRoute === 'notificaciones'"
+       [class.hover:bg-surface-container-high]="activeRoute !== 'notificaciones'"
+       [class.hover:text-primary]="activeRoute !== 'notificaciones'">
+      <span class="material-symbols-outlined">notifications</span>
+      <span class="flex-1">Notificaciones</span>
+    </a>
+  </nav>
+</aside>

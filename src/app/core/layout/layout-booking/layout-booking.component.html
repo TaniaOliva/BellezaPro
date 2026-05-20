@@ -1,0 +1,51 @@
+<app-topbar [showAcceder]="false" [showUserAvatar]="true" [navLinks]="navLinks"></app-topbar>
+<app-sidebar-cliente [activeRoute]="activeRoute"></app-sidebar-cliente>
+
+<!-- Stepper Strip -->
+<div class="fixed top-[64px] left-[240px] right-0 z-30 bg-surface border-b border-outline-variant">
+  <div class="h-[56px] flex items-center justify-center px-[32px]">
+    <div class="flex items-center gap-4 max-w-4xl mx-auto">
+      <div *ngFor="let step of steps; let i = index" class="flex items-center gap-4">
+        <div class="flex flex-col items-center">
+          <ng-container *ngIf="currentStep > step.number; else activeOrInactive">
+            <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center">
+              <span class="material-symbols-outlined text-sm">check</span>
+            </div>
+          </ng-container>
+          <ng-template #activeOrInactive>
+            <div *ngIf="currentStep === step.number; else inactiveStep"
+                 class="w-8 h-8 rounded-full bg-surface border-2 border-primary text-primary flex items-center justify-center font-label-md">
+              {{ step.number }}
+            </div>
+          </ng-template>
+          <ng-template #inactiveStep>
+            <div class="w-8 h-8 rounded-full bg-surface-container-highest text-secondary flex items-center justify-center">
+              {{ step.number }}
+            </div>
+          </ng-template>
+          <span class="font-label-sm mt-1"
+                [class.text-primary]="currentStep >= step.number"
+                [class.text-secondary]="currentStep < step.number">
+            {{ step.label }}
+          </span>
+        </div>
+
+        <div *ngIf="i < steps.length - 1"
+             class="flex-1 h-[2px] mb-6 transition-colors"
+             [class.bg-primary]="currentStep > step.number"
+             [class.bg-outline-variant]="currentStep <= step.number">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<main class="md:ml-[240px] pt-[120px] pb-[80px] min-h-screen bg-background">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- Bottom Sticky Bar -->
+<div class="fixed bottom-0 left-[240px] right-0 h-[64px] bg-surface border-t border-outline-variant flex items-center justify-end px-[32px]">
+  <ng-content></ng-content>
+</div>

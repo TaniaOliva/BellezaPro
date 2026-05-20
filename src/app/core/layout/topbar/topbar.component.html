@@ -1,0 +1,43 @@
+<nav class="fixed top-0 left-0 right-0 z-50 bg-surface border-b border-outline-variant shadow-sm h-[64px] flex justify-between items-center px-[32px]">
+  <!-- Left: Logo -->
+  <div class="flex items-center gap-2">
+    <span class="material-symbols-outlined text-primary text-2xl">content_cut</span>
+    <div class="flex flex-col">
+      <span class="text-[11px] text-secondary font-label-sm">Honduras</span>
+      <span class="text-[20px] font-bold text-primary leading-none">BellezaPro</span>
+    </div>
+  </div>
+
+  <!-- Center: Nav links -->
+  <div class="hidden md:flex gap-[24px]" *ngIf="showAcceder || navLinks.length > 0">
+    <a *ngFor="let link of navLinks"
+       [href]="link.href"
+       [class.border-b-2]="link.active"
+       [class.border-primary]="link.active"
+       [class.text-primary]="link.active"
+       [class.text-secondary]="!link.active"
+       class="font-label-md transition-colors hover:text-primary pb-1">
+      {{ link.label }}
+    </a>
+  </div>
+
+  <!-- Right: Acceder button OR notification bell + avatar -->
+  <div class="flex items-center gap-3">
+    <button *ngIf="showAcceder; else userArea"
+            class="bg-primary text-on-primary rounded-lg px-4 py-2 font-label-md flex items-center gap-2 hover:bg-surface-tint transition-colors">
+      <span class="material-symbols-outlined text-sm">security</span>
+      Acceder
+    </button>
+
+    <ng-template #userArea>
+      <div *ngIf="showUserAvatar" class="flex items-center gap-2">
+        <button class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
+          <span class="material-symbols-outlined text-secondary hover:text-primary">notifications</span>
+        </button>
+        <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant overflow-hidden flex items-center justify-center">
+          <span class="material-symbols-outlined text-sm text-secondary">account_circle</span>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</nav>
