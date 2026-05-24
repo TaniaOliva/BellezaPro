@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { TopbarComponent, NavLink } from '../topbar/topbar.component';
+import { TopbarComponent } from '../topbar/topbar.component';
 import { SidebarClienteComponent } from '../sidebar-cliente/sidebar-cliente.component';
 
 @Component({
@@ -12,15 +12,6 @@ import { SidebarClienteComponent } from '../sidebar-cliente/sidebar-cliente.comp
   styleUrls: ['./layout-booking.component.css']
 })
 export class LayoutBookingComponent {
-  navLinks: NavLink[] = [
-    { label: 'Inicio', href: '/inicio', active: false },
-    { label: 'Servicios', href: '/servicios', active: false },
-    { label: 'Estilistas', href: '/estilistas', active: false },
-    { label: 'Portafolio', href: '/portafolio', active: false },
-    { label: 'Nosotros', href: '/nosotros', active: false }
-  ];
-
-  activeRoute: string = 'servicios';
   @Input() currentStep: number = 1;
 
   steps = [

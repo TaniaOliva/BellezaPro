@@ -25,87 +25,39 @@
 
   <!-- Nav Links -->
   <nav class="flex-1 px-2 space-y-1 mt-4">
-    <a href="#/estilista/inicio"
-       [class.bg-secondary-fixed]="activeRoute === 'inicio'"
-       [class.text-primary]="activeRoute === 'inicio'"
-       [class.border-l-[3px]]="activeRoute === 'inicio'"
-       [class.border-primary]="activeRoute === 'inicio'"
-       [class.text-secondary]="activeRoute !== 'inicio'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'inicio'"
-       [class.opacity-90]="activeRoute === 'inicio'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'inicio'"
-       [class.hover:text-primary]="activeRoute !== 'inicio'">
+    <a routerLink="/estilista/inicio"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">dashboard</span>
       <span class="flex-1">Inicio</span>
     </a>
-    <a href="#/estilista/agenda"
-       [class.bg-secondary-fixed]="activeRoute === 'agenda'"
-       [class.text-primary]="activeRoute === 'agenda'"
-       [class.border-l-[3px]]="activeRoute === 'agenda'"
-       [class.border-primary]="activeRoute === 'agenda'"
-       [class.text-secondary]="activeRoute !== 'agenda'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'agenda'"
-       [class.opacity-90]="activeRoute === 'agenda'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'agenda'"
-       [class.hover:text-primary]="activeRoute !== 'agenda'">
+    <a routerLink="/estilista/agenda"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">calendar_month</span>
       <span class="flex-1">Mi Agenda</span>
     </a>
-    <a href="#/estilista/clientes"
-       [class.bg-secondary-fixed]="activeRoute === 'clientes'"
-       [class.text-primary]="activeRoute === 'clientes'"
-       [class.border-l-[3px]]="activeRoute === 'clientes'"
-       [class.border-primary]="activeRoute === 'clientes'"
-       [class.text-secondary]="activeRoute !== 'clientes'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'clientes'"
-       [class.opacity-90]="activeRoute === 'clientes'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'clientes'"
-       [class.hover:text-primary]="activeRoute !== 'clientes'">
+    <a routerLink="/estilista/mis-clientes"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">group</span>
       <span class="flex-1">Mis Clientes</span>
     </a>
-    <a href="#/estilista/reportar"
-       [class.bg-secondary-fixed]="activeRoute === 'reportar'"
-       [class.text-primary]="activeRoute === 'reportar'"
-       [class.border-l-[3px]]="activeRoute === 'reportar'"
-       [class.border-primary]="activeRoute === 'reportar'"
-       [class.text-secondary]="activeRoute !== 'reportar'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'reportar'"
-       [class.opacity-90]="activeRoute === 'reportar'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'reportar'"
-       [class.hover:text-primary]="activeRoute !== 'reportar'">
+    <a routerLink="/estilista/reportar-cliente"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">report_problem</span>
       <span class="flex-1">Reportar Cliente</span>
     </a>
-    <a href="#/estilista/perfil"
-       [class.bg-secondary-fixed]="activeRoute === 'perfil'"
-       [class.text-primary]="activeRoute === 'perfil'"
-       [class.border-l-[3px]]="activeRoute === 'perfil'"
-       [class.border-primary]="activeRoute === 'perfil'"
-       [class.text-secondary]="activeRoute !== 'perfil'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'perfil'"
-       [class.opacity-90]="activeRoute === 'perfil'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'perfil'"
-       [class.hover:text-primary]="activeRoute !== 'perfil'">
+    <a routerLink="/estilista/perfil"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">person</span>
       <span class="flex-1">Mi Perfil</span>
     </a>
-    <a href="#/estilista/notificaciones"
-       [class.bg-secondary-fixed]="activeRoute === 'notificaciones'"
-       [class.text-primary]="activeRoute === 'notificaciones'"
-       [class.border-l-[3px]]="activeRoute === 'notificaciones'"
-       [class.border-primary]="activeRoute === 'notificaciones'"
-       [class.text-secondary]="activeRoute !== 'notificaciones'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'notificaciones'"
-       [class.opacity-90]="activeRoute === 'notificaciones'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'notificaciones'"
-       [class.hover:text-primary]="activeRoute !== 'notificaciones'">
+    <a routerLink="/estilista/notificaciones"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">notifications</span>
       <span class="flex-1">Notificaciones</span>
     </a>

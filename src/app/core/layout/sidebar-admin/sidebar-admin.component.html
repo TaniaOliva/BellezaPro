@@ -14,129 +14,57 @@
 
   <!-- Nav Links -->
   <nav class="flex-1 px-2 space-y-1">
-    <a href="#/admin/inicio"
-       [class.bg-secondary-fixed]="activeRoute === 'inicio'"
-       [class.text-primary]="activeRoute === 'inicio'"
-       [class.border-l-[3px]]="activeRoute === 'inicio'"
-       [class.border-primary]="activeRoute === 'inicio'"
-       [class.text-secondary]="activeRoute !== 'inicio'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'inicio'"
-       [class.opacity-90]="activeRoute === 'inicio'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'inicio'"
-       [class.hover:text-primary]="activeRoute !== 'inicio'">
+    <a routerLink="/admin/inicio"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">dashboard</span>
       <span class="flex-1">Inicio</span>
     </a>
-    <a href="#/admin/agenda"
-       [class.bg-secondary-fixed]="activeRoute === 'agenda'"
-       [class.text-primary]="activeRoute === 'agenda'"
-       [class.border-l-[3px]]="activeRoute === 'agenda'"
-       [class.border-primary]="activeRoute === 'agenda'"
-       [class.text-secondary]="activeRoute !== 'agenda'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'agenda'"
-       [class.opacity-90]="activeRoute === 'agenda'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'agenda'"
-       [class.hover:text-primary]="activeRoute !== 'agenda'">
+    <a routerLink="/admin/agenda-general"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">calendar_month</span>
       <span class="flex-1">Agenda General</span>
     </a>
-    <a href="#/admin/empleados"
-       [class.bg-secondary-fixed]="activeRoute === 'empleados'"
-       [class.text-primary]="activeRoute === 'empleados'"
-       [class.border-l-[3px]]="activeRoute === 'empleados'"
-       [class.border-primary]="activeRoute === 'empleados'"
-       [class.text-secondary]="activeRoute !== 'empleados'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'empleados'"
-       [class.opacity-90]="activeRoute === 'empleados'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'empleados'"
-       [class.hover:text-primary]="activeRoute !== 'empleados'">
+    <a routerLink="/admin/empleados"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">badge</span>
       <span class="flex-1">Empleados</span>
     </a>
-    <a href="#/admin/servicios"
-       [class.bg-secondary-fixed]="activeRoute === 'servicios'"
-       [class.text-primary]="activeRoute === 'servicios'"
-       [class.border-l-[3px]]="activeRoute === 'servicios'"
-       [class.border-primary]="activeRoute === 'servicios'"
-       [class.text-secondary]="activeRoute !== 'servicios'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'servicios'"
-       [class.opacity-90]="activeRoute === 'servicios'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'servicios'"
-       [class.hover:text-primary]="activeRoute !== 'servicios'">
+    <a routerLink="/admin/servicios"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">content_cut</span>
       <span class="flex-1">Servicios</span>
     </a>
-    <a href="#/admin/clientes"
-       [class.bg-secondary-fixed]="activeRoute === 'clientes'"
-       [class.text-primary]="activeRoute === 'clientes'"
-       [class.border-l-[3px]]="activeRoute === 'clientes'"
-       [class.border-primary]="activeRoute === 'clientes'"
-       [class.text-secondary]="activeRoute !== 'clientes'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'clientes'"
-       [class.opacity-90]="activeRoute === 'clientes'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'clientes'"
-       [class.hover:text-primary]="activeRoute !== 'clientes'">
+    <a routerLink="/admin/clientes"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">group</span>
       <span class="flex-1">Clientes</span>
     </a>
-    <a href="#/admin/solicitudes"
-       [class.bg-secondary-fixed]="activeRoute === 'solicitudes'"
-       [class.text-primary]="activeRoute === 'solicitudes'"
-       [class.border-l-[3px]]="activeRoute === 'solicitudes'"
-       [class.border-primary]="activeRoute === 'solicitudes'"
-       [class.text-secondary]="activeRoute !== 'solicitudes'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'solicitudes'"
-       [class.opacity-90]="activeRoute === 'solicitudes'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'solicitudes'"
-       [class.hover:text-primary]="activeRoute !== 'solicitudes'">
+    <a routerLink="/admin/solicitudes-especiales"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">star</span>
       <span class="flex-1">Solicitudes Especiales</span>
     </a>
-    <a href="#/admin/reportes-clientes"
-       [class.bg-secondary-fixed]="activeRoute === 'reportes-clientes'"
-       [class.text-primary]="activeRoute === 'reportes-clientes'"
-       [class.border-l-[3px]]="activeRoute === 'reportes-clientes'"
-       [class.border-primary]="activeRoute === 'reportes-clientes'"
-       [class.text-secondary]="activeRoute !== 'reportes-clientes'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'reportes-clientes'"
-       [class.opacity-90]="activeRoute === 'reportes-clientes'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'reportes-clientes'"
-       [class.hover:text-primary]="activeRoute !== 'reportes-clientes'">
+    <a routerLink="/admin/reportes-clientes"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">report_problem</span>
       <span class="flex-1">Reportes de Clientes</span>
     </a>
-    <a href="#/admin/estadisticas"
-       [class.bg-secondary-fixed]="activeRoute === 'estadisticas'"
-       [class.text-primary]="activeRoute === 'estadisticas'"
-       [class.border-l-[3px]]="activeRoute === 'estadisticas'"
-       [class.border-primary]="activeRoute === 'estadisticas'"
-       [class.text-secondary]="activeRoute !== 'estadisticas'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'estadisticas'"
-       [class.opacity-90]="activeRoute === 'estadisticas'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'estadisticas'"
-       [class.hover:text-primary]="activeRoute !== 'estadisticas'">
+    <a routerLink="/admin/reportes-estadisticas"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">analytics</span>
       <span class="flex-1">Reportes y Estadisticas</span>
     </a>
-    <a href="#/admin/configuracion"
-       [class.bg-secondary-fixed]="activeRoute === 'configuracion'"
-       [class.text-primary]="activeRoute === 'configuracion'"
-       [class.border-l-[3px]]="activeRoute === 'configuracion'"
-       [class.border-primary]="activeRoute === 'configuracion'"
-       [class.text-secondary]="activeRoute !== 'configuracion'"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md"
-       [class.rounded-r-lg]="activeRoute === 'configuracion'"
-       [class.opacity-90]="activeRoute === 'configuracion'"
-       [class.hover:bg-surface-container-high]="activeRoute !== 'configuracion'"
-       [class.hover:text-primary]="activeRoute !== 'configuracion'">
+    <a routerLink="/admin/configuracion"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">settings</span>
       <span class="flex-1">Configuracion</span>
     </a>
