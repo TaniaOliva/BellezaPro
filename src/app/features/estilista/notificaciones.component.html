@@ -1,0 +1,28 @@
+<div class="p-stack_lg">
+  <h1 class="font-headline-lg mb-stack_lg">Notificaciones</h1>
+
+  <div class="space-y-2">
+    <div
+      *ngFor="let notif of notificaciones"
+      [class.bg-surface-container-low]="!notif.leida"
+      [class.bg-surface]="notif.leida"
+      (click)="marcarComoLeida(notif.id)"
+      class="rounded-lg border border-outline-variant p-stack_md flex items-start gap-4 cursor-pointer hover:bg-surface-container-low transition"
+    >
+      <!-- Icono -->
+      <div class="flex-shrink-0 mt-1">
+        <span [class]="'material-symbols-outlined text-2xl ' + notif.iconoColor">{{ notif.icono }}</span>
+      </div>
+
+      <!-- Contenido -->
+      <div class="flex-1 min-w-0">
+        <h3 class="font-body-md font-bold mb-1">{{ notif.titulo }}</h3>
+        <p class="font-body-sm text-secondary mb-1">{{ notif.descripcion }}</p>
+        <p class="font-label-sm text-secondary text-xs">{{ notif.tiempo }}</p>
+      </div>
+
+      <!-- Indicador de no leído -->
+      <div *ngIf="!notif.leida" class="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-2"></div>
+    </div>
+  </div>
+</div>

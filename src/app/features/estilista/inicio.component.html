@@ -1,0 +1,150 @@
+<div class="p-stack_lg">
+  <!-- Banner de bienvenida -->
+  <div class="bg-gradient-to-r from-primary-fixed to-secondary-fixed rounded-xl p-stack_md h-[100px] flex items-center justify-between">
+    <div>
+      <h1 class="font-headline-xl text-on-primary-fixed">Buenos días, Ana</h1>
+      <p class="font-body-lg text-on-primary-fixed-variant">Hoy es martes 29 de abril · 4 citas programadas</p>
+    </div>
+    <div class="flex gap-2">
+      <div class="bg-white border border-outline-variant rounded-full px-3 py-1 font-label-sm text-gray-800">
+        4 Citas hoy
+      </div>
+      <div class="bg-white border border-outline-variant rounded-full px-3 py-1 font-label-sm text-gray-800">
+        2 Completadas
+      </div>
+      <div class="bg-white border border-outline-variant rounded-full px-3 py-1 font-label-sm text-gray-800">
+        L 960 Ingresos
+      </div>
+      <div class="bg-white border border-outline-variant rounded-full px-3 py-1 font-label-sm text-gray-800">
+        4.9 Rating
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="grid grid-cols-4 gap-gutter mt-stack_lg">
+    <div class="bg-surface rounded-xl border border-outline-variant p-stack_md">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-primary text-xl">event_available</span>
+        </div>
+      </div>
+      <p class="font-label-sm text-secondary uppercase">Citas hoy</p>
+      <p class="font-headline-lg text-on-surface">4</p>
+    </div>
+
+    <div class="bg-surface rounded-xl border border-outline-variant p-stack_md">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-primary text-xl">calendar_month</span>
+        </div>
+      </div>
+      <p class="font-label-sm text-secondary uppercase">Citas este mes</p>
+      <p class="font-headline-lg text-on-surface">18</p>
+    </div>
+
+    <div class="bg-surface rounded-xl border border-outline-variant p-stack_md">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-primary text-xl">star</span>
+        </div>
+      </div>
+      <p class="font-label-sm text-secondary uppercase">Rating</p>
+      <p class="font-headline-lg text-on-surface">4.8★</p>
+    </div>
+
+    <div class="bg-surface rounded-xl border border-outline-variant p-stack_md">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-primary text-xl">payments</span>
+        </div>
+      </div>
+      <p class="font-label-sm text-secondary uppercase">Ingresos</p>
+      <p class="font-headline-lg text-on-surface">L 7,560</p>
+    </div>
+  </div>
+
+  <!-- Layout de dos columnas -->
+  <div class="grid grid-cols-12 gap-stack_lg mt-stack_lg">
+    <!-- Citas de hoy (col-span-7) -->
+    <div class="col-span-7">
+      <div class="bg-surface rounded-xl border border-outline-variant p-stack_md">
+        <div class="flex items-center justify-between mb-stack_md">
+          <h2 class="font-headline-md">Citas de hoy</h2>
+          <a href="#" class="text-primary font-body-sm">Ver todas</a>
+        </div>
+
+        <!-- Timeline de citas -->
+        <div class="border-l-2 border-surface-variant pl-6 space-y-stack_md">
+          <div *ngFor="let cita of citas" class="relative">
+            <!-- Círculo en el borde izquierdo -->
+            <div class="absolute -left-[32px] -top-1 w-6 h-6 rounded-full bg-surface border-2 border-surface-variant"></div>
+
+            <!-- Card interna -->
+            <div class="bg-surface-bright p-stack_sm rounded-lg border border-outline-variant flex items-center justify-between">
+              <div>
+                <p class="font-label-md text-secondary">{{ cita.hora }}</p>
+                <p class="font-body-md">{{ cita.cliente }}</p>
+                <p class="font-label-sm text-secondary">{{ cita.servicio }}</p>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <span *ngIf="cita.estado === 'Completada'" class="bg-surface-variant text-secondary font-label-sm px-2 py-1 rounded">
+                  {{ cita.estado }}
+                </span>
+                <span *ngIf="cita.estado === 'En progreso'" class="bg-primary text-on-primary font-label-sm px-2 py-1 rounded animate-pulse">
+                  {{ cita.estado }}
+                </span>
+                <button *ngIf="cita.estado !== 'Completada'" class="bg-primary text-on-primary rounded py-1 px-3 font-label-sm hover:bg-primary-container">
+                  Completar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mi rendimiento (col-span-5) -->
+    <div class="col-span-5">
+      <div class="bg-surface rounded-xl border border-outline-variant p-stack_md">
+        <h2 class="font-headline-md mb-stack_md">Mi rendimiento</h2>
+
+        <!-- Métricas -->
+        <div class="space-y-0">
+          <div class="p-2 hover:bg-surface-container-low rounded-lg flex items-center justify-between">
+            <span class="font-body-md">Retencion de clientes</span>
+            <span class="font-headline-md text-primary">85%</span>
+          </div>
+          <div class="p-2 hover:bg-surface-container-low rounded-lg flex items-center justify-between">
+            <span class="font-body-md">Puntualidad</span>
+            <span class="font-headline-md text-primary">98%</span>
+          </div>
+          <div class="p-2 hover:bg-surface-container-low rounded-lg flex items-center justify-between">
+            <span class="font-body-md">Servicio mas popular</span>
+            <span class="font-headline-md text-primary">Manicure Gel</span>
+          </div>
+          <div class="p-2 hover:bg-surface-container-low rounded-lg flex items-center justify-between">
+            <span class="font-body-md">Cancelaciones</span>
+            <span class="font-headline-md text-primary">2</span>
+          </div>
+        </div>
+
+        <!-- Gráfico de barras simple -->
+        <div class="flex items-end gap-2 mt-stack_md h-32 border-t border-outline-variant pt-stack_md">
+          <div *ngFor="let i of [0, 1, 2, 3, 4, 5]" class="flex-1 flex flex-col items-center">
+            <div
+              [style.height.px]="alturasBarra[i]"
+              [ngClass]="{
+                'bg-primary-container': i === 2,
+                'bg-surface-variant': i !== 2
+              }"
+              class="w-full rounded-t"
+            ></div>
+            <span class="font-label-sm text-secondary mt-1">{{ diasSemana[i] }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

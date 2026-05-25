@@ -1,0 +1,155 @@
+<div class="p-stack_lg">
+  <!-- Header card con avatar y especialidades -->
+  <div class="bg-surface rounded-xl border border-outline-variant p-stack_lg mb-stack_lg">
+    <div class="flex items-start gap-stack_md mb-stack_md">
+      <!-- Avatar con botón de cámara -->
+      <div class="relative">
+        <div class="w-24 h-24 rounded-full bg-primary-fixed border-4 border-primary-fixed flex items-center justify-center text-on-primary text-3xl font-bold">
+          AG
+        </div>
+        <button class="absolute bottom-0 right-0 bg-primary rounded-full p-2 hover:bg-primary-container">
+          <span class="material-symbols-outlined text-on-primary text-xl">photo_camera</span>
+        </button>
+      </div>
+
+      <!-- Información principal -->
+      <div class="flex-1">
+        <h1 class="font-headline-xl mb-1">Ana Garcia</h1>
+        <div class="flex items-center gap-2 mb-stack_md">
+          <span class="bg-gray-300 text-gray-700 font-label-sm px-3 py-1 rounded-full">Estilista</span>
+        </div>
+        <p class="font-label-md text-secondary mb-2">Especialidades</p>
+        <div class="flex gap-2">
+          <span class="bg-primary-container text-on-primary-container font-label-sm px-3 py-1 rounded-full">
+            Manicure
+          </span>
+          <span class="bg-primary-container text-on-primary-container font-label-sm px-3 py-1 rounded-full">
+            Nail Art
+          </span>
+          <span class="bg-secondary-fixed text-on-secondary-fixed font-label-sm px-3 py-1 rounded-full">
+            Pedicure
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats 2x2 -->
+    <div class="grid grid-cols-4 gap-4">
+      <div class="p-3 bg-surface-container rounded-lg">
+        <p class="font-label-sm text-secondary mb-1">Citas este mes</p>
+        <p class="font-headline-lg">18</p>
+      </div>
+      <div class="p-3 bg-surface-container rounded-lg">
+        <p class="font-label-sm text-secondary mb-1">Rating</p>
+        <p class="font-headline-lg">4.8★</p>
+      </div>
+      <div class="p-3 bg-surface-container rounded-lg">
+        <p class="font-label-sm text-secondary mb-1">Años</p>
+        <p class="font-headline-lg">3</p>
+      </div>
+      <div class="p-3 bg-surface-container rounded-lg">
+        <p class="font-label-sm text-secondary mb-1">Ingresos</p>
+        <p class="font-headline-lg">L 7,560</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Información personal -->
+  <div class="bg-surface rounded-xl border border-outline-variant p-stack_lg mb-stack_lg">
+    <h2 class="font-headline-md mb-stack_md">Información personal</h2>
+    <div class="space-y-3">
+      <div>
+        <label class="font-label-sm text-secondary">Nombre completo</label>
+        <p class="font-body-md">Ana Garcia</p>
+      </div>
+      <div>
+        <label class="font-label-sm text-secondary">Email</label>
+        <p class="font-body-md">ana.garcia&#64;bellezapro.com</p>
+      </div>
+      <div>
+        <label class="font-label-sm text-secondary">Teléfono</label>
+        <p class="font-body-md">+504 9999-1234</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mis especialidades -->
+  <div class="bg-surface rounded-xl border border-outline-variant p-stack_lg mb-stack_lg">
+    <div class="flex items-center justify-between mb-stack_md">
+      <h2 class="font-headline-md">Mis especialidades</h2>
+      <button
+        (click)="guardarEspecialidades()"
+        class="border border-primary text-primary rounded-lg py-2 px-4 font-label-md hover:bg-primary-container/20"
+      >
+        Guardar especialidades
+      </button>
+    </div>
+    <p class="font-label-sm text-secondary italic text-xs mb-stack_md">
+      Selecciona las especialidades que ofreces
+    </p>
+    <div class="flex gap-2 flex-wrap">
+      <button
+        *ngFor="let esp of especialidades; let i = index"
+        (click)="toggleEspecialidad(i)"
+        [class.bg-primary-container]="esp.activa"
+        [class.text-on-primary-container]="esp.activa"
+        [class.border-primary]="esp.activa"
+        [class.bg-surface]="!esp.activa"
+        [class.border-outline-variant]="!esp.activa"
+        [class.text-secondary]="!esp.activa"
+        class="border rounded-full px-3 py-2 font-label-sm transition"
+      >
+        {{ esp.nombre }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Mi horario -->
+  <div class="bg-surface rounded-xl border border-outline-variant p-stack_lg mb-stack_lg">
+    <div class="flex items-center justify-between mb-stack_md">
+      <h2 class="font-headline-md">Mi horario</h2>
+      <button
+        (click)="guardarHorario()"
+        class="bg-primary text-on-primary rounded-lg py-2 px-4 font-label-md hover:bg-primary-container"
+      >
+        Guardar horario
+      </button>
+    </div>
+
+    <div class="space-y-1">
+      <div *ngFor="let h of horario; let i = index" class="flex items-center gap-4 p-2 hover:bg-surface-container-low rounded">
+        <span class="w-30 font-body-sm">{{ h.dia }}</span>
+        <label class="flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            [(ngModel)]="h.activo"
+            (change)="toggleHorario(i)"
+            class="w-4 h-4"
+          />
+        </label>
+        <div *ngIf="h.activo" class="flex gap-2">
+          <input type="time" [(ngModel)]="h.inicio" class="px-2 py-1 border border-outline-variant rounded text-xs" />
+          <span class="text-secondary font-label-sm">a</span>
+          <input type="time" [(ngModel)]="h.fin" class="px-2 py-1 border border-outline-variant rounded text-xs" />
+        </div>
+        <span *ngIf="!h.activo" class="text-secondary font-label-sm italic text-xs">Descanso</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Seguridad -->
+  <div class="bg-surface rounded-xl border border-outline-variant p-stack_lg">
+    <h2 class="font-headline-md mb-stack_md">Seguridad</h2>
+    <div class="space-y-3">
+      <button class="w-full border border-outline-variant text-on-surface rounded-lg py-2 px-4 font-label-md hover:bg-surface-container-low text-left">
+        Cambiar contraseña
+      </button>
+      <button class="w-full border border-outline-variant text-on-surface rounded-lg py-2 px-4 font-label-md hover:bg-surface-container-low text-left">
+        Sessiones activas
+      </button>
+      <button class="w-full border border-error text-error rounded-lg py-2 px-4 font-label-md hover:bg-error/5 text-left">
+        Eliminar cuenta
+      </button>
+    </div>
+  </div>
+</div>

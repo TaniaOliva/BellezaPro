@@ -1,0 +1,159 @@
+<div class="p-stack_lg">
+  <!-- Aviso de uso responsable -->
+  <div class="bg-[#FFF8E7] border border-[#FFE082] rounded-lg p-stack_md mb-stack_lg flex gap-3">
+    <span class="material-symbols-outlined text-[#FF8F00] flex-shrink-0">warning</span>
+    <div>
+      <p class="font-label-md text-[#FF8F00] mb-1">Uso responsable</p>
+      <p class="font-body-md text-gray-700">
+        Este formulario es para reportes legítimos. Los reportes falsos pueden resultar en sanciones.
+      </p>
+    </div>
+  </div>
+
+  <!-- Grid de 2 columnas -->
+  <div class="grid grid-cols-3 gap-stack_lg">
+    <!-- Columna izquierda: selección de cita -->
+    <div class="col-span-2">
+      <!-- Sección de citas recientes -->
+      <div class="bg-surface rounded-xl border border-outline-variant p-stack_md mb-stack_lg">
+        <p class="font-body-md font-bold mb-stack_md">Selecciona la cita relacionada con el incidente</p>
+
+        <!-- Scroll horizontal de citas -->
+        <div class="flex gap-3 overflow-x-auto pb-2 mb-stack_md">
+          <div
+            *ngFor="let cita of citasRecientes"
+            (click)="seleccionarCita(cita.id)"
+            [class.border-primary]="selectedCita === cita.id"
+            [class.bg-primary-fixed]="selectedCita === cita.id"
+            [class.border-outline-variant]="selectedCita !== cita.id"
+            [class.bg-surface]="selectedCita !== cita.id"
+            class="flex-shrink-0 w-[220px] border rounded-xl p-stack_md cursor-pointer transition"
+          >
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary text-xs font-bold">
+                {{ cita.avatar }}
+              </div>
+            </div>
+            <p class="font-body-sm font-bold mb-1">{{ cita.cliente }}</p>
+            <p class="font-label-sm text-secondary text-xs mb-1">{{ cita.servicio }}</p>
+            <p class="font-label-sm text-secondary text-xs mb-stack_sm">{{ cita.fecha }}</p>
+
+            <button
+              *ngIf="selectedCita === cita.id"
+              class="w-full bg-primary text-on-primary rounded py-1 px-2 font-label-sm text-xs"
+            >
+              Seleccionada ✓
+            </button>
+            <button
+              *ngIf="selectedCita !== cita.id"
+              class="w-full border border-outline-variant text-on-surface rounded py-1 px-2 font-label-sm text-xs"
+            >
+              Seleccionar
+            </button>
+          </div>
+        </div>
+
+        <a href="#" class="text-primary font-body-sm">No encuentro la cita</a>
+      </div>
+
+      <!-- Strip de cita seleccionada -->
+      <div
+        *ngIf="selectedCita !== ''"
+        class="bg-primary-fixed rounded p-3 flex items-center gap-3 mb-stack_lg"
+      >
+        <div class="w-7 h-7 rounded-full bg-primary-container flex items-center justify-center text-primary text-xs font-bold flex-shrink-0">
+          {{ obtenerCitaSeleccionada()?.avatar }}
+        </div>
+        <div class="flex-1">
+          <p class="font-body-sm font-bold text-on-primary-fixed">{{ obtenerCitaSeleccionada()?.cliente }}</p>
+          <p class="font-label-sm text-on-primary-fixed-variant">{{ obtenerCitaSeleccionada()?.servicio }}</p>
+        </div>
+        <button (click)="deseleccionarCita()" class="p-1 hover:bg-primary rounded">
+          <span class="material-symbols-outlined text-on-primary-fixed text-sm">close</span>
+        </button>
+      </div>
+
+      <!-- Radio group de motivos -->
+      <div class="bg-surface rounded-xl border border-outline-variant p-stack_md mb-stack_lg">
+        <p class="font-body-md font-bold mb-stack_md">Motivo del reporte</p>
+        <div>
+          <div
+            *ngFor="let motivo of motivos"
+            (click)="selectedMotivo = motivo"
+            class="flex items-center gap-3 p-3 border-b border-outline-variant cursor-pointer hover:bg-surface-container-low"
+          >
+            <input
+              type="radio"
+              [name]="'motivo'"
+              [value]="motivo"
+              [(ngModel)]="selectedMotivo"
+              class="w-4 h-4"
+            />
+            <label class="cursor-pointer font-body-sm flex-1">{{ motivo }}</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Textarea de descripción -->
+      <div class="bg-surface rounded-xl border border-outline-variant p-stack_md">
+        <label class="font-body-md font-bold mb-2 block">Descripcion detallada</label>
+        <textarea
+          [(ngModel)]="descripcion"
+          (input)="actualizarDescripcion()"
+          rows="5"
+          placeholder="Describe con detalle el incidente..."
+          class="w-full border border-outline-variant rounded-lg p-2 font-body-sm resize-none"
+        ></textarea>
+        <div class="text-right text-secondary font-label-sm text-xs mt-2">
+          {{ descripcion.length }} / 500
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha: tabla de reportes -->
+    <div class="col-span-1">
+      <div class="bg-surface rounded-xl border border-outline-variant p-stack_md">
+        <p class="font-body-md font-bold mb-stack_md">Reportes anteriores</p>
+
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="border-b border-outline-variant">
+              <th class="text-left py-2 font-label-sm">Cliente</th>
+              <th class="text-left py-2 font-label-sm">Motivo</th>
+              <th class="text-left py-2 font-label-sm">Fecha</th>
+              <th class="text-left py-2 font-label-sm">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let reporte of reportesAnteriores" class="border-b border-outline-variant">
+              <td class="py-2 font-body-sm">{{ reporte.cliente }}</td>
+              <td class="py-2 font-body-sm text-secondary">{{ reporte.motivo }}</td>
+              <td class="py-2 font-body-sm text-secondary">{{ reporte.fecha }}</td>
+              <td class="py-2">
+                <span [ngClass]="reporte.estadoBg + ' ' + reporte.estadoText" class="text-xs px-2 py-1 rounded-full">
+                  {{ reporte.estado }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones de acción -->
+  <div class="flex gap-2 mt-stack_lg">
+    <button class="border border-outline-variant text-on-surface rounded-lg py-2 px-4 font-label-md hover:bg-surface-container-low">
+      Cancelar
+    </button>
+    <button
+      (click)="enviarReporte()"
+      [disabled]="!puedeEnviar()"
+      [class.opacity-50]="!puedeEnviar()"
+      [class.cursor-not-allowed]="!puedeEnviar()"
+      class="bg-primary text-on-primary rounded-lg py-2 px-4 font-label-md hover:bg-primary-container disabled:hover:bg-primary"
+    >
+      Enviar reporte
+    </button>
+  </div>
+</div>

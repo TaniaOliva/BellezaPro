@@ -1,0 +1,147 @@
+<div class="p-stack_lg">
+  <!-- Controles superiores -->
+  <div class="flex items-center justify-between mb-stack_lg">
+    <div class="flex items-center gap-4">
+      <button class="p-2 hover:bg-surface-container-low rounded-lg">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <span class="font-body-md">Semana del 28 Abr al 02 May</span>
+      <button class="p-2 hover:bg-surface-container-low rounded-lg">
+        <span class="material-symbols-outlined">arrow_forward</span>
+      </button>
+    </div>
+    <div class="flex gap-2">
+      <button
+        (click)="viewMode = 'semana'"
+        [class.bg-primary]="viewMode === 'semana'"
+        [class.text-on-primary]="viewMode === 'semana'"
+        [class.bg-surface]="viewMode !== 'semana'"
+        class="px-4 py-2 rounded-full font-label-md border border-outline-variant"
+      >
+        Semana
+      </button>
+      <button
+        (click)="viewMode = 'dia'"
+        [class.bg-primary]="viewMode === 'dia'"
+        [class.text-on-primary]="viewMode === 'dia'"
+        [class.bg-surface]="viewMode !== 'dia'"
+        class="px-4 py-2 rounded-full font-label-md border border-outline-variant"
+      >
+        Día
+      </button>
+    </div>
+  </div>
+
+  <!-- Resumen de días -->
+  <div class="grid grid-cols-5 gap-gutter mb-stack_lg">
+    <div
+      *ngFor="let dia of citasResumenDias"
+      [class.bg-primary-fixed]="dia.esHoy"
+      [class.border-primary]="dia.esHoy"
+      [class.bg-surface]="!dia.esHoy"
+      [class.border-outline-variant]="!dia.esHoy"
+      class="rounded-xl border p-stack_md text-center h-20 flex flex-col items-center justify-center"
+    >
+      <span *ngIf="dia.esHoy" class="font-label-sm text-primary mb-1">Hoy</span>
+      <p class="font-body-sm font-bold">{{ dia.dia }}</p>
+      <p class="font-headline-md text-primary">{{ dia.numero }}</p>
+      <p class="font-label-sm text-secondary">citas</p>
+    </div>
+  </div>
+
+  <!-- Grid semanal -->
+  <div class="bg-surface rounded-xl border border-outline-variant overflow-hidden">
+    <div class="flex overflow-x-auto">
+      <!-- Columna de horas (fija) -->
+      <div class="w-16 flex-shrink-0 border-r border-outline-variant">
+        <div class="h-12"></div>
+        <div *ngFor="let hora of horasDisponibles" class="h-12 flex items-center justify-center">
+          <span class="font-label-sm text-secondary text-xs">{{ hora }}</span>
+        </div>
+      </div>
+
+      <!-- Grid de días -->
+      <div class="flex flex-1">
+        <div *ngFor="let i of [0, 1, 2, 3, 4]" class="flex-1 border-r border-outline-variant last:border-r-0">
+          <!-- Header del día -->
+          <div class="h-12 border-b border-outline-variant flex items-center justify-center font-body-sm font-bold">
+            {{ diasSemana[i] }}
+          </div>
+
+          <!-- Slots de hora -->
+          <div *ngFor="let hora of horasDisponibles" class="h-12 border-b border-outline-variant p-1 relative hover:bg-surface-container-low">
+            <!-- Cita ocupada -->
+            <div
+              *ngIf="obtenerCitaEnHora(i, hora)"
+              (click)="abrirCita(obtenerCitaEnHora(i, hora))"
+              class="bg-primary-fixed border-l-[3px] border-primary rounded p-1 cursor-pointer text-xs absolute left-1 right-1 z-10"
+              [style.height]="obtenerAltoCita(obtenerCitaEnHora(i, hora).duracion)"
+            >
+              <p class="font-bold text-[12px] text-on-primary">{{ obtenerCitaEnHora(i, hora).cliente }}</p>
+              <p class="text-[11px] text-on-primary/70">{{ obtenerCitaEnHora(i, hora).servicio }}</p>
+            </div>
+
+            <!-- Slot bloqueado -->
+            <div *ngIf="esBloqueado(i, hora)" class="bg-surface-container-highest border border-dashed rounded p-1 flex items-center justify-center absolute left-1 right-1 h-12">
+              <span class="material-symbols-outlined text-[12px] text-on-surface/40">lock</span>
+              <span class="text-[11px] text-on-surface/40 ml-1">Bloqueado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de cita seleccionada -->
+<div
+  *ngIf="selectedCita"
+  class="fixed inset-0 bg-inverse-surface/40 flex items-center justify-center z-50"
+  (click)="cerrarCita()"
+>
+  <div
+    class="bg-surface rounded-xl p-stack_lg w-[480px] shadow-lg"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Header modal -->
+    <div class="flex items-center justify-between mb-stack_md">
+      <div>
+        <h2 class="font-headline-md">{{ selectedCita.precioCompleto }}</h2>
+        <p class="font-body-sm text-secondary">{{ selectedCita.servicioCompleto }}</p>
+        <p class="font-label-sm text-secondary">{{ selectedCita.horaCompleta }}</p>
+      </div>
+      <button (click)="cerrarCita()" class="p-2 hover:bg-surface-container-low rounded-lg">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Chips de información -->
+    <div class="flex gap-2 mb-stack_lg">
+      <div class="bg-surface-container rounded-full px-3 py-2 font-label-sm text-on-surface">
+        Precio: {{ selectedCita.precio }}
+      </div>
+      <div class="bg-surface-container rounded-full px-3 py-2 font-label-sm text-on-surface">
+        Duracion: {{ selectedCita.duracionCompleta }}
+      </div>
+      <div class="bg-surface-container rounded-full px-3 py-2 font-label-sm text-on-surface">
+        Estado: {{ selectedCita.estado }}
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="flex gap-2">
+      <button
+        (click)="marcarCompletada()"
+        class="flex-1 bg-primary text-on-primary rounded-lg py-2 px-4 font-label-md hover:bg-primary-container"
+      >
+        Marcar como completada
+      </button>
+      <button
+        (click)="cancelarCita()"
+        class="flex-1 border border-error text-error rounded-lg py-2 px-4 font-label-md hover:bg-error/5"
+      >
+        Cancelar cita
+      </button>
+    </div>
+  </div>
+</div>
