@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { TopbarComponent } from '../topbar/topbar.component';
-import { SidebarEstilistaComponent } from '../sidebar-estilista/sidebar-estilista.component';
+import { TopbarComponent } from './topbar.component';
+import { SidebarEstilistaComponent } from './sidebar-estilista.component';
 
 @Component({
   selector: 'app-layout-estilista',

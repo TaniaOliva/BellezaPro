@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { TopbarComponent } from '../topbar/topbar.component';
-import { SidebarClienteComponent } from '../sidebar-cliente/sidebar-cliente.component';
+import { TopbarComponent } from './topbar.component';
+import { SidebarClienteComponent } from './sidebar-cliente.component';
 
 @Component({
   selector: 'app-layout-booking',

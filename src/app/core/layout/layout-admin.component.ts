@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { TopbarComponent } from '../topbar/topbar.component';
-import { SidebarAdminComponent } from '../sidebar-admin/sidebar-admin.component';
+import { TopbarComponent } from './topbar.component';
+import { SidebarAdminComponent } from './sidebar-admin.component';
 
 @Component({
   selector: 'app-layout-admin',
