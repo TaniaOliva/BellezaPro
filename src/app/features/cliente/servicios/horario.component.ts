@@ -1,9 +1,125 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-horario',
+  selector: 'app-cliente-horario',
   standalone: true,
-  imports: [],
-  template: `<div class="p-8"><p class="text-secondary font-label-md">Horario — servicios</p></div>`
+  imports: [CommonModule, RouterLink],
+  template: `
+    <div class="bg-white min-h-screen">
+      <div class="px-8 py-8">
+        <!-- Step indicator -->
+        <div class="flex items-center justify-between mb-8 max-w-3xl mx-auto">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center font-bold text-sm">✓</div>
+            <span class="text-sm text-gray-600">Servicio</span>
+          </div>
+          <div class="flex-1 h-1 bg-pink-600 mx-3"></div>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center font-bold text-sm">✓</div>
+            <span class="text-sm text-gray-600">Opciones</span>
+          </div>
+          <div class="flex-1 h-1 bg-pink-600 mx-3"></div>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center font-bold text-sm">✓</div>
+            <span class="text-sm text-gray-600">Estilista</span>
+          </div>
+          <div class="flex-1 h-1 bg-pink-600 mx-3"></div>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-sm">5</div>
+            <span class="text-sm text-gray-600">Horario</span>
+          </div>
+        </div>
+
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Selecciona fecha y hora</h1>
+        <p class="text-gray-600 mb-8">Elige la fecha y hora que mejor se adapte a tu agenda</p>
+
+        <div class="grid grid-cols-3 gap-8 max-w-5xl">
+          <!-- Calendario -->
+          <div class="col-span-2">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Abril 2024</h3>
+            <div class="grid grid-cols-7 gap-2 mb-8">
+              <span class="text-xs font-semibold text-gray-600 text-center py-2">D</span>
+              <span class="text-xs font-semibold text-gray-600 text-center py-2">L</span>
+              <span class="text-xs font-semibold text-gray-600 text-center py-2">M</span>
+              <span class="text-xs font-semibold text-gray-600 text-center py-2">M</span>
+              <span class="text-xs font-semibold text-gray-600 text-center py-2">J</span>
+              <span class="text-xs font-semibold text-gray-600 text-center py-2">V</span>
+              <span class="text-xs font-semibold text-gray-600 text-center py-2">S</span>
+
+              <button class="p-2 text-gray-400 text-sm">28</button>
+              <button class="p-2 text-gray-400 text-sm">29</button>
+              <button class="p-2 text-gray-400 text-sm">30</button>
+              <button class="p-2 text-gray-600 text-sm hover:bg-gray-100 rounded">1</button>
+              <button class="p-2 text-gray-600 text-sm hover:bg-gray-100 rounded">2</button>
+              <button class="p-2 text-gray-600 text-sm hover:bg-gray-100 rounded">3</button>
+              <button class="p-2 text-gray-600 text-sm hover:bg-gray-100 rounded">4</button>
+              <button class="p-2 text-gray-600 text-sm hover:bg-gray-100 rounded">5</button>
+              <button class="p-2 text-gray-600 text-sm hover:bg-gray-100 rounded">6</button>
+              <button class="p-2 text-gray-600 text-sm hover:bg-gray-100 rounded">7</button>
+              <button class="p-2 text-gray-600 text-sm hover:bg-gray-100 rounded">8</button>
+              <button class="p-2 text-gray-600 text-sm hover:bg-gray-100 rounded">9</button>
+              <button class="p-2 text-gray-600 text-sm hover:bg-gray-100 rounded">10</button>
+              <button class="p-2 text-gray-600 text-sm hover:bg-gray-100 rounded">11</button>
+              <button class="p-2 bg-pink-100 text-pink-600 text-sm font-bold rounded border-2 border-pink-600">29</button>
+              <button class="p-2 text-gray-600 text-sm hover:bg-gray-100 rounded">30</button>
+              <button class="p-2 text-gray-400 text-sm">1</button>
+              <button class="p-2 text-gray-400 text-sm">2</button>
+              <button class="p-2 text-gray-400 text-sm">3</button>
+              <button class="p-2 text-gray-400 text-sm">4</button>
+              <button class="p-2 text-gray-400 text-sm">5</button>
+            </div>
+
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Horarios disponibles - Martes, 29 de Abril</h3>
+            <div class="grid grid-cols-4 gap-3">
+              <button class="p-3 border border-gray-300 rounded-lg text-sm font-semibold hover:border-pink-600 hover:bg-pink-50">08:00 AM</button>
+              <button class="p-3 border border-gray-300 rounded-lg text-sm font-semibold hover:border-pink-600 hover:bg-pink-50">09:00 AM</button>
+              <button class="p-3 border border-gray-300 rounded-lg text-sm font-semibold hover:border-pink-600 hover:bg-pink-50">10:00 AM</button>
+              <button class="p-3 border border-pink-600 bg-pink-50 text-pink-600 rounded-lg text-sm font-semibold">10:30 AM</button>
+              <button class="p-3 border border-gray-300 rounded-lg text-sm font-semibold hover:border-pink-600 hover:bg-pink-50">11:00 AM</button>
+              <button class="p-3 border border-gray-300 rounded-lg text-sm font-semibold hover:border-pink-600 hover:bg-pink-50">12:00 PM</button>
+              <button class="p-3 border border-gray-300 rounded-lg text-sm font-semibold hover:border-pink-600 hover:bg-pink-50">03:00 PM</button>
+              <button class="p-3 border border-gray-300 rounded-lg text-sm font-semibold hover:border-pink-600 hover:bg-pink-50">04:00 PM</button>
+            </div>
+          </div>
+
+          <!-- Resumen lateral -->
+          <div>
+            <div class="bg-pink-50 border border-pink-200 rounded-lg p-6 sticky top-8">
+              <h4 class="font-bold text-gray-800 mb-4">Resumen de la cita</h4>
+              
+              <div class="space-y-3 pb-4 border-b border-pink-200">
+                <div>
+                  <p class="text-xs text-gray-600 uppercase font-semibold">Servicio</p>
+                  <p class="text-sm font-semibold text-gray-800">Manicure premium</p>
+                  <p class="text-xs text-gray-600 mt-1">Mediana, Rosa claro</p>
+                </div>
+              </div>
+
+              <div class="space-y-3 pb-4 border-b border-pink-200">
+                <div>
+                  <p class="text-xs text-gray-600 uppercase font-semibold">Estilista</p>
+                  <p class="text-sm font-semibold text-gray-800">Sofia R.</p>
+                </div>
+              </div>
+
+              <div class="space-y-3 pb-4">
+                <div>
+                  <p class="text-xs text-gray-600 uppercase font-semibold">Fecha y hora</p>
+                  <p class="text-sm font-semibold text-gray-800">Martes 29 de Abril</p>
+                  <p class="text-sm font-semibold text-pink-600">10:30 AM</p>
+                </div>
+              </div>
+
+              <button routerLink="/cliente/servicios/confirmar" class="w-full bg-pink-600 text-white rounded-lg py-3 font-semibold hover:bg-pink-700 transition">
+                Continuar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
 })
 export class HorarioComponent {}

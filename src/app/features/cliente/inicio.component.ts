@@ -3,153 +3,156 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-inicio',
+  selector: 'app-cliente-inicio',
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <div class="p-8 space-y-8">
-      <div class="rounded-[32px] bg-gradient-to-r from-primary-fixed to-secondary-fixed min-h-[120px] p-6 flex items-center justify-between overflow-hidden">
+    <div class="bg-white min-h-screen">
+      <!-- Banner bienvenida -->
+      <div class="bg-pink-50 px-8 py-12 rounded-none">
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">Bienvenida, María</h1>
+        <p class="text-gray-600">Que servicio te apetece hoy?</p>
+      </div>
+
+      <div class="px-8 py-8 space-y-8">
+        <!-- Cards de info -->
+        <div class="grid grid-cols-3 gap-6">
+          <div class="bg-white rounded-lg border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="material-symbols-outlined text-pink-600 text-2xl">calendar_today</span>
+            </div>
+            <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Proxima cita</p>
+            <p class="text-2xl font-bold text-gray-800 mb-1">15 de Octubre</p>
+            <p class="text-sm text-gray-600 mb-4">Estilista: Sofia Gomez</p>
+            <a routerLink="/cliente/mis-citas" class="text-pink-600 font-semibold text-sm hover:underline">Ver detalles →</a>
+          </div>
+
+          <div class="bg-white rounded-lg border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="material-symbols-outlined text-pink-600 text-2xl">content_cut</span>
+            </div>
+            <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Citas este mes</p>
+            <p class="text-2xl font-bold text-gray-800">3</p>
+          </div>
+
+          <div class="bg-white rounded-lg border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="material-symbols-outlined text-pink-600 text-2xl">star</span>
+            </div>
+            <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Mi calificacion</p>
+            <div class="flex items-center gap-2">
+              <p class="text-2xl font-bold text-gray-800">4.8</p>
+              <div class="flex gap-0.5 text-amber-400">
+                <span class="material-symbols-outlined text-lg">star</span>
+                <span class="material-symbols-outlined text-lg">star</span>
+                <span class="material-symbols-outlined text-lg">star</span>
+                <span class="material-symbols-outlined text-lg">star</span>
+                <span class="material-symbols-outlined text-lg">star_half</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Servicios populares -->
         <div>
-          <p class="text-headline-xl font-semibold text-on-primary-fixed mb-2">Bienvenida, Maria</p>
-          <p class="text-body-lg text-on-primary-fixed-variant">Que servicio te apetece hoy?</p>
-        </div>
-        <span class="material-symbols-outlined text-[120px] text-on-primary-fixed/15">content_cut</span>
-      </div>
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Servicios populares</h2>
+            <a routerLink="/cliente/servicios" class="text-pink-600 font-semibold text-sm">Ver todos</a>
+          </div>
+          <div class="grid grid-cols-4 gap-6">
+            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
+              <div class="relative bg-gray-200 h-48">
+                <span class="absolute top-3 left-3 bg-pink-100 text-pink-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
+              </div>
+              <div class="p-5">
+                <p class="text-xs text-gray-500 uppercase mb-2">Cabello</p>
+                <p class="text-lg font-bold text-gray-800 mb-2">Corte y Secado Premium</p>
+                <p class="text-sm text-gray-600 mb-4">Desde L. 250</p>
+                <button routerLink="/cliente/servicios" class="w-full text-pink-600 border border-pink-600 rounded-lg py-2 font-semibold hover:bg-pink-50 transition">Agendar</button>
+              </div>
+            </div>
 
-      <div class="grid grid-cols-3 gap-stack_md">
-        <div class="rounded-[28px] border border-outline-variant bg-surface p-6 space-y-4">
-          <div class="flex items-center justify-between">
-            <div class="rounded-3xl bg-primary-fixed/10 p-3 text-primary-fixed">
-              <span class="material-symbols-outlined">calendar_today</span>
+            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
+              <div class="relative bg-gray-200 h-48">
+                <span class="absolute top-3 left-3 bg-pink-100 text-pink-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
+              </div>
+              <div class="p-5">
+                <p class="text-xs text-gray-500 uppercase mb-2">Uñas</p>
+                <p class="text-lg font-bold text-gray-800 mb-2">Manicure Spa Completa</p>
+                <p class="text-sm text-gray-600 mb-4">Desde L. 350</p>
+                <button routerLink="/cliente/servicios" class="w-full text-pink-600 border border-pink-600 rounded-lg py-2 font-semibold hover:bg-pink-50 transition">Agendar</button>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
+              <div class="relative bg-gray-200 h-48">
+                <span class="absolute top-3 left-3 bg-pink-100 text-pink-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
+              </div>
+              <div class="p-5">
+                <p class="text-xs text-gray-500 uppercase mb-2">Facial</p>
+                <p class="text-lg font-bold text-gray-800 mb-2">Limpieza Facial Profunda</p>
+                <p class="text-sm text-gray-600 mb-4">Desde L. 600</p>
+                <button routerLink="/cliente/servicios" class="w-full text-pink-600 border border-pink-600 rounded-lg py-2 font-semibold hover:bg-pink-50 transition">Agendar</button>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
+              <div class="relative bg-gray-200 h-48">
+                <span class="absolute top-3 left-3 bg-pink-100 text-pink-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
+              </div>
+              <div class="p-5">
+                <p class="text-xs text-gray-500 uppercase mb-2">Maquillaje</p>
+                <p class="text-lg font-bold text-gray-800 mb-2">Maquillaje de Noche</p>
+                <p class="text-sm text-gray-600 mb-4">Desde L. 600</p>
+                <button routerLink="/cliente/servicios" class="w-full text-pink-600 border border-pink-600 rounded-lg py-2 font-semibold hover:bg-pink-50 transition">Agendar</button>
+              </div>
             </div>
           </div>
-          <p class="text-label-sm text-secondary">Proxima cita</p>
-          <p class="text-headline-xl font-semibold">15 de Octubre</p>
-          <p class="text-body-md text-secondary">Estilista Sofia Gomez</p>
-          <a routerLink="/cliente/mis-citas" class="text-primary font-semibold">Ver detalles</a>
         </div>
 
-        <div class="rounded-[28px] border border-outline-variant bg-surface p-6 space-y-4">
-          <div class="flex items-center justify-between">
-            <div class="rounded-3xl bg-secondary-fixed/10 p-3 text-secondary-fixed">
-              <span class="material-symbols-outlined">content_cut</span>
+        <!-- Explora por categoría -->
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">Explora por categoria</h2>
+          <div class="grid grid-cols-5 gap-4">
+            <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
+              <span class="material-symbols-outlined text-pink-600 text-4xl mx-auto block">content_cut</span>
+              <p class="font-bold text-gray-800 mt-4">Cabello</p>
+              <p class="text-xs text-gray-500 mt-1">Cortes y estilo</p>
+            </div>
+            <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
+              <span class="material-symbols-outlined text-pink-600 text-4xl mx-auto block">back_hand</span>
+              <p class="font-bold text-gray-800 mt-4">Uñas</p>
+              <p class="text-xs text-gray-500 mt-1">Manicure y pedicure</p>
+            </div>
+            <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
+              <span class="material-symbols-outlined text-pink-600 text-4xl mx-auto block">face</span>
+              <p class="font-bold text-gray-800 mt-4">Facial</p>
+              <p class="text-xs text-gray-500 mt-1">Limpieza y mascarilla</p>
+            </div>
+            <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
+              <span class="material-symbols-outlined text-pink-600 text-4xl mx-auto block">brush</span>
+              <p class="font-bold text-gray-800 mt-4">Maquillaje</p>
+              <p class="text-xs text-gray-500 mt-1">Diario y eventos</p>
+            </div>
+            <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
+              <span class="material-symbols-outlined text-pink-600 text-4xl mx-auto block">more_horiz</span>
+              <p class="font-bold text-gray-800 mt-4">Mas</p>
+              <p class="text-xs text-gray-500 mt-1">Otros servicios</p>
             </div>
           </div>
-          <p class="text-label-sm text-secondary">Citas este mes</p>
-          <p class="text-headline-xl font-semibold">3</p>
         </div>
 
-        <div class="rounded-[28px] border border-outline-variant bg-surface p-6 space-y-4">
-          <div class="flex items-center justify-between">
-            <div class="rounded-3xl bg-tertiary-fixed/10 p-3 text-tertiary-fixed">
-              <span class="material-symbols-outlined">star</span>
-            </div>
-          </div>
-          <p class="text-label-sm text-secondary">Mi calificacion</p>
-          <div class="flex items-center gap-2">
-            <p class="text-headline-xl font-semibold">4.8</p>
-            <div class="flex items-center gap-1 text-primary">
-              <span class="material-symbols-outlined text-base">star</span>
-              <span class="material-symbols-outlined text-base">star</span>
-              <span class="material-symbols-outlined text-base">star</span>
-              <span class="material-symbols-outlined text-base">star</span>
-              <span class="material-symbols-outlined text-base">star_half</span>
+        <!-- Busca algo especial -->
+        <div class="bg-pink-50 border-l-4 border-pink-600 rounded-lg p-6">
+          <div class="flex gap-4">
+            <span class="material-symbols-outlined text-pink-600 text-4xl flex-shrink-0">auto_awesome</span>
+            <div>
+              <p class="text-xl font-bold text-gray-800 mb-1">¿Buscas algo especial?</p>
+              <p class="text-gray-600 mb-4">Paquetes nuevos, eventos o consultas personalizadas.</p>
+              <a routerLink="/cliente/solicitud-especial" class="text-pink-600 font-semibold text-sm hover:underline">Crear solicitud especial →</a>
             </div>
           </div>
         </div>
-      </div>
-
-      <section class="space-y-4">
-        <div class="flex items-center justify-between gap-4">
-          <p class="text-headline-lg font-semibold">Servicios populares</p>
-          <a routerLink="/cliente/servicios" class="text-primary font-semibold">Ver todos</a>
-        </div>
-        <div class="flex gap-4 overflow-x-auto pb-2">
-          <div class="min-w-[280px] rounded-[28px] border border-outline-variant bg-surface p-5">
-            <div class="relative mb-4">
-              <div class="bg-surface-container-low h-[160px] rounded-[24px]"></div>
-              <span class="absolute top-4 left-4 rounded-full bg-pink-100 px-3 py-1 text-[11px] font-semibold text-pink-600 uppercase tracking-[0.16em]">Popular</span>
-            </div>
-            <p class="text-label-sm text-tertiary">Cabello</p>
-            <p class="text-label-md font-semibold mt-2">Corte degradado</p>
-            <p class="text-body-sm text-secondary mt-1">Desde L. 350</p>
-            <button routerLink="/cliente/servicios" class="mt-5 w-full rounded-2xl border border-primary text-primary py-3 hover:bg-primary-fixed">Agendar</button>
-          </div>
-          <div class="min-w-[280px] rounded-[28px] border border-outline-variant bg-surface p-5">
-            <div class="relative mb-4">
-              <div class="bg-surface-container-low h-[160px] rounded-[24px]"></div>
-              <span class="absolute top-4 left-4 rounded-full bg-pink-100 px-3 py-1 text-[11px] font-semibold text-pink-600 uppercase tracking-[0.16em]">Popular</span>
-            </div>
-            <p class="text-label-sm text-tertiary">Uñas</p>
-            <p class="text-label-md font-semibold mt-2">Manicure deluxe</p>
-            <p class="text-body-sm text-secondary mt-1">Desde L. 220</p>
-            <button routerLink="/cliente/servicios" class="mt-5 w-full rounded-2xl border border-primary text-primary py-3 hover:bg-primary-fixed">Agendar</button>
-          </div>
-          <div class="min-w-[280px] rounded-[28px] border border-outline-variant bg-surface p-5">
-            <div class="relative mb-4">
-              <div class="bg-surface-container-low h-[160px] rounded-[24px]"></div>
-              <span class="absolute top-4 left-4 rounded-full bg-pink-100 px-3 py-1 text-[11px] font-semibold text-pink-600 uppercase tracking-[0.16em]">Popular</span>
-            </div>
-            <p class="text-label-sm text-tertiary">Facial</p>
-            <p class="text-label-md font-semibold mt-2">Limpieza facial</p>
-            <p class="text-body-sm text-secondary mt-1">Desde L. 480</p>
-            <button routerLink="/cliente/servicios" class="mt-5 w-full rounded-2xl border border-primary text-primary py-3 hover:bg-primary-fixed">Agendar</button>
-          </div>
-          <div class="min-w-[280px] rounded-[28px] border border-outline-variant bg-surface p-5">
-            <div class="relative mb-4">
-              <div class="bg-surface-container-low h-[160px] rounded-[24px]"></div>
-              <span class="absolute top-4 left-4 rounded-full bg-pink-100 px-3 py-1 text-[11px] font-semibold text-pink-600 uppercase tracking-[0.16em]">Popular</span>
-            </div>
-            <p class="text-label-sm text-tertiary">Maquillaje</p>
-            <p class="text-label-md font-semibold mt-2">Look de noche</p>
-            <p class="text-body-sm text-secondary mt-1">Desde L. 650</p>
-            <button routerLink="/cliente/servicios" class="mt-5 w-full rounded-2xl border border-primary text-primary py-3 hover:bg-primary-fixed">Agendar</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="space-y-4">
-        <p class="text-headline-lg font-semibold">Explora por categoria</p>
-        <div class="grid grid-cols-5 gap-4">
-          <div class="rounded-[24px] bg-surface p-6 text-center hover:bg-surface-container-low transition">
-            <span class="material-symbols-outlined text-[36px] text-primary">face</span>
-            <p class="text-label-md font-semibold mt-4">Cabello</p>
-            <p class="text-label-sm text-secondary mt-1">Cortes y estilo</p>
-          </div>
-          <div class="rounded-[24px] bg-surface p-6 text-center hover:bg-surface-container-low transition">
-            <span class="material-symbols-outlined text-[36px] text-primary">back_hand</span>
-            <p class="text-label-md font-semibold mt-4">Uñas</p>
-            <p class="text-label-sm text-secondary mt-1">Manicure y pedicure</p>
-          </div>
-          <div class="rounded-[24px] bg-surface p-6 text-center hover:bg-surface-container-low transition">
-            <span class="material-symbols-outlined text-[36px] text-primary">spa</span>
-            <p class="text-label-md font-semibold mt-4">Facial</p>
-            <p class="text-label-sm text-secondary mt-1">Cuidado de piel</p>
-          </div>
-          <div class="rounded-[24px] bg-surface p-6 text-center hover:bg-surface-container-low transition">
-            <span class="material-symbols-outlined text-[36px] text-primary">brush</span>
-            <p class="text-label-md font-semibold mt-4">Maquillaje</p>
-            <p class="text-label-sm text-secondary mt-1">Look profesional</p>
-          </div>
-          <div class="rounded-[24px] bg-surface p-6 text-center hover:bg-surface-container-low transition">
-            <span class="material-symbols-outlined text-[36px] text-primary">more_horiz</span>
-            <p class="text-label-md font-semibold mt-4">Mas</p>
-            <p class="text-label-sm text-secondary mt-1">Otros servicios</p>
-          </div>
-        </div>
-      </section>
-
-      <div class="rounded-[28px] border-l-[4px] border-primary bg-surface p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div class="flex items-center gap-4">
-          <div class="rounded-full bg-primary-fixed/10 p-4 text-primary-fixed">
-            <span class="material-symbols-outlined">auto_awesome</span>
-          </div>
-          <div>
-            <p class="text-headline-md font-semibold">Buscas algo especial?</p>
-            <p class="text-body-md text-secondary">Cuéntanos que necesitas y te ayudamos a coordinarlo.</p>
-          </div>
-        </div>
-        <a routerLink="/cliente/solicitud-especial" class="rounded-2xl bg-primary px-6 py-3 text-on-primary text-center font-semibold">Solicitar ahora</a>
       </div>
     </div>
   `
