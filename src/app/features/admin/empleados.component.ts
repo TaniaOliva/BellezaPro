@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
       <div class="px-8 py-8">
         <div class="flex items-center justify-between mb-8">
           <h1 class="text-3xl font-bold text-gray-800">Gestionar Estilistas</h1>
-          <button class="bg-pink-600 text-white rounded-lg px-6 py-3 font-semibold hover:bg-pink-700 transition flex items-center gap-2">
+          <button class="bg-red-600 text-white rounded-lg px-6 py-3 font-semibold hover:bg-red-700 transition flex items-center gap-2">
             <span class="material-symbols-outlined">add</span>
             Agregar estilista
           </button>
@@ -22,7 +22,7 @@ import { CommonModule } from '@angular/common';
             <span class="material-symbols-outlined text-gray-400">search</span>
             <input type="text" placeholder="Buscar estilista..." class="ml-2 flex-1 outline-none text-gray-700">
           </div>
-          <button class="px-4 py-2 bg-pink-100 text-pink-600 rounded-lg font-semibold">Activos</button>
+          <button class="px-4 py-2 bg-red-100 text-red-600 rounded-lg font-semibold">Activos</button>
           <button class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg font-semibold hover:bg-gray-50">Todos</button>
         </div>
 
@@ -47,7 +47,7 @@ import { CommonModule } from '@angular/common';
                 <td class="px-6 py-4"><p class="text-sm text-gray-600">Manicure, Nail Art</p></td>
                 <td class="px-6 py-4"><span class="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded">Activo</span></td>
                 <td class="px-6 py-4 text-center">
-                  <button class="text-pink-600 font-semibold text-sm hover:text-pink-700">Editar</button>
+                  <button class="text-red-600 font-semibold text-sm hover:text-red-700">Editar</button>
                 </td>
               </tr>
               <tr class="hover:bg-gray-50 transition">
@@ -57,7 +57,7 @@ import { CommonModule } from '@angular/common';
                 <td class="px-6 py-4"><p class="text-sm text-gray-600">Pedicure, Spa</p></td>
                 <td class="px-6 py-4"><span class="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded">Activo</span></td>
                 <td class="px-6 py-4 text-center">
-                  <button class="text-pink-600 font-semibold text-sm hover:text-pink-700">Editar</button>
+                  <button class="text-red-600 font-semibold text-sm hover:text-red-700">Editar</button>
                 </td>
               </tr>
               <tr class="hover:bg-gray-50 transition">
@@ -67,7 +67,7 @@ import { CommonModule } from '@angular/common';
                 <td class="px-6 py-4"><p class="text-sm text-gray-600">Cabello, Coloración</p></td>
                 <td class="px-6 py-4"><span class="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded">Activo</span></td>
                 <td class="px-6 py-4 text-center">
-                  <button class="text-pink-600 font-semibold text-sm hover:text-pink-700">Editar</button>
+                  <button class="text-red-600 font-semibold text-sm hover:text-red-700">Editar</button>
                 </td>
               </tr>
             </tbody>
@@ -78,3 +78,4 @@ import { CommonModule } from '@angular/common';
   `
 })
 export class EmpleadosComponent {}
+

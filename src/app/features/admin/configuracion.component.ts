@@ -20,7 +20,7 @@ import { FormsModule } from '@angular/forms';
                 <span class="material-symbols-outlined text-4xl text-gray-400 block mb-2">image</span>
                 <p class="text-gray-600 font-semibold mb-2">Arrastra tu logo aquí o haz clic</p>
                 <input type="file" accept="image/*" class="hidden">
-                <button type="button" class="text-pink-600 font-semibold text-sm">Seleccionar imagen</button>
+                <button type="button" class="text-red-600 font-semibold text-sm">Seleccionar imagen</button>
               </div>
             </div>
 
@@ -103,7 +103,7 @@ import { FormsModule } from '@angular/forms';
             <!-- Botones -->
             <div class="flex gap-4 pt-6">
               <button type="button" class="flex-1 border border-gray-300 text-gray-800 rounded-lg py-3 font-semibold hover:bg-gray-50">Cancelar</button>
-              <button type="submit" class="flex-1 bg-pink-600 text-white rounded-lg py-3 font-semibold hover:bg-pink-700 transition flex items-center justify-center gap-2">
+              <button type="submit" class="flex-1 bg-red-600 text-white rounded-lg py-3 font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2">
                 <span class="material-symbols-outlined">save</span>
                 Guardar cambios
               </button>
@@ -115,3 +115,4 @@ import { FormsModule } from '@angular/forms';
   `
 })
 export class ConfiguracionComponent {}
+

@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
   template: `
     <div class="bg-white min-h-screen">
       <div class="max-w-6xl mx-auto px-8 py-8 space-y-8">
-        <div class="bg-pink-50 rounded-3xl p-8 flex flex-col lg:flex-row gap-8">
+        <div class="bg-red-50 rounded-3xl p-8 flex flex-col lg:flex-row gap-8">
           <div class="relative flex-shrink-0">
             <div class="w-28 h-28 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-4xl">
               <span class="material-symbols-outlined">person</span>
@@ -99,3 +99,4 @@ import { CommonModule } from '@angular/common';
   `
 })
 export class PerfilComponent {}
+

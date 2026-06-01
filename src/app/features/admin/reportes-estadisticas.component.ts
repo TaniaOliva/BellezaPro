@@ -62,12 +62,12 @@ import { CommonModule } from '@angular/common';
           <div class="col-span-2 bg-white border border-gray-200 rounded-lg p-6">
             <h3 class="text-lg font-bold text-gray-800 mb-4">Ingresos por mes</h3>
             <div class="bg-gray-100 rounded-lg p-6 h-48 flex items-end justify-around gap-2">
-              <div class="w-8 bg-pink-600 rounded-t" style="height: 40%;"></div>
-              <div class="w-8 bg-pink-600 rounded-t" style="height: 60%;"></div>
-              <div class="w-8 bg-pink-600 rounded-t" style="height: 45%;"></div>
-              <div class="w-8 bg-pink-600 rounded-t" style="height: 75%;"></div>
-              <div class="w-8 bg-pink-600 rounded-t" style="height: 85%;"></div>
-              <div class="w-8 bg-pink-600 rounded-t" style="height: 90%;"></div>
+              <div class="w-8 bg-red-600 rounded-t" style="height: 40%;"></div>
+              <div class="w-8 bg-red-600 rounded-t" style="height: 60%;"></div>
+              <div class="w-8 bg-red-600 rounded-t" style="height: 45%;"></div>
+              <div class="w-8 bg-red-600 rounded-t" style="height: 75%;"></div>
+              <div class="w-8 bg-red-600 rounded-t" style="height: 85%;"></div>
+              <div class="w-8 bg-red-600 rounded-t" style="height: 90%;"></div>
             </div>
             <p class="text-xs text-gray-500 text-center mt-2">Ene - Feb - Mar - Abr - May - Jun</p>
           </div>
@@ -82,7 +82,7 @@ import { CommonModule } from '@angular/common';
             </div>
             <div class="space-y-2 mt-4 text-xs">
               <div class="flex items-center gap-2">
-                <div class="w-3 h-3 rounded-full bg-pink-600"></div>
+                <div class="w-3 h-3 rounded-full bg-red-600"></div>
                 <span class="text-gray-600">Manicure (35%)</span>
               </div>
               <div class="flex items-center gap-2">
@@ -106,7 +106,7 @@ import { CommonModule } from '@angular/common';
               <div class="flex items-center justify-between">
                 <span class="text-gray-700 font-semibold">Sofia R.</span>
                 <div class="flex-1 mx-3 bg-gray-200 rounded-full h-2">
-                  <div class="bg-pink-600 h-2 rounded-full" style="width: 90%;"></div>
+                  <div class="bg-red-600 h-2 rounded-full" style="width: 90%;"></div>
                 </div>
                 <span class="text-gray-600 text-sm">90%</span>
               </div>
@@ -133,13 +133,13 @@ import { CommonModule } from '@angular/common';
             <div class="space-y-3">
               <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-full bg-pink-200 flex items-center justify-center text-pink-600 font-bold">MG</div>
+                  <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold">MG</div>
                   <div>
                     <p class="font-semibold text-gray-800">María Garcia</p>
                     <p class="text-xs text-gray-600">12 visitas</p>
                   </div>
                 </div>
-                <span class="text-pink-600 font-semibold">L. 4,200</span>
+                <span class="text-red-600 font-semibold">L. 4,200</span>
               </div>
               <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div class="flex items-center gap-3">
@@ -169,3 +169,4 @@ import { CommonModule } from '@angular/common';
   `
 })
 export class ReportesEstadisticasComponent {}
+

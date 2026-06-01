@@ -14,25 +14,25 @@ import { FormsModule } from '@angular/forms';
 
         <!-- Step indicator -->
         <div class="flex items-center justify-center gap-2 mb-8">
-          <div class="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center font-bold text-xs">✓</div>
-          <div class="w-12 h-1 bg-pink-600"></div>
-          <div class="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center font-bold text-xs">✓</div>
-          <div class="w-12 h-1 bg-pink-600"></div>
-          <div class="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center font-bold text-xs">✓</div>
-          <div class="w-12 h-1 bg-pink-600"></div>
-          <div class="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center font-bold text-xs">4</div>
+          <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-xs">✓</div>
+          <div class="w-12 h-1 bg-red-600"></div>
+          <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-xs">✓</div>
+          <div class="w-12 h-1 bg-red-600"></div>
+          <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-xs">✓</div>
+          <div class="w-12 h-1 bg-red-600"></div>
+          <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-xs">4</div>
           <div class="w-12 h-1 bg-gray-300"></div>
           <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-xs">5</div>
         </div>
 
         <!-- Resumen -->
-        <div class="bg-pink-50 rounded-lg p-6 mb-8 border-l-4 border-pink-600">
+        <div class="bg-red-50 rounded-lg p-6 mb-8 border-l-4 border-red-600">
           <h2 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
-            <span class="material-symbols-outlined text-pink-600">receipt</span>
+            <span class="material-symbols-outlined text-red-600">receipt</span>
             Resumen de tu reserva
           </h2>
 
-          <div class="space-y-4 pb-4 border-b border-pink-200">
+          <div class="space-y-4 pb-4 border-b border-red-200">
             <div class="flex justify-between">
               <span class="text-sm uppercase text-gray-600 font-semibold">Servicio</span>
               <span class="text-sm text-gray-800">L 350</span>
@@ -43,7 +43,7 @@ import { FormsModule } from '@angular/forms';
             </div>
           </div>
 
-          <div class="py-4 border-b border-pink-200 space-y-2">
+          <div class="py-4 border-b border-red-200 space-y-2">
             <div class="text-sm uppercase text-gray-600 font-semibold">Estilista</div>
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-bold">AG</div>
@@ -67,7 +67,7 @@ import { FormsModule } from '@angular/forms';
         <!-- Total -->
         <div class="flex justify-between items-center mb-8">
           <span class="text-gray-600 font-semibold">Total estimado</span>
-          <span class="text-3xl font-bold text-pink-600">L 480</span>
+          <span class="text-3xl font-bold text-red-600">L 480</span>
         </div>
 
         <!-- Notas -->
@@ -87,7 +87,7 @@ import { FormsModule } from '@angular/forms';
           <button class="flex-1 border border-gray-300 text-gray-800 rounded-lg py-3 font-semibold hover:bg-gray-50 transition">
             Modificar reserva
           </button>
-          <button class="flex-1 bg-pink-600 text-white rounded-lg py-3 font-semibold hover:bg-pink-700 transition flex items-center justify-center gap-2">
+          <button class="flex-1 bg-red-600 text-white rounded-lg py-3 font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2">
             <span class="material-symbols-outlined">check_circle</span>
             Confirmar reserva
           </button>
@@ -97,3 +97,4 @@ import { FormsModule } from '@angular/forms';
   `
 })
 export class ConfirmarComponent {}
+

@@ -9,7 +9,7 @@ import { RouterLink } from '@angular/router';
   template: `
     <div class="bg-white min-h-screen">
       <!-- Banner bienvenida -->
-      <div class="bg-pink-50 px-8 py-12 rounded-none">
+      <div class="bg-red-50 px-8 py-12 rounded-none">
         <h1 class="text-4xl font-bold text-gray-800 mb-2">Bienvenida, María</h1>
         <p class="text-gray-600">Que servicio te apetece hoy?</p>
       </div>
@@ -19,17 +19,17 @@ import { RouterLink } from '@angular/router';
         <div class="grid grid-cols-3 gap-6">
           <div class="bg-white rounded-lg border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-4">
-              <span class="material-symbols-outlined text-pink-600 text-2xl">calendar_today</span>
+              <span class="material-symbols-outlined text-red-600 text-2xl">calendar_today</span>
             </div>
             <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Proxima cita</p>
             <p class="text-2xl font-bold text-gray-800 mb-1">15 de Octubre</p>
             <p class="text-sm text-gray-600 mb-4">Estilista: Sofia Gomez</p>
-            <a routerLink="/cliente/mis-citas" class="text-pink-600 font-semibold text-sm hover:underline">Ver detalles →</a>
+            <a routerLink="/cliente/mis-citas" class="text-red-600 font-semibold text-sm hover:underline">Ver detalles →</a>
           </div>
 
           <div class="bg-white rounded-lg border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-4">
-              <span class="material-symbols-outlined text-pink-600 text-2xl">content_cut</span>
+              <span class="material-symbols-outlined text-red-600 text-2xl">content_cut</span>
             </div>
             <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Citas este mes</p>
             <p class="text-2xl font-bold text-gray-800">3</p>
@@ -37,7 +37,7 @@ import { RouterLink } from '@angular/router';
 
           <div class="bg-white rounded-lg border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-4">
-              <span class="material-symbols-outlined text-pink-600 text-2xl">star</span>
+              <span class="material-symbols-outlined text-red-600 text-2xl">star</span>
             </div>
             <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Mi calificacion</p>
             <div class="flex items-center gap-2">
@@ -57,54 +57,54 @@ import { RouterLink } from '@angular/router';
         <div>
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-800">Servicios populares</h2>
-            <a routerLink="/cliente/servicios" class="text-pink-600 font-semibold text-sm">Ver todos</a>
+            <a routerLink="/cliente/servicios" class="text-red-600 font-semibold text-sm">Ver todos</a>
           </div>
           <div class="grid grid-cols-4 gap-6">
             <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
               <div class="relative bg-gray-200 h-48">
-                <span class="absolute top-3 left-3 bg-pink-100 text-pink-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
+                <span class="absolute top-3 left-3 bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
               </div>
               <div class="p-5">
                 <p class="text-xs text-gray-500 uppercase mb-2">Cabello</p>
                 <p class="text-lg font-bold text-gray-800 mb-2">Corte y Secado Premium</p>
                 <p class="text-sm text-gray-600 mb-4">Desde L. 250</p>
-                <button routerLink="/cliente/servicios" class="w-full text-pink-600 border border-pink-600 rounded-lg py-2 font-semibold hover:bg-pink-50 transition">Agendar</button>
+                <button routerLink="/cliente/servicios" class="w-full text-red-600 border border-red-600 rounded-lg py-2 font-semibold hover:bg-red-50 transition">Agendar</button>
               </div>
             </div>
 
             <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
               <div class="relative bg-gray-200 h-48">
-                <span class="absolute top-3 left-3 bg-pink-100 text-pink-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
+                <span class="absolute top-3 left-3 bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
               </div>
               <div class="p-5">
                 <p class="text-xs text-gray-500 uppercase mb-2">Uñas</p>
                 <p class="text-lg font-bold text-gray-800 mb-2">Manicure Spa Completa</p>
                 <p class="text-sm text-gray-600 mb-4">Desde L. 350</p>
-                <button routerLink="/cliente/servicios" class="w-full text-pink-600 border border-pink-600 rounded-lg py-2 font-semibold hover:bg-pink-50 transition">Agendar</button>
+                <button routerLink="/cliente/servicios" class="w-full text-red-600 border border-red-600 rounded-lg py-2 font-semibold hover:bg-red-50 transition">Agendar</button>
               </div>
             </div>
 
             <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
               <div class="relative bg-gray-200 h-48">
-                <span class="absolute top-3 left-3 bg-pink-100 text-pink-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
+                <span class="absolute top-3 left-3 bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
               </div>
               <div class="p-5">
                 <p class="text-xs text-gray-500 uppercase mb-2">Facial</p>
                 <p class="text-lg font-bold text-gray-800 mb-2">Limpieza Facial Profunda</p>
                 <p class="text-sm text-gray-600 mb-4">Desde L. 600</p>
-                <button routerLink="/cliente/servicios" class="w-full text-pink-600 border border-pink-600 rounded-lg py-2 font-semibold hover:bg-pink-50 transition">Agendar</button>
+                <button routerLink="/cliente/servicios" class="w-full text-red-600 border border-red-600 rounded-lg py-2 font-semibold hover:bg-red-50 transition">Agendar</button>
               </div>
             </div>
 
             <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
               <div class="relative bg-gray-200 h-48">
-                <span class="absolute top-3 left-3 bg-pink-100 text-pink-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
+                <span class="absolute top-3 left-3 bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
               </div>
               <div class="p-5">
                 <p class="text-xs text-gray-500 uppercase mb-2">Maquillaje</p>
                 <p class="text-lg font-bold text-gray-800 mb-2">Maquillaje de Noche</p>
                 <p class="text-sm text-gray-600 mb-4">Desde L. 600</p>
-                <button routerLink="/cliente/servicios" class="w-full text-pink-600 border border-pink-600 rounded-lg py-2 font-semibold hover:bg-pink-50 transition">Agendar</button>
+                <button routerLink="/cliente/servicios" class="w-full text-red-600 border border-red-600 rounded-lg py-2 font-semibold hover:bg-red-50 transition">Agendar</button>
               </div>
             </div>
           </div>
@@ -115,27 +115,27 @@ import { RouterLink } from '@angular/router';
           <h2 class="text-2xl font-bold text-gray-800 mb-6">Explora por categoria</h2>
           <div class="grid grid-cols-5 gap-4">
             <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
-              <span class="material-symbols-outlined text-pink-600 text-4xl mx-auto block">content_cut</span>
+              <span class="material-symbols-outlined text-red-600 text-4xl mx-auto block">content_cut</span>
               <p class="font-bold text-gray-800 mt-4">Cabello</p>
               <p class="text-xs text-gray-500 mt-1">Cortes y estilo</p>
             </div>
             <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
-              <span class="material-symbols-outlined text-pink-600 text-4xl mx-auto block">back_hand</span>
+              <span class="material-symbols-outlined text-red-600 text-4xl mx-auto block">back_hand</span>
               <p class="font-bold text-gray-800 mt-4">Uñas</p>
               <p class="text-xs text-gray-500 mt-1">Manicure y pedicure</p>
             </div>
             <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
-              <span class="material-symbols-outlined text-pink-600 text-4xl mx-auto block">face</span>
+              <span class="material-symbols-outlined text-red-600 text-4xl mx-auto block">face</span>
               <p class="font-bold text-gray-800 mt-4">Facial</p>
               <p class="text-xs text-gray-500 mt-1">Limpieza y mascarilla</p>
             </div>
             <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
-              <span class="material-symbols-outlined text-pink-600 text-4xl mx-auto block">brush</span>
+              <span class="material-symbols-outlined text-red-600 text-4xl mx-auto block">brush</span>
               <p class="font-bold text-gray-800 mt-4">Maquillaje</p>
               <p class="text-xs text-gray-500 mt-1">Diario y eventos</p>
             </div>
             <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
-              <span class="material-symbols-outlined text-pink-600 text-4xl mx-auto block">more_horiz</span>
+              <span class="material-symbols-outlined text-red-600 text-4xl mx-auto block">more_horiz</span>
               <p class="font-bold text-gray-800 mt-4">Mas</p>
               <p class="text-xs text-gray-500 mt-1">Otros servicios</p>
             </div>
@@ -143,13 +143,13 @@ import { RouterLink } from '@angular/router';
         </div>
 
         <!-- Busca algo especial -->
-        <div class="bg-pink-50 border-l-4 border-pink-600 rounded-lg p-6">
+        <div class="bg-red-50 border-l-4 border-red-600 rounded-lg p-6">
           <div class="flex gap-4">
-            <span class="material-symbols-outlined text-pink-600 text-4xl flex-shrink-0">auto_awesome</span>
+            <span class="material-symbols-outlined text-red-600 text-4xl flex-shrink-0">auto_awesome</span>
             <div>
               <p class="text-xl font-bold text-gray-800 mb-1">¿Buscas algo especial?</p>
               <p class="text-gray-600 mb-4">Paquetes nuevos, eventos o consultas personalizadas.</p>
-              <a routerLink="/cliente/solicitud-especial" class="text-pink-600 font-semibold text-sm hover:underline">Crear solicitud especial →</a>
+              <a routerLink="/cliente/solicitud-especial" class="text-red-600 font-semibold text-sm hover:underline">Crear solicitud especial →</a>
             </div>
           </div>
         </div>
@@ -158,3 +158,4 @@ import { RouterLink } from '@angular/router';
   `
 })
 export class InicioComponent {}
+

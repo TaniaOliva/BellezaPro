@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 
         <!-- Tabs -->
         <div class="flex gap-8 border-b border-gray-200 mb-8">
-          <button class="pb-3 border-b-2 border-pink-600 text-pink-600 font-semibold">Pendientes (3)</button>
+          <button class="pb-3 border-b-2 border-red-600 text-red-600 font-semibold">Pendientes (3)</button>
           <button class="pb-3 text-gray-600 font-semibold hover:text-gray-800">Resueltos</button>
           <button class="pb-3 text-gray-600 font-semibold hover:text-gray-800">Todos</button>
         </div>
@@ -24,7 +24,7 @@ import { CommonModule } from '@angular/common';
           <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition">
             <div class="flex items-start justify-between mb-4">
               <div>
-                <p class="text-sm text-pink-600 font-semibold uppercase">Comportamiento inapropiado</p>
+                <p class="text-sm text-red-600 font-semibold uppercase">Comportamiento inapropiado</p>
                 <p class="text-lg font-bold text-gray-800 mt-1">Reporte de Sofia R.</p>
               </div>
               <span class="bg-red-100 text-red-700 text-xs font-bold px-3 py-1 rounded">Pendiente</span>
@@ -47,11 +47,11 @@ import { CommonModule } from '@angular/common';
             </div>
 
             <div class="mt-4 flex gap-3">
-              <button class="flex-1 text-pink-600 border border-pink-600 rounded-lg py-2 font-semibold hover:bg-pink-50">
+              <button class="flex-1 text-red-600 border border-red-600 rounded-lg py-2 font-semibold hover:bg-red-50">
                 <span class="material-symbols-outlined text-sm align-middle">more_vert</span> Ver más
               </button>
               <button class="flex-1 bg-gray-200 text-gray-700 rounded-lg py-2 font-semibold hover:bg-gray-300">Descartar</button>
-              <button class="flex-1 bg-pink-600 text-white rounded-lg py-2 font-semibold hover:bg-pink-700">Revisar</button>
+              <button class="flex-1 bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700">Revisar</button>
             </div>
           </div>
 
@@ -82,11 +82,11 @@ import { CommonModule } from '@angular/common';
             </div>
 
             <div class="mt-4 flex gap-3">
-              <button class="flex-1 text-pink-600 border border-pink-600 rounded-lg py-2 font-semibold hover:bg-pink-50">
+              <button class="flex-1 text-red-600 border border-red-600 rounded-lg py-2 font-semibold hover:bg-red-50">
                 <span class="material-symbols-outlined text-sm align-middle">more_vert</span> Ver más
               </button>
               <button class="flex-1 bg-gray-200 text-gray-700 rounded-lg py-2 font-semibold hover:bg-gray-300">Descartar</button>
-              <button class="flex-1 bg-pink-600 text-white rounded-lg py-2 font-semibold hover:bg-pink-700">Revisar</button>
+              <button class="flex-1 bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700">Revisar</button>
             </div>
           </div>
 
@@ -117,11 +117,11 @@ import { CommonModule } from '@angular/common';
             </div>
 
             <div class="mt-4 flex gap-3">
-              <button class="flex-1 text-pink-600 border border-pink-600 rounded-lg py-2 font-semibold hover:bg-pink-50">
+              <button class="flex-1 text-red-600 border border-red-600 rounded-lg py-2 font-semibold hover:bg-red-50">
                 <span class="material-symbols-outlined text-sm align-middle">more_vert</span> Ver más
               </button>
               <button class="flex-1 bg-gray-200 text-gray-700 rounded-lg py-2 font-semibold hover:bg-gray-300">Descartar</button>
-              <button class="flex-1 bg-pink-600 text-white rounded-lg py-2 font-semibold hover:bg-pink-700">Revisar</button>
+              <button class="flex-1 bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700">Revisar</button>
             </div>
           </div>
         </div>
@@ -130,3 +130,4 @@ import { CommonModule } from '@angular/common';
   `
 })
 export class ReportesClientesComponent {}
+

@@ -134,3 +134,4 @@ export class SolicitudEspecialComponent {
     { name: 'Lina Torres', initials: 'LT', specialty: 'Cabello y color', rating: '4.8' }
   ];
 }
+

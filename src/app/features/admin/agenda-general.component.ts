@@ -21,7 +21,7 @@ import { CommonModule } from '@angular/common';
           </div>
           <div class="bg-white border border-gray-200 rounded-lg p-4 text-center">
             <p class="text-xs text-gray-600 uppercase font-semibold">Capacidad</p>
-            <p class="text-3xl font-bold text-pink-600 mt-2">78%</p>
+            <p class="text-3xl font-bold text-red-600 mt-2">78%</p>
           </div>
           <div class="bg-white border border-gray-200 rounded-lg p-4 text-center">
             <p class="text-xs text-gray-600 uppercase font-semibold">Ausencias</p>
@@ -92,3 +92,4 @@ import { CommonModule } from '@angular/common';
   `
 })
 export class AgendaGeneralComponent {}
+
