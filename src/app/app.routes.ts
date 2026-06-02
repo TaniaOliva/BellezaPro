@@ -3,13 +3,17 @@ import { LayoutClienteComponent } from './core/layout/layout-cliente.component';
 import { LayoutBookingComponent } from './core/layout/layout-booking.component';
 import { LayoutEstilistaComponent } from './core/layout/layout-estilista.component';
 import { LayoutAdminComponent } from './core/layout/layout-admin.component';
+import { LoginComponent } from './features/auth/login/login.component';
+import { rolGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'cliente/inicio', pathMatch: 'full' },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
 
   {
     path: 'cliente',
     component: LayoutClienteComponent,
+    canActivate: [rolGuard(['cliente'])],
     children: [
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       { path: 'inicio',              loadComponent: () => import('./features/cliente/inicio.component').then(m => m.InicioComponent) },
@@ -23,6 +27,7 @@ export const routes: Routes = [
   {
     path: 'cliente/servicios',
     component: LayoutBookingComponent,
+    canActivate: [rolGuard(['cliente'])],
     children: [
       { path: '',    loadComponent: () => import('./features/cliente/servicios/catalogo.component').then(m => m.CatalogoComponent) },
       { path: 'opciones',   loadComponent: () => import('./features/cliente/servicios/opciones.component').then(m => m.OpcionesComponent) },
@@ -35,6 +40,7 @@ export const routes: Routes = [
   {
     path: 'estilista',
     component: LayoutEstilistaComponent,
+    canActivate: [rolGuard(['estilista'])],
     children: [
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       { path: 'inicio',           loadComponent: () => import('./features/estilista/inicio.component').then(m => m.InicioComponent) },
@@ -49,6 +55,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: LayoutAdminComponent,
+    canActivate: [rolGuard(['admin'])],
     children: [
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       { path: 'inicio',                  loadComponent: () => import('./features/admin/inicio.component').then(m => m.InicioComponent) },
@@ -63,5 +70,5 @@ export const routes: Routes = [
     ]
   },
 
-  { path: '**', redirectTo: 'cliente/inicio' }
+  { path: '**', redirectTo: 'login' }
 ];

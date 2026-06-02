@@ -1,15 +1,15 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const conectarDB = require('./database');
+const conectarDB = require('./src/config/database');
 
-const Usuario = require('../models/Usuario');
-const Servicio = require('../models/Servicio');
-const Cita = require('../models/Cita');
-const Calificacion = require('../models/Calificacion');
-const SolicitudEspecial = require('../models/SolicitudEspecial');
-const ReporteCliente = require('../models/ReporteCliente');
-const Bloqueo = require('../models/Bloqueo');
+const Usuario = require('./src/models/Usuario');
+const Servicio = require('./src/models/Servicio');
+const Cita = require('./src/models/Cita');
+const Calificacion = require('./src/models/Calificacion');
+const SolicitudEspecial = require('./src/models/SolicitudEspecial');
+const ReporteCliente = require('./src/models/ReporteCliente');
+const Bloqueo = require('./src/models/Bloqueo');
 
 const seed = async () => {
   await conectarDB();
@@ -65,23 +65,21 @@ const seed = async () => {
   // Crear calificacion de prueba
   await Calificacion.create({
     citaId: cita._id, clienteId: cliente._id,
-    estilistaId: estilista._id, estrellas: 5,
+    estilistaId: estilista._id, puntuacion: 5,
     comentario: 'Excelente servicio'
   });
 
   // Crear solicitud especial de prueba
   await SolicitudEspecial.create({
-    clienteId: cliente._id, categoria: 'Cabello',
-    descripcion: 'Peinado para boda con recogido elegante',
-    presupuesto: 'L.300-600'
+    clienteId: cliente._id, tipo: 'Cabello',
+    descripcion: 'Peinado para boda con recogido elegante'
   });
 
   // Crear reporte de prueba
   await ReporteCliente.create({
-    estilistaId: estilista._id, clienteId: cliente._id,
-    citaId: cita._id, motivo: 'inasistencia',
-    descripcion: 'La cliente no se presento a su cita confirmada sin avisar',
-    fechaIncidente: new Date('2025-10-15')
+    reportadorId: estilista._id, reportadoId: cliente._id,
+    tipo: 'inasistencia',
+    descripcion: 'La cliente no se presento a su cita confirmada sin avisar'
   });
 
   // Crear bloqueo de prueba
@@ -97,3 +95,4 @@ const seed = async () => {
 };
 
 seed().catch(err => { console.error(err); process.exit(1); });
+

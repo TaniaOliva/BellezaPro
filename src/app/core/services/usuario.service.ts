@@ -1,0 +1,38 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Usuario } from '../models';
+
+@Injectable({ providedIn: 'root' })
+export class UsuarioService {
+  private apiUrl = '/api/usuarios';
+  constructor(private http: HttpClient) {}
+
+  listarEstilistas(): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(`${this.apiUrl}/estilistas`);
+  }
+
+  listarClientes(): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(`${this.apiUrl}/clientes`);
+  }
+
+  obtenerPerfil(): Observable<Usuario> {
+    return this.http.get<Usuario>(`${this.apiUrl}/perfil`);
+  }
+
+  actualizarPerfil(datos: Partial<Usuario>): Observable<Usuario> {
+    return this.http.put<Usuario>(`${this.apiUrl}/perfil`, datos);
+  }
+
+  cambiarPassword(passwordActual: string, passwordNueva: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/perfil/password`, { passwordActual, passwordNueva });
+  }
+
+  actualizarEstado(id: string, estado: string): Observable<Usuario> {
+    return this.http.patch<Usuario>(`${this.apiUrl}/${id}/estado`, { estado });
+  }
+
+  crearEmpleado(datos: Partial<Usuario>): Observable<Usuario> {
+    return this.http.post<Usuario>(`${this.apiUrl}/empleados`, datos);
+  }
+}
