@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CitaService } from '../../core/services/cita.service';
+import { Cita } from '../../core/models';
 
 @Component({
   selector: 'app-estilista-agenda',
@@ -105,8 +107,10 @@ import { CommonModule } from '@angular/common';
     </div>
   `
 })
-export class AgendaComponent {
+export class AgendaComponent implements OnInit {
   selectedCita: any = null;
+  citas: Cita[] = [];
+  cargando = true;
   viewMode: 'semana' | 'dia' = 'semana';
 
   diasSemana = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie'];
@@ -116,71 +120,11 @@ export class AgendaComponent {
   ];
 
   citasHardcodeadas = [
-    {
-      dia: 0, // Lun
-      horaInicio: '09:00',
-      duracion: 45,
-      cliente: 'Laura M.',
-      servicio: 'Manicure Clasico',
-      precioCompleto: 'Laura Mendez',
-      servicioCompleto: 'Manicure Clasico',
-      horaCompleta: '09:00',
-      precio: 'L 150',
-      duracionCompleta: '45 min',
-      estado: 'Confirmada'
-    },
-    {
-      dia: 1, // Mar
-      horaInicio: '10:30',
-      duracion: 70,
-      cliente: 'Sofia T.',
-      servicio: 'Nail Art',
-      precioCompleto: 'Sofia Torres',
-      servicioCompleto: 'Nail Art Sencillo',
-      horaCompleta: '10:30',
-      precio: 'L 200',
-      duracionCompleta: '70 min',
-      estado: 'Confirmada'
-    },
-    {
-      dia: 2, // Mie
-      horaInicio: '09:00',
-      duracion: 60,
-      cliente: 'Carmen R.',
-      servicio: 'Manicure Gel',
-      precioCompleto: 'Carmen Reyes',
-      servicioCompleto: 'Manicure Gel',
-      horaCompleta: '09:00',
-      precio: 'L 180',
-      duracionCompleta: '60 min',
-      estado: 'Confirmada'
-    },
-    {
-      dia: 2, // Mie
-      horaInicio: '12:00',
-      duracion: 75,
-      cliente: 'Valeria C.',
-      servicio: 'Pedicure Spa',
-      precioCompleto: 'Valeria Cruz',
-      servicioCompleto: 'Pedicure Spa',
-      horaCompleta: '12:00',
-      precio: 'L 220',
-      duracionCompleta: '75 min',
-      estado: 'Confirmada'
-    },
-    {
-      dia: 3, // Jue
-      horaInicio: '14:00',
-      duracion: 70,
-      cliente: 'Ana P.',
-      servicio: 'Manicure premium',
-      precioCompleto: 'Ana P.',
-      servicioCompleto: 'Manicure premium',
-      horaCompleta: '14:00',
-      precio: 'L 250',
-      duracionCompleta: '70 min',
-      estado: 'Confirmada'
-    }
+    { dia: 0, horaInicio: '09:00', duracion: 45, cliente: 'Laura M.', servicio: 'Manicure Clasico', precioCompleto: 'Laura Mendez', servicioCompleto: 'Manicure Clasico', horaCompleta: '09:00', precio: 'L 150', duracionCompleta: '45 min', estado: 'Confirmada' },
+    { dia: 1, horaInicio: '10:30', duracion: 70, cliente: 'Sofia T.', servicio: 'Nail Art', precioCompleto: 'Sofia Torres', servicioCompleto: 'Nail Art Sencillo', horaCompleta: '10:30', precio: 'L 200', duracionCompleta: '70 min', estado: 'Confirmada' },
+    { dia: 2, horaInicio: '09:00', duracion: 60, cliente: 'Carmen R.', servicio: 'Manicure Gel', precioCompleto: 'Carmen Reyes', servicioCompleto: 'Manicure Gel', horaCompleta: '09:00', precio: 'L 180', duracionCompleta: '60 min', estado: 'Confirmada' },
+    { dia: 2, horaInicio: '12:00', duracion: 75, cliente: 'Valeria C.', servicio: 'Pedicure Spa', precioCompleto: 'Valeria Cruz', servicioCompleto: 'Pedicure Spa', horaCompleta: '12:00', precio: 'L 220', duracionCompleta: '75 min', estado: 'Confirmada' },
+    { dia: 3, horaInicio: '14:00', duracion: 70, cliente: 'Ana P.', servicio: 'Manicure premium', precioCompleto: 'Ana P.', servicioCompleto: 'Manicure premium', horaCompleta: '14:00', precio: 'L 250', duracionCompleta: '70 min', estado: 'Confirmada' }
   ];
 
   citasResumenDias = [
@@ -191,35 +135,37 @@ export class AgendaComponent {
     { dia: 'Vie', numero: 0 }
   ];
 
-  abrirCita(cita: any) {
-    this.selectedCita = cita;
+  constructor(private citaSvc: CitaService) {}
+
+  ngOnInit(): void {
+    this.citaSvc.miAgenda().subscribe({
+      next: (data: Cita[]) => { this.citas = data; this.cargando = false; },
+      error: () => this.cargando = false
+    });
   }
 
-  cerrarCita() {
-    this.selectedCita = null;
+  abrirCita(cita: any): void { this.selectedCita = cita; }
+
+  cerrarCita(): void { this.selectedCita = null; }
+
+  marcarCompletada(): void {
+    if (this.selectedCita?._id) {
+      this.citaSvc.actualizarEstado(this.selectedCita._id, 'completada').subscribe((actualizada: Cita) => {
+        this.citas = this.citas.map((c: Cita) => c._id === actualizada._id ? actualizada : c);
+        this.cerrarCita();
+      });
+    } else {
+      this.cerrarCita();
+    }
   }
 
-  marcarCompletada() {
-    alert('Cita marcada como completada');
-    this.cerrarCita();
-  }
-
-  cancelarCita() {
-    alert('Cita cancelada');
-    this.cerrarCita();
-  }
+  cancelarCita(): void { this.cerrarCita(); }
 
   obtenerCitaEnHora(dia: number, hora: string): any {
     return this.citasHardcodeadas.find(c => c.dia === dia && c.horaInicio === hora);
   }
 
-  obtenerAltoCita(duracion: number): string {
-    return `${duracion * 0.8}px`;
-  }
+  obtenerAltoCita(duracion: number): string { return `${duracion * 0.8}px`; }
 
-  esBloqueado(dia: number, hora: string): boolean {
-    return dia === 4 && hora === '10:00'; // Viernes 10:00 bloqueado
-  }
+  esBloqueado(dia: number, hora: string): boolean { return dia === 4 && hora === '10:00'; }
 }
-
-

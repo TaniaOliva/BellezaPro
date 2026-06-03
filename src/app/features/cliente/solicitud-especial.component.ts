@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { SolicitudService } from '../../core/services/solicitud.service';
 
 @Component({
   selector: 'app-cliente-solicitud-especial',
@@ -37,7 +39,7 @@ import { FormsModule } from '@angular/forms';
 
           <ng-container *ngIf="currentStep === 2">
             <p class="text-headline-lg font-semibold">Describe tu solicitud</p>
-            <textarea rows="5" class="w-full rounded-[28px] border border-outline-variant bg-surface p-5 text-body-md" placeholder="Describe el servicio que buscas"></textarea>
+            <textarea rows="5" [(ngModel)]="descripcion" class="w-full rounded-[28px] border border-outline-variant bg-surface p-5 text-body-md" placeholder="Describe el servicio que buscas"></textarea>
             <div class="rounded-[28px] border-2 border-dashed border-outline-variant bg-surface-container-low h-32 flex flex-col items-center justify-center gap-2 text-center text-secondary">
               <span class="material-symbols-outlined text-[32px]">upload_file</span>
               <p>Arrastra una imagen o haz clic</p>
@@ -103,16 +105,19 @@ import { FormsModule } from '@angular/forms';
               </div>
               <div>
                 <p class="text-label-sm text-secondary">Descripcion</p>
-                <p class="text-body-md text-secondary">Quiero un servicio con detalles suaves y un estilo elegante para un evento especial.</p>
+                <p class="text-body-md text-secondary">{{ descripcion || 'Sin descripción' }}</p>
               </div>
             </div>
             <div class="rounded-[28px] bg-primary-fixed/10 p-4 flex items-center gap-3 text-primary">
               <span class="material-symbols-outlined">info</span>
               <p>Respuesta en menos de 24 horas</p>
             </div>
+            <p *ngIf="error" class="text-red-600 text-sm">{{ error }}</p>
             <div class="flex justify-between">
               <button type="button" (click)="currentStep = 3" class="rounded-2xl border border-outline-variant px-6 py-3 text-secondary">Volver</button>
-              <button type="button" class="rounded-2xl bg-primary px-6 py-3 text-on-primary font-semibold">Enviar solicitud</button>
+              <button type="button" (click)="enviar()" [disabled]="enviando" class="rounded-2xl bg-primary px-6 py-3 text-on-primary font-semibold disabled:opacity-50">
+                {{ enviando ? 'Enviando...' : 'Enviar solicitud' }}
+              </button>
             </div>
           </ng-container>
         </div>
@@ -121,10 +126,14 @@ import { FormsModule } from '@angular/forms';
   `
 })
 export class SolicitudEspecialComponent {
-  currentStep: number = 1;
-  selectedCategory: string = '';
-  selectedBudget: string = '';
-  selectedStylist: string = '';
+  currentStep = 1;
+  selectedCategory = '';
+  selectedBudget = '';
+  selectedStylist = '';
+  descripcion = '';
+  enviando = false;
+  enviado = false;
+  error = '';
 
   steps = ['Categoria', 'Descripcion', 'Estilista', 'Confirmar'];
   categories = ['Uñas', 'Cabello', 'Maquillaje', 'Cejas', 'Tratamiento', 'Otro'];
@@ -133,5 +142,29 @@ export class SolicitudEspecialComponent {
     { name: 'Ana Garcia', initials: 'AG', specialty: 'Uñas y belleza', rating: '4.9' },
     { name: 'Lina Torres', initials: 'LT', specialty: 'Cabello y color', rating: '4.8' }
   ];
-}
 
+  constructor(private solicitudSvc: SolicitudService, private router: Router) {}
+
+  enviar(): void {
+    if (!this.selectedCategory || this.descripcion.length < 10) {
+      this.error = 'Completa la categoria y la descripcion';
+      return;
+    }
+    this.enviando = true;
+    this.solicitudSvc.crear({
+      categoria: this.selectedCategory,
+      descripcion: this.descripcion,
+      presupuesto: this.selectedBudget
+    } as any).subscribe({
+      next: () => {
+        this.enviado = true;
+        this.enviando = false;
+        setTimeout(() => this.router.navigate(['/cliente/inicio']), 2000);
+      },
+      error: (err: any) => {
+        this.error = err.error?.mensaje || 'Error al enviar';
+        this.enviando = false;
+      }
+    });
+  }
+}

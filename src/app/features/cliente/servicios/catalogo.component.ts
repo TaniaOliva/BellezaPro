@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { ServicioService } from '../../../core/services/servicio.service';
+import { Servicio } from '../../../core/models';
 
 @Component({
   selector: 'app-cliente-catalogo',
@@ -103,5 +105,36 @@ import { RouterLink } from '@angular/router';
     </div>
   `
 })
-export class CatalogoComponent {}
+export class CatalogoComponent implements OnInit {
+  servicios: Servicio[] = [];
+  serviciosFiltrados: Servicio[] = [];
+  categoriaActiva = 'Todos';
+  cargando = true;
+  categorias = ['Todos', 'Manicure', 'Pedicure', 'Cortes', 'Tintes', 'Maquillaje'];
+
+  constructor(private servicioSvc: ServicioService, private router: Router) {}
+
+  ngOnInit(): void {
+    this.servicioSvc.listar().subscribe({
+      next: (data: Servicio[]) => {
+        this.servicios = data;
+        this.serviciosFiltrados = data;
+        this.cargando = false;
+      },
+      error: () => this.cargando = false
+    });
+  }
+
+  filtrar(categoria: string): void {
+    this.categoriaActiva = categoria;
+    this.serviciosFiltrados = categoria === 'Todos'
+      ? this.servicios
+      : this.servicios.filter((s: Servicio) => s.categoria === categoria);
+  }
+
+  seleccionar(servicio: Servicio): void {
+    sessionStorage.setItem('bp_servicio', JSON.stringify(servicio));
+    this.router.navigate(['/cliente/servicios/opciones']);
+  }
+}
 

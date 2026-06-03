@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReporteService } from '../../core/services/reporte.service';
+import { ReporteCliente } from '../../core/models';
 
 @Component({
   selector: 'app-admin-reportes-clientes',
@@ -129,5 +131,32 @@ import { CommonModule } from '@angular/common';
     </div>
   `
 })
-export class ReportesClientesComponent {}
+export class ReportesClientesComponent implements OnInit {
+  reportes: ReporteCliente[] = [];
+  seleccionado: ReporteCliente | null = null;
+  cargando = true;
+  guardando = false;
+
+  constructor(private reporteSvc: ReporteService) {}
+
+  ngOnInit(): void {
+    this.cargar();
+  }
+
+  cargar(): void {
+    this.reporteSvc.listarTodos().subscribe({
+      next: (data: ReporteCliente[]) => { this.reportes = data; this.cargando = false; },
+      error: () => this.cargando = false
+    });
+  }
+
+  resolver(accion: 'advertencia' | 'bloqueo'): void {
+    if (!this.seleccionado) return;
+    this.guardando = true;
+    this.reporteSvc.resolver(this.seleccionado._id, accion).subscribe({
+      next: () => { this.seleccionado = null; this.guardando = false; this.cargar(); },
+      error: () => this.guardando = false
+    });
+  }
+}
 

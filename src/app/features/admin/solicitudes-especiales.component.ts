@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { SolicitudService } from '../../core/services/solicitud.service';
+import { SolicitudEspecial } from '../../core/models';
 
 @Component({
   selector: 'app-admin-solicitudes-especiales',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="bg-white min-h-screen">
       <div class="px-8 py-8">
@@ -72,5 +75,56 @@ import { CommonModule } from '@angular/common';
     </div>
   `
 })
-export class SolicitudesEspecialesComponent {}
+export class SolicitudesEspecialesComponent implements OnInit {
+  solicitudes: SolicitudEspecial[] = [];
+  seleccionada: SolicitudEspecial | null = null;
+  cargando = true;
+  precio = 0;
+  duracion = 0;
+  respuesta = '';
+  guardando = false;
+
+  constructor(private solicitudSvc: SolicitudService) {}
+
+  ngOnInit(): void {
+    this.cargar();
+  }
+
+  cargar(): void {
+    this.solicitudSvc.listarTodas().subscribe({
+      next: (data: SolicitudEspecial[]) => { this.solicitudes = data; this.cargando = false; },
+      error: () => this.cargando = false
+    });
+  }
+
+  abrir(s: SolicitudEspecial): void {
+    this.seleccionada = s;
+    this.precio = s.precioEstimado ?? 0;
+    this.duracion = s.duracionEstimada ?? 0;
+    this.respuesta = s.respuesta ?? '';
+  }
+
+  aprobar(): void {
+    if (!this.seleccionada) return;
+    this.guardando = true;
+    this.solicitudSvc.responder(this.seleccionada._id, {
+      estado: 'aprobada', respuesta: this.respuesta,
+      precioEstimado: this.precio, duracionEstimada: this.duracion
+    }).subscribe({
+      next: () => { this.seleccionada = null; this.guardando = false; this.cargar(); },
+      error: () => this.guardando = false
+    });
+  }
+
+  rechazar(): void {
+    if (!this.seleccionada) return;
+    this.guardando = true;
+    this.solicitudSvc.responder(this.seleccionada._id, {
+      estado: 'rechazada', respuesta: this.respuesta
+    }).subscribe({
+      next: () => { this.seleccionada = null; this.guardando = false; this.cargar(); },
+      error: () => this.guardando = false
+    });
+  }
+}
 

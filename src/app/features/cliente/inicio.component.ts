@@ -1,6 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { CitaService } from '../../core/services/cita.service';
+import { ServicioService } from '../../core/services/servicio.service';
+import { AuthService } from '../../core/services/auth.service';
+import { Cita, Servicio } from '../../core/models';
 
 @Component({
   selector: 'app-cliente-inicio',
@@ -157,5 +161,35 @@ import { RouterLink } from '@angular/router';
     </div>
   `
 })
-export class InicioComponent {}
+export class InicioComponent implements OnInit {
+  proximaCita: Cita | null = null;
+  citasEsteMes = 0;
+  serviciosPopulares: Servicio[] = [];
+  nombreUsuario = '';
+
+  constructor(
+    private citaSvc: CitaService,
+    private servicioSvc: ServicioService,
+    private auth: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    const usuario = this.auth.getUsuario();
+    this.nombreUsuario = usuario?.nombre ?? 'Cliente';
+
+    this.citaSvc.misCitas().subscribe((citas: Cita[]) => {
+      const activas = citas.filter((c: Cita) => ['pendiente','confirmada'].includes(c.estado));
+      this.proximaCita = activas.sort((a: Cita,b: Cita) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())[0] ?? null;
+      const hoy = new Date();
+      this.citasEsteMes = citas.filter((c: Cita) => {
+        const f = new Date(c.fecha);
+        return f.getMonth() === hoy.getMonth() && f.getFullYear() === hoy.getFullYear();
+      }).length;
+    });
+
+    this.servicioSvc.listar().subscribe((svcs: Servicio[]) => {
+      this.serviciosPopulares = svcs.slice(0, 4);
+    });
+  }
+}
 

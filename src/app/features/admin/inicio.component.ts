@@ -1,5 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { UsuarioService } from '../../core/services/usuario.service';
+import { ServicioService } from '../../core/services/servicio.service';
+import { SolicitudService } from '../../core/services/solicitud.service';
+import { ReporteService } from '../../core/services/reporte.service';
+import { Usuario, Servicio, SolicitudEspecial, ReporteCliente } from '../../core/models';
 
 @Component({
   selector: 'app-admin-inicio',
@@ -107,5 +112,30 @@ import { CommonModule } from '@angular/common';
     </div>
   `
 })
-export class InicioComponent {}
+export class InicioComponent implements OnInit {
+  totalEmpleadas = 0;
+  totalClientes = 0;
+  totalServicios = 0;
+  solicitudesPendientes = 0;
+  reportesPendientes = 0;
+  cargando = true;
+
+  constructor(
+    private usuarioSvc: UsuarioService,
+    private servicioSvc: ServicioService,
+    private solicitudSvc: SolicitudService,
+    private reporteSvc: ReporteService
+  ) {}
+
+  ngOnInit(): void {
+    this.usuarioSvc.listarEstilistas().subscribe((e: Usuario[]) => this.totalEmpleadas = e.length);
+    this.usuarioSvc.listarClientes().subscribe((c: Usuario[]) => this.totalClientes = c.length);
+    this.servicioSvc.listar().subscribe((s: Servicio[]) => this.totalServicios = s.length);
+    this.solicitudSvc.listarPendientes().subscribe((s: SolicitudEspecial[]) => {
+      this.solicitudesPendientes = s.length;
+      this.cargando = false;
+    });
+    this.reporteSvc.listarPendientes().subscribe((r: ReporteCliente[]) => this.reportesPendientes = r.length);
+  }
+}
 

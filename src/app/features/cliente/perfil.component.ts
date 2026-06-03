@@ -1,10 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { UsuarioService } from '../../core/services/usuario.service';
+import { SolicitudService } from '../../core/services/solicitud.service';
+import { Usuario, SolicitudEspecial } from '../../core/models';
 
 @Component({
   selector: 'app-cliente-perfil',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="bg-white min-h-screen">
       <div class="max-w-6xl mx-auto px-8 py-8 space-y-8">
@@ -98,5 +102,49 @@ import { CommonModule } from '@angular/common';
     </div>
   `
 })
-export class PerfilComponent {}
+export class PerfilComponent implements OnInit {
+  usuario: Usuario | null = null;
+  solicitudes: SolicitudEspecial[] = [];
+  nombre = ''; apellido = ''; telefono = '';
+  passwordActual = ''; passwordNueva = ''; passwordConfirm = '';
+  mensajePerfil = ''; mensajePassword = '';
+  guardando = false;
+
+  constructor(
+    private usuarioSvc: UsuarioService,
+    private solicitudSvc: SolicitudService
+  ) {}
+
+  ngOnInit(): void {
+    this.usuarioSvc.obtenerPerfil().subscribe((u: Usuario) => {
+      this.usuario = u;
+      this.nombre = u.nombre;
+      this.apellido = u.apellido ?? '';
+      this.telefono = u.telefono ?? '';
+    });
+    this.solicitudSvc.misSolicitudes().subscribe((s: SolicitudEspecial[]) => this.solicitudes = s.slice(0, 3));
+  }
+
+  guardarPerfil(): void {
+    this.guardando = true;
+    this.usuarioSvc.actualizarPerfil({ nombre: this.nombre, apellido: this.apellido, telefono: this.telefono }).subscribe({
+      next: () => { this.mensajePerfil = 'Cambios guardados'; this.guardando = false; },
+      error: () => { this.mensajePerfil = 'Error al guardar'; this.guardando = false; }
+    });
+  }
+
+  cambiarPassword(): void {
+    if (this.passwordNueva !== this.passwordConfirm) {
+      this.mensajePassword = 'Las contrasenas no coinciden';
+      return;
+    }
+    this.usuarioSvc.cambiarPassword(this.passwordActual, this.passwordNueva).subscribe({
+      next: () => {
+        this.mensajePassword = 'Contrasena actualizada';
+        this.passwordActual = this.passwordNueva = this.passwordConfirm = '';
+      },
+      error: (err: any) => this.mensajePassword = err.error?.mensaje || 'Error'
+    });
+  }
+}
 

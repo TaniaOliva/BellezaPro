@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CitaService } from '../../core/services/cita.service';
+import { Cita } from '../../core/models';
 
 @Component({
   selector: 'app-estilista-mis-clientes',
@@ -19,19 +21,19 @@ import { FormsModule } from '@angular/forms';
         <div class="mb-6 flex gap-4 items-center">
           <div class="flex-1 flex items-center border border-gray-300 rounded-lg px-4 py-2 bg-white">
             <span class="material-symbols-outlined text-gray-400">search</span>
-            <input 
+            <input
               [(ngModel)]="busqueda"
-              type="text" 
-              placeholder="Buscar cliente..." 
+              type="text"
+              placeholder="Buscar cliente..."
               class="ml-2 flex-1 outline-none text-gray-700">
           </div>
-          <button 
+          <button
             (click)="activeFilter = 'todas'"
             [class]="activeFilter === 'todas' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
             class="px-4 py-2 rounded-lg font-semibold">
             Todos
           </button>
-          <button 
+          <button
             (click)="activeFilter = 'vip'"
             [class]="activeFilter === 'vip' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
             class="px-4 py-2 rounded-lg font-semibold">
@@ -92,56 +94,45 @@ import { FormsModule } from '@angular/forms';
     </div>
   `
 })
-export class MisClientesComponent {
-  activeFilter: string = 'todas';
-  busqueda: string = '';
+export class MisClientesComponent implements OnInit {
+  activeFilter = 'todas';
+  busqueda = '';
+  cargando = true;
+  clientes: any[] = [];
 
-  clientes = [
-    {
-      iniciales: 'LM',
-      nombre: 'Laura Mendez',
-      visitas: 8,
-      servicioUltimo: 'Manicure Clasico',
-      hace: '2 dias',
-      estrellas: 5,
-      vip: false
-    },
-    {
-      iniciales: 'ST',
-      nombre: 'Sofia Torres',
-      visitas: 3,
-      servicioUltimo: 'Nail Art',
-      hace: '5 dias',
-      estrellas: 4,
-      vip: false
-    },
-    {
-      iniciales: 'CR',
-      nombre: 'Carmen Reyes',
-      visitas: 12,
-      servicioUltimo: 'Manicure Gel',
-      hace: '1 semana',
-      estrellas: 5,
-      vip: true
-    },
-    {
-      iniciales: 'VC',
-      nombre: 'Valeria Cruz',
-      visitas: 1,
-      servicioUltimo: 'Pedicure Spa',
-      hace: '2 semanas',
-      estrellas: 4,
-      vip: false
-    }
-  ];
+  constructor(private citaSvc: CitaService) {}
 
-  getEstrellas(cantidad: number): number[] {
-    return Array(cantidad).fill(0);
+  ngOnInit(): void {
+    this.citaSvc.miAgenda().subscribe({
+      next: (data: Cita[]) => {
+        const mapaClientes = new Map<string, any>();
+        data.forEach((c: Cita) => {
+          if (c.clienteId && c.clienteId._id) {
+            const existing = mapaClientes.get(c.clienteId._id);
+            const nombre = c.clienteId.nombre ?? '';
+            const apellido = c.clienteId.apellido ?? '';
+            const iniciales = (nombre + ' ' + apellido).trim()
+              .split(' ').map((n: string) => n[0] ?? '').slice(0, 2).join('').toUpperCase();
+            const visitas = (existing?.visitas ?? 0) + 1;
+            mapaClientes.set(c.clienteId._id, {
+              _id: c.clienteId._id,
+              nombre: nombre + (apellido ? ' ' + apellido : ''),
+              iniciales,
+              visitas,
+              servicioUltimo: c.servicioId?.nombre ?? '',
+              hace: c.fecha,
+              estrellas: 5,
+              vip: visitas >= 5
+            });
+          }
+        });
+        this.clientes = Array.from(mapaClientes.values());
+        this.cargando = false;
+      },
+      error: () => this.cargando = false
+    });
   }
 
-  getEstrellasVacias(cantidad: number): number[] {
-    return Array(5 - cantidad).fill(0);
-  }
+  getEstrellas(cantidad: number): number[] { return Array(cantidad).fill(0); }
+  getEstrellasVacias(cantidad: number): number[] { return Array(5 - cantidad).fill(0); }
 }
-
-

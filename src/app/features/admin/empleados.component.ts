@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { UsuarioService } from '../../core/services/usuario.service';
+import { Usuario } from '../../core/models';
 
 @Component({
   selector: 'app-admin-empleados',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="bg-white min-h-screen">
       <div class="px-8 py-8">
@@ -77,5 +80,49 @@ import { CommonModule } from '@angular/common';
     </div>
   `
 })
-export class EmpleadosComponent {}
+export class EmpleadosComponent implements OnInit {
+  empleados: Usuario[] = [];
+  cargando = true;
+  mostrarDrawer = false;
+  nuevo = { nombre: '', apellido: '', email: '', telefono: '' };
+  guardando = false;
+  error = '';
+
+  constructor(private usuarioSvc: UsuarioService) {}
+
+  ngOnInit(): void {
+    this.cargar();
+  }
+
+  cargar(): void {
+    this.usuarioSvc.listarEstilistas().subscribe({
+      next: (data: Usuario[]) => { this.empleados = data; this.cargando = false; },
+      error: () => this.cargando = false
+    });
+  }
+
+  guardar(): void {
+    if (!this.nuevo.nombre || !this.nuevo.email) {
+      this.error = 'Nombre y correo son obligatorios';
+      return;
+    }
+    this.guardando = true;
+    this.usuarioSvc.crearEmpleado(this.nuevo as any).subscribe({
+      next: () => {
+        this.mostrarDrawer = false;
+        this.nuevo = { nombre: '', apellido: '', email: '', telefono: '' };
+        this.guardando = false;
+        this.cargar();
+      },
+      error: (err: any) => {
+        this.error = err.error?.mensaje || 'Error al guardar';
+        this.guardando = false;
+      }
+    });
+  }
+
+  cambiarEstado(id: string, estado: string): void {
+    this.usuarioSvc.actualizarEstado(id, estado).subscribe(() => this.cargar());
+  }
+}
 

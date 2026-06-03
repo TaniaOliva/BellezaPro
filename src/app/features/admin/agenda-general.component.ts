@@ -1,10 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { UsuarioService } from '../../core/services/usuario.service';
+import { CitaService } from '../../core/services/cita.service';
+import { Usuario, Cita } from '../../core/models';
 
 @Component({
   selector: 'app-admin-agenda-general',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="bg-white min-h-screen">
       <div class="px-8 py-8">
@@ -91,5 +95,40 @@ import { CommonModule } from '@angular/common';
     </div>
   `
 })
-export class AgendaGeneralComponent {}
+export class AgendaGeneralComponent implements OnInit {
+  estilistas: Usuario[] = [];
+  citas: Cita[] = [];
+  filtroEstilista = 'todas';
+  cargando = true;
+  mostrarModalBloqueo = false;
+  bloqueo = { estilistaId: '', fechaInicio: '', fechaFin: '', motivo: '' };
 
+  constructor(
+    private usuarioSvc: UsuarioService,
+    private citaSvc: CitaService
+  ) {}
+
+  ngOnInit(): void {
+    this.usuarioSvc.listarEstilistas().subscribe((data: Usuario[]) => {
+      this.estilistas = data;
+    });
+    this.citaSvc.miAgenda().subscribe({
+      next: (data: Cita[]) => { this.citas = data; this.cargando = false; },
+      error: () => this.cargando = false
+    });
+  }
+
+  get citasFiltradas(): Cita[] {
+    if (this.filtroEstilista === 'todas') return this.citas;
+    return this.citas.filter((c: Cita) => {
+      const id = c.estilistaId?._id ?? c.estilistaId;
+      return id === this.filtroEstilista;
+    });
+  }
+
+  cambiarEstado(id: string, estado: string): void {
+    this.citaSvc.actualizarEstado(id, estado).subscribe((actualizada: Cita) => {
+      this.citas = this.citas.map((c: Cita) => c._id === id ? actualizada : c);
+    });
+  }
+}

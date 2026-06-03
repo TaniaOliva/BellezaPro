@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CitaService } from '../../core/services/cita.service';
+import { Cita } from '../../core/models';
 
 @Component({
   selector: 'app-cliente-mis-citas',
@@ -78,7 +80,25 @@ import { CommonModule } from '@angular/common';
     </div>
   `
 })
-export class MisCitasComponent {
-  activeTab: string = 'proximas';
+export class MisCitasComponent implements OnInit {
+  citas: Cita[] = [];
+  proximas: Cita[] = [];
+  historial: Cita[] = [];
+  activeTab = 'proximas';
+  cargando = true;
+
+  constructor(private citaSvc: CitaService) {}
+
+  ngOnInit(): void {
+    this.citaSvc.misCitas().subscribe({
+      next: (data: Cita[]) => {
+        this.citas = data;
+        this.proximas = data.filter((c: Cita) => ['pendiente','confirmada','en_progreso'].includes(c.estado));
+        this.historial = data.filter((c: Cita) => ['completada','cancelada'].includes(c.estado));
+        this.cargando = false;
+      },
+      error: () => this.cargando = false
+    });
+  }
 }
 

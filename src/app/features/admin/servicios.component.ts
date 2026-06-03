@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ServicioService } from '../../core/services/servicio.service';
+import { Servicio } from '../../core/models';
 
 @Component({
   selector: 'app-admin-servicios',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="bg-white min-h-screen">
       <div class="px-8 py-8">
@@ -81,5 +84,62 @@ import { CommonModule } from '@angular/common';
     </div>
   `
 })
-export class ServiciosComponent {}
+export class ServiciosComponent implements OnInit {
+  servicios: Servicio[] = [];
+  seleccionado: Servicio | null = null;
+  mostrarDrawer = false;
+  cargando = true;
+  guardando = false;
+  error = '';
 
+  nuevo: Partial<Servicio> = {
+    nombre: '', descripcion: '', categoria: 'Manicure',
+    precioBase: 0, duracion: 60, activo: true, variantes: []
+  };
+
+  categorias = ['Manicure', 'Pedicure', 'Cortes', 'Tintes', 'Maquillaje'];
+
+  constructor(private servicioSvc: ServicioService) {}
+
+  ngOnInit(): void {
+    this.cargar();
+  }
+
+  cargar(): void {
+    this.servicioSvc.listar().subscribe({
+      next: (data: Servicio[]) => { this.servicios = data; this.cargando = false; },
+      error: () => this.cargando = false
+    });
+  }
+
+  abrirNuevo(): void {
+    this.seleccionado = null;
+    this.nuevo = { nombre: '', descripcion: '', categoria: 'Manicure', precioBase: 0, duracion: 60, activo: true, variantes: [] };
+    this.mostrarDrawer = true;
+  }
+
+  abrirEditar(s: Servicio): void {
+    this.seleccionado = s;
+    this.nuevo = { ...s };
+    this.mostrarDrawer = true;
+  }
+
+  guardar(): void {
+    if (!this.nuevo.nombre || !this.nuevo.precioBase) {
+      this.error = 'Nombre y precio son obligatorios';
+      return;
+    }
+    this.guardando = true;
+    const op = this.seleccionado
+      ? this.servicioSvc.actualizar(this.seleccionado._id, this.nuevo)
+      : this.servicioSvc.crear(this.nuevo);
+    op.subscribe({
+      next: () => { this.mostrarDrawer = false; this.guardando = false; this.error = ''; this.cargar(); },
+      error: (err: any) => { this.error = err.error?.mensaje || 'Error al guardar'; this.guardando = false; }
+    });
+  }
+
+  toggleActivo(s: Servicio): void {
+    this.servicioSvc.actualizar(s._id, { activo: !s.activo }).subscribe(() => this.cargar());
+  }
+}

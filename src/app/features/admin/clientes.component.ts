@@ -1,5 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { UsuarioService } from '../../core/services/usuario.service';
+import { ReporteService } from '../../core/services/reporte.service';
+import { Usuario, ReporteCliente } from '../../core/models';
 
 @Component({
   selector: 'app-admin-clientes',
@@ -81,5 +84,43 @@ import { CommonModule } from '@angular/common';
     </div>
   `
 })
-export class ClientesComponent {}
+export class ClientesComponent implements OnInit {
+  clientes: Usuario[] = [];
+  seleccionado: Usuario | null = null;
+  reportesCliente: ReporteCliente[] = [];
+  cargando = true;
+  guardando = false;
 
+  constructor(
+    private usuarioSvc: UsuarioService,
+    private reporteSvc: ReporteService
+  ) {}
+
+  ngOnInit(): void {
+    this.usuarioSvc.listarClientes().subscribe({
+      next: (data: Usuario[]) => { this.clientes = data; this.cargando = false; },
+      error: () => this.cargando = false
+    });
+  }
+
+  abrirDetalle(cliente: Usuario): void {
+    this.seleccionado = cliente;
+    this.reporteSvc.porCliente(cliente.id).subscribe({
+      next: (data: ReporteCliente[]) => this.reportesCliente = data,
+      error: () => this.reportesCliente = []
+    });
+  }
+
+  cambiarEstado(estado: string): void {
+    if (!this.seleccionado) return;
+    this.guardando = true;
+    this.usuarioSvc.actualizarEstado(this.seleccionado.id, estado).subscribe({
+      next: (actualizado: Usuario) => {
+        this.seleccionado = actualizado;
+        this.guardando = false;
+        this.usuarioSvc.listarClientes().subscribe((data: Usuario[]) => this.clientes = data);
+      },
+      error: () => this.guardando = false
+    });
+  }
+}

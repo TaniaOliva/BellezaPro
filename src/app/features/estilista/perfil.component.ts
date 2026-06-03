@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { UsuarioService } from '../../core/services/usuario.service';
+import { Usuario } from '../../core/models';
 
 @Component({
   selector: 'app-estilista-perfil',
@@ -43,8 +45,8 @@ import { FormsModule } from '@angular/forms';
           <h2 class="text-xl font-bold text-gray-800 mb-4">Mis Especialidades</h2>
           <div class="grid grid-cols-3 gap-3 mb-4">
             <div *ngFor="let esp of especialidades; let i = index" class="flex items-center">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 [checked]="esp.activa"
                 (change)="toggleEspecialidad(i)"
                 class="w-4 h-4 border border-gray-300 rounded accent-red-600">
@@ -62,20 +64,20 @@ import { FormsModule } from '@angular/forms';
           <div class="space-y-3 mb-4">
             <div *ngFor="let h of horario; let i = index" class="flex items-center gap-4 pb-4 border-b border-gray-200 last:border-b-0">
               <div class="w-24 font-semibold text-gray-700">{{ h.dia }}</div>
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 [checked]="h.activo"
                 (change)="toggleHorario(i)"
                 class="w-4 h-4 border border-gray-300 rounded accent-red-600">
-              <input 
+              <input
                 *ngIf="h.activo"
-                type="time" 
+                type="time"
                 [(ngModel)]="h.inicio"
                 class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-red-600">
               <span *ngIf="h.activo" class="text-gray-600">-</span>
-              <input 
+              <input
                 *ngIf="h.activo"
-                type="time" 
+                type="time"
                 [(ngModel)]="h.fin"
                 class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-red-600">
             </div>
@@ -88,7 +90,13 @@ import { FormsModule } from '@angular/forms';
     </div>
   `
 })
-export class PerfilComponent {
+export class PerfilComponent implements OnInit {
+  usuario: Usuario | null = null;
+  nombre = ''; apellido = ''; telefono = '';
+  passwordActual = ''; passwordNueva = ''; passwordConfirm = '';
+  mensajePerfil = ''; mensajePassword = '';
+  guardando = false;
+
   especialidades = [
     { nombre: 'Manicure', activa: true },
     { nombre: 'Nail Art', activa: true },
@@ -109,11 +117,20 @@ export class PerfilComponent {
     { dia: 'Domingo', activo: false, inicio: '', fin: '' }
   ];
 
-  toggleEspecialidad(index: number) {
-    this.especialidades[index].activa = !this.especialidades[index].activa;
+  constructor(private usuarioSvc: UsuarioService) {}
+
+  ngOnInit(): void {
+    this.usuarioSvc.obtenerPerfil().subscribe((u: Usuario) => {
+      this.usuario = u;
+      this.nombre = u.nombre;
+      this.apellido = u.apellido ?? '';
+      this.telefono = u.telefono ?? '';
+    });
   }
 
-  toggleHorario(index: number) {
+  toggleEspecialidad(index: number): void { this.especialidades[index].activa = !this.especialidades[index].activa; }
+
+  toggleHorario(index: number): void {
     this.horario[index].activo = !this.horario[index].activo;
     if (!this.horario[index].activo) {
       this.horario[index].inicio = '';
@@ -124,13 +141,29 @@ export class PerfilComponent {
     }
   }
 
-  guardarEspecialidades() {
-    alert('Especialidades guardadas');
+  guardarEspecialidades(): void { alert('Especialidades guardadas'); }
+
+  guardarHorario(): void { alert('Horario guardado'); }
+
+  guardarPerfil(): void {
+    this.guardando = true;
+    this.usuarioSvc.actualizarPerfil({ nombre: this.nombre, apellido: this.apellido, telefono: this.telefono }).subscribe({
+      next: () => { this.mensajePerfil = 'Cambios guardados'; this.guardando = false; },
+      error: () => { this.mensajePerfil = 'Error al guardar'; this.guardando = false; }
+    });
   }
 
-  guardarHorario() {
-    alert('Horario guardado');
+  cambiarPassword(): void {
+    if (this.passwordNueva !== this.passwordConfirm) {
+      this.mensajePassword = 'Las contrasenas no coinciden';
+      return;
+    }
+    this.usuarioSvc.cambiarPassword(this.passwordActual, this.passwordNueva).subscribe({
+      next: () => {
+        this.mensajePassword = 'Contrasena actualizada';
+        this.passwordActual = this.passwordNueva = this.passwordConfirm = '';
+      },
+      error: (err: any) => this.mensajePassword = err.error?.mensaje || 'Error'
+    });
   }
 }
-
-
