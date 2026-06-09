@@ -21,7 +21,7 @@ import { Cita } from '../../core/models';
         <div class="grid grid-cols-4 gap-6 mb-8">
           <div class="bg-white border border-gray-200 rounded-lg p-4">
             <p class="text-xs text-gray-600 uppercase font-semibold">Citas hoy</p>
-            <p class="text-3xl font-bold text-gray-800 mt-2">4</p>
+            <p class="text-3xl font-bold text-gray-800 mt-2">{{ citasHoy.length }}</p>
           </div>
           <div class="bg-white border border-gray-200 rounded-lg p-4">
             <p class="text-xs text-gray-600 uppercase font-semibold">Ingresos</p>
@@ -43,15 +43,25 @@ import { Cita } from '../../core/models';
             <div class="bg-white border border-gray-200 rounded-lg p-6">
               <h2 class="text-xl font-bold text-gray-800 mb-4">Citas de hoy</h2>
               <div class="space-y-3">
-                <div *ngFor="let cita of citas" [class]="cita.estado === 'En progreso' ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'" class="border rounded-lg p-4 flex items-center justify-between">
+                <div *ngIf="!cargando && citas.length === 0" class="text-center py-8 text-gray-400 text-sm">
+                  No tienes citas hoy.
+                </div>
+                <div *ngFor="let cita of citas" [class]="cita.estado === 'en_progreso' ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'" class="border rounded-lg p-4 flex items-center justify-between">
                   <div>
                     <p class="text-sm text-gray-600">{{ cita.hora }}</p>
-                    <p class="font-semibold text-gray-800">{{ cita.clienteId }}</p>
-                    <p class="text-xs text-gray-600">{{ cita.servicioId }}</p>
+                    <p class="font-semibold text-gray-800">{{ cita.clienteId?.nombre ?? cita.clienteId }}</p>
+                    <p class="text-xs text-gray-600">{{ cita.servicioId?.nombre ?? cita.servicioId }}</p>
                   </div>
-                  <span [class]="cita.estado === 'Completada' ? 'bg-green-100 text-green-700' : cita.estado === 'En progreso' ? 'bg-red-100 text-red-700' : cita.estado === 'Confirmada' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'" class="px-3 py-1 rounded-full text-xs font-semibold">
-                    {{ cita.estado }}
-                  </span>
+                  <div class="flex items-center gap-3">
+                    <button *ngIf="cita.estado !== 'completada' && cita.estado !== 'cancelada'"
+                      (click)="completar(cita._id)"
+                      class="text-xs font-semibold px-3 py-1 bg-green-600 text-white rounded-full hover:bg-green-700 transition">
+                      Completar
+                    </button>
+                    <span [class]="cita.estado === 'completada' ? 'bg-green-100 text-green-700' : cita.estado === 'en_progreso' ? 'bg-red-100 text-red-700' : cita.estado === 'confirmada' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'" class="px-3 py-1 rounded-full text-xs font-semibold capitalize">
+                      {{ cita.estado }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -87,13 +97,13 @@ export class InicioComponent implements OnInit {
     this.nombreEstilista = this.auth.getUsuario()?.nombre ?? 'Estilista';
     this.citaSvc.miAgenda().subscribe({
       next: (citas: Cita[]) => {
-        const hoy = new Date().toDateString();
-        this.citasHoy = citas.filter((c: Cita) => new Date(c.fecha).toDateString() === hoy);
+        const ahora = new Date();
+        const hoyStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
+        this.citasHoy = citas.filter((c: Cita) => c.fecha.substring(0, 10) === hoyStr);
         this.citas = this.citasHoy;
-        const now = new Date();
         this.citasEsteMes = citas.filter((c: Cita) => {
           const f = new Date(c.fecha);
-          return f.getMonth() === now.getMonth() && f.getFullYear() === now.getFullYear();
+          return f.getMonth() === ahora.getMonth() && f.getFullYear() === ahora.getFullYear();
         });
         this.cargando = false;
       },

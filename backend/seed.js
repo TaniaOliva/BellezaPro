@@ -48,12 +48,58 @@ const seed = async () => {
     rol: 'cliente'
   });
 
-  // Crear servicio de prueba
-  const servicio = await Servicio.create({
-    nombre: 'Manicure Clasico', categoria: 'Manicure',
-    precioBase: 150, duracion: 45,
-    variantes: [{ tipo: 'acabado', nombre: 'Gel', precioExtra: 50 }]
-  });
+  const variantesUnas = [
+    { tipo: 'nivel',    nombre: 'Clásico',           precioExtra: 0   },
+    { tipo: 'nivel',    nombre: 'Premium',            precioExtra: 80  },
+    { tipo: 'nivel',    nombre: 'Spa',                precioExtra: 150 },
+    { tipo: 'largo',    nombre: 'Corta',              precioExtra: 0   },
+    { tipo: 'largo',    nombre: 'Mediana',            precioExtra: 0   },
+    { tipo: 'largo',    nombre: 'Larga',              precioExtra: 0   },
+    { tipo: 'largo',    nombre: 'Extra larga',        precioExtra: 0   },
+    { tipo: 'acabado',  nombre: 'Esmalte normal',     precioExtra: 0   },
+    { tipo: 'acabado',  nombre: 'Gel semipermanente', precioExtra: 50  },
+    { tipo: 'acabado',  nombre: 'Acrílico',           precioExtra: 100 },
+  ];
+
+  const variantesCabello = [
+    { tipo: 'nivel', nombre: 'Básico',    precioExtra: 0   },
+    { tipo: 'nivel', nombre: 'Estilizado',precioExtra: 100 },
+    { tipo: 'nivel', nombre: 'Premium',   precioExtra: 200 },
+    { tipo: 'largo', nombre: 'Corto',     precioExtra: 0   },
+    { tipo: 'largo', nombre: 'Medio',     precioExtra: 0   },
+    { tipo: 'largo', nombre: 'Largo',     precioExtra: 0   },
+    { tipo: 'largo', nombre: 'Muy largo', precioExtra: 0   },
+  ];
+
+  const variantesTinte = [
+    ...variantesCabello,
+    { tipo: 'tecnica', nombre: 'Color completo', precioExtra: 0   },
+    { tipo: 'tecnica', nombre: 'Mechas',         precioExtra: 0   },
+    { tipo: 'tecnica', nombre: 'Balayage',       precioExtra: 150 },
+  ];
+
+  const variantesMaquillaje = [
+    { tipo: 'ocasion',    nombre: 'Natural',     precioExtra: 0   },
+    { tipo: 'ocasion',    nombre: 'Social',      precioExtra: 0   },
+    { tipo: 'ocasion',    nombre: 'Quinceañera', precioExtra: 0   },
+    { tipo: 'ocasion',    nombre: 'Novia',       precioExtra: 0   },
+    { tipo: 'ocasion',    nombre: 'Editorial',   precioExtra: 0   },
+    { tipo: 'intensidad', nombre: 'Ligero',      precioExtra: 0   },
+    { tipo: 'intensidad', nombre: 'Completo',    precioExtra: 80  },
+    { tipo: 'intensidad', nombre: 'Glam',        precioExtra: 150 },
+  ];
+
+  // Crear servicios
+  const serviciosCreados = await Servicio.insertMany([
+    { nombre: 'Manicure Clasico',  categoria: 'Manicure',   precioBase: 150, duracion: 45,  variantes: variantesUnas      },
+    { nombre: 'Manicure Gel',      categoria: 'Manicure',   precioBase: 350, duracion: 60,  variantes: variantesUnas      },
+    { nombre: 'Nail Art Sencillo', categoria: 'Manicure',   precioBase: 420, duracion: 75,  variantes: variantesUnas      },
+    { nombre: 'Pedicure Spa',      categoria: 'Pedicure',   precioBase: 300, duracion: 60,  variantes: variantesUnas      },
+    { nombre: 'Corte Clasico',     categoria: 'Cortes',     precioBase: 250, duracion: 45,  variantes: variantesCabello   },
+    { nombre: 'Tinte Completo',    categoria: 'Tintes',     precioBase: 600, duracion: 120, variantes: variantesTinte     },
+    { nombre: 'Maquillaje Social', categoria: 'Maquillaje', precioBase: 450, duracion: 60,  variantes: variantesMaquillaje},
+  ]);
+  const servicio = serviciosCreados[0];
 
   // Crear cita de prueba
   const cita = await Cita.create({

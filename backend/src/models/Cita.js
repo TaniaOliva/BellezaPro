@@ -6,7 +6,7 @@ const citaSchema = new mongoose.Schema({
   servicioId: { type: mongoose.Schema.Types.ObjectId, ref: 'Servicio', required: true },
   fecha: { type: Date, required: true },
   hora: { type: String, required: true },
-  estado: { type: String, enum: ['pendiente', 'confirmada', 'en_progreso', 'completada', 'cancelada'], default: 'pendiente' },
+  estado: { type: String, default: 'confirmada', enum: ['pendiente', 'confirmada', 'en_progreso', 'completada', 'cancelada'] },
   notas: String,
   createdAt: { type: Date, default: Date.now }
 });

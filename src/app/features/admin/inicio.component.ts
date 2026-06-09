@@ -18,18 +18,26 @@ import { Usuario, Servicio, SolicitudEspecial, ReporteCliente } from '../../core
             <h1 class="text-3xl font-bold text-gray-800">Panel de administración</h1>
             <p class="text-gray-600 mt-2">Resumen rápido de la operación y métricas clave.</p>
           </div>
-          <div class="grid grid-cols-3 gap-4">
+          <div class="grid grid-cols-5 gap-4">
             <div class="bg-red-50 border border-red-100 rounded-lg p-4 text-center">
-              <p class="text-xs uppercase text-gray-500 font-semibold">Citas hoy</p>
-              <p class="text-2xl font-bold text-gray-800 mt-2">12</p>
-            </div>
-            <div class="bg-red-50 border border-red-100 rounded-lg p-4 text-center">
-              <p class="text-xs uppercase text-gray-500 font-semibold">Ingresos</p>
-              <p class="text-2xl font-bold text-gray-800 mt-2">L. 45,320</p>
+              <p class="text-xs uppercase text-gray-500 font-semibold">Empleadas</p>
+              <p class="text-2xl font-bold text-gray-800 mt-2">{{ totalEmpleadas }}</p>
             </div>
             <div class="bg-red-50 border border-red-100 rounded-lg p-4 text-center">
               <p class="text-xs uppercase text-gray-500 font-semibold">Clientes</p>
-              <p class="text-2xl font-bold text-gray-800 mt-2">128</p>
+              <p class="text-2xl font-bold text-gray-800 mt-2">{{ totalClientes }}</p>
+            </div>
+            <div class="bg-red-50 border border-red-100 rounded-lg p-4 text-center">
+              <p class="text-xs uppercase text-gray-500 font-semibold">Servicios</p>
+              <p class="text-2xl font-bold text-gray-800 mt-2">{{ totalServicios }}</p>
+            </div>
+            <div class="bg-yellow-50 border border-yellow-100 rounded-lg p-4 text-center">
+              <p class="text-xs uppercase text-gray-500 font-semibold">Solicitudes</p>
+              <p class="text-2xl font-bold text-yellow-700 mt-2">{{ solicitudesPendientes }}</p>
+            </div>
+            <div class="bg-orange-50 border border-orange-100 rounded-lg p-4 text-center">
+              <p class="text-xs uppercase text-gray-500 font-semibold">Reportes</p>
+              <p class="text-2xl font-bold text-orange-700 mt-2">{{ reportesPendientes }}</p>
             </div>
           </div>
         </div>

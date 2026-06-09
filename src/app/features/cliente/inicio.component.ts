@@ -14,7 +14,7 @@ import { Cita, Servicio } from '../../core/models';
     <div class="bg-white min-h-screen">
       <!-- Banner bienvenida -->
       <div class="bg-red-50 px-8 py-12 rounded-none">
-        <h1 class="text-4xl font-bold text-gray-800 mb-2">Bienvenida, María</h1>
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">Bienvenida, {{ nombreUsuario }}</h1>
         <p class="text-gray-600">Que servicio te apetece hoy?</p>
       </div>
 
@@ -26,8 +26,17 @@ import { Cita, Servicio } from '../../core/models';
               <span class="material-symbols-outlined text-red-600 text-2xl">calendar_today</span>
             </div>
             <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Proxima cita</p>
-            <p class="text-2xl font-bold text-gray-800 mb-1">15 de Octubre</p>
-            <p class="text-sm text-gray-600 mb-4">Estilista: Sofia Gomez</p>
+            <ng-container *ngIf="proximaCita; else sinCita">
+              <p class="text-2xl font-bold text-gray-800 mb-1">{{ proximaCita.fecha | date:'d MMM':'UTC' }}</p>
+              <p class="text-sm text-gray-600 mb-4">
+                {{ proximaCita.servicioId?.nombre ?? 'Servicio' }}
+                <ng-container *ngIf="proximaCita.estilistaId?.nombre"> · {{ proximaCita.estilistaId.nombre }}</ng-container>
+              </p>
+            </ng-container>
+            <ng-template #sinCita>
+              <p class="text-2xl font-bold text-gray-800 mb-1">Sin citas próximas</p>
+              <p class="text-sm text-gray-600 mb-4">¡Agenda tu próxima visita!</p>
+            </ng-template>
             <a routerLink="/cliente/mis-citas" class="text-red-600 font-semibold text-sm hover:underline">Ver detalles →</a>
           </div>
 
@@ -36,7 +45,7 @@ import { Cita, Servicio } from '../../core/models';
               <span class="material-symbols-outlined text-red-600 text-2xl">content_cut</span>
             </div>
             <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Citas este mes</p>
-            <p class="text-2xl font-bold text-gray-800">3</p>
+            <p class="text-2xl font-bold text-gray-800">{{ citasEsteMes }}</p>
           </div>
 
           <div class="bg-white rounded-lg border border-gray-200 p-6">
@@ -64,50 +73,14 @@ import { Cita, Servicio } from '../../core/models';
             <a routerLink="/cliente/servicios" class="text-red-600 font-semibold text-sm">Ver todos</a>
           </div>
           <div class="grid grid-cols-4 gap-6">
-            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
+            <div *ngFor="let s of serviciosPopulares" class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
               <div class="relative bg-gray-200 h-48">
                 <span class="absolute top-3 left-3 bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
               </div>
               <div class="p-5">
-                <p class="text-xs text-gray-500 uppercase mb-2">Cabello</p>
-                <p class="text-lg font-bold text-gray-800 mb-2">Corte y Secado Premium</p>
-                <p class="text-sm text-gray-600 mb-4">Desde L. 250</p>
-                <button routerLink="/cliente/servicios" class="w-full text-red-600 border border-red-600 rounded-lg py-2 font-semibold hover:bg-red-50 transition">Agendar</button>
-              </div>
-            </div>
-
-            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
-              <div class="relative bg-gray-200 h-48">
-                <span class="absolute top-3 left-3 bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
-              </div>
-              <div class="p-5">
-                <p class="text-xs text-gray-500 uppercase mb-2">Uñas</p>
-                <p class="text-lg font-bold text-gray-800 mb-2">Manicure Spa Completa</p>
-                <p class="text-sm text-gray-600 mb-4">Desde L. 350</p>
-                <button routerLink="/cliente/servicios" class="w-full text-red-600 border border-red-600 rounded-lg py-2 font-semibold hover:bg-red-50 transition">Agendar</button>
-              </div>
-            </div>
-
-            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
-              <div class="relative bg-gray-200 h-48">
-                <span class="absolute top-3 left-3 bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
-              </div>
-              <div class="p-5">
-                <p class="text-xs text-gray-500 uppercase mb-2">Facial</p>
-                <p class="text-lg font-bold text-gray-800 mb-2">Limpieza Facial Profunda</p>
-                <p class="text-sm text-gray-600 mb-4">Desde L. 600</p>
-                <button routerLink="/cliente/servicios" class="w-full text-red-600 border border-red-600 rounded-lg py-2 font-semibold hover:bg-red-50 transition">Agendar</button>
-              </div>
-            </div>
-
-            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
-              <div class="relative bg-gray-200 h-48">
-                <span class="absolute top-3 left-3 bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
-              </div>
-              <div class="p-5">
-                <p class="text-xs text-gray-500 uppercase mb-2">Maquillaje</p>
-                <p class="text-lg font-bold text-gray-800 mb-2">Maquillaje de Noche</p>
-                <p class="text-sm text-gray-600 mb-4">Desde L. 600</p>
+                <p class="text-xs text-gray-500 uppercase mb-2">{{ s.categoria }}</p>
+                <p class="text-lg font-bold text-gray-800 mb-2">{{ s.nombre }}</p>
+                <p class="text-sm text-gray-600 mb-4">Desde L. {{ s.precioBase }}</p>
                 <button routerLink="/cliente/servicios" class="w-full text-red-600 border border-red-600 rounded-lg py-2 font-semibold hover:bg-red-50 transition">Agendar</button>
               </div>
             </div>

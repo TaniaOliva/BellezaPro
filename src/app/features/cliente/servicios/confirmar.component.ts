@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { BookingService, BookingState } from '../../../core/services/booking.service';
+import { CitaService } from '../../../core/services/cita.service';
 
 @Component({
   selector: 'app-cliente-confirmar',
@@ -20,7 +23,7 @@ import { FormsModule } from '@angular/forms';
           <div class="w-12 h-1 bg-red-600"></div>
           <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-xs">✓</div>
           <div class="w-12 h-1 bg-red-600"></div>
-          <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-xs">4</div>
+          <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-xs">✓</div>
           <div class="w-12 h-1 bg-gray-300"></div>
           <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-xs">5</div>
         </div>
@@ -35,19 +38,25 @@ import { FormsModule } from '@angular/forms';
           <div class="space-y-4 pb-4 border-b border-red-200">
             <div class="flex justify-between">
               <span class="text-sm uppercase text-gray-600 font-semibold">Servicio</span>
-              <span class="text-sm text-gray-800">L 350</span>
+              <span class="text-sm text-gray-800">L {{ estado.precioFinal }}</span>
             </div>
             <div>
-              <p class="text-gray-800 font-semibold">Manicure premium</p>
-              <p class="text-xs text-gray-600">Mediana, Rosa claro</p>
+              <p class="text-gray-800 font-semibold">{{ estado.servicio?.nombre }}</p>
+              <p *ngIf="estado.variantes?.largo || estado.variantes?.color" class="text-xs text-gray-600">
+                {{ estado.variantes?.largo }}{{ estado.variantes?.color ? ', ' + estado.variantes?.color : '' }}
+              </p>
             </div>
           </div>
 
           <div class="py-4 border-b border-red-200 space-y-2">
             <div class="text-sm uppercase text-gray-600 font-semibold">Estilista</div>
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-bold">AG</div>
-              <p class="text-gray-800 font-semibold">Ana Garcia</p>
+              <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-bold">
+                {{ estado.estilista ? (estado.estilista.nombre[0] + (estado.estilista.apellido?.[0] ?? '')) : 'A' }}
+              </div>
+              <p class="text-gray-800 font-semibold">
+                {{ estado.estilista ? (estado.estilista.nombre + ' ' + estado.estilista.apellido) : 'Asignación automática' }}
+              </p>
             </div>
           </div>
 
@@ -55,11 +64,11 @@ import { FormsModule } from '@angular/forms';
             <div class="text-sm uppercase text-gray-600 font-semibold">Cita</div>
             <div class="flex items-center gap-2 text-gray-800">
               <span class="material-symbols-outlined text-sm">calendar_today</span>
-              <span>Jueves, 24 Octubre 2024</span>
+              <span>{{ estado.fecha }}</span>
             </div>
             <div class="flex items-center gap-2 text-gray-800">
               <span class="material-symbols-outlined text-sm">schedule</span>
-              <span>10:00 AM (1 hr 30 min)</span>
+              <span>{{ estado.hora }} ({{ estado.servicio?.duracion }} min)</span>
             </div>
           </div>
         </div>
@@ -67,13 +76,23 @@ import { FormsModule } from '@angular/forms';
         <!-- Total -->
         <div class="flex justify-between items-center mb-8">
           <span class="text-gray-600 font-semibold">Total estimado</span>
-          <span class="text-3xl font-bold text-red-600">L 480</span>
+          <span class="text-3xl font-bold text-red-600">L {{ estado.precioFinal }}</span>
         </div>
 
         <!-- Notas -->
         <div class="mb-8">
           <label class="block text-sm font-bold text-gray-800 mb-3">Notas adicionales para la estilista (Opcional)</label>
-          <textarea rows="4" class="w-full p-3 border border-gray-300 rounded-lg text-gray-700 placeholder-gray-400" placeholder="Ej. Tengo sensibilidad en las cutículas..."></textarea>
+          <textarea
+            [(ngModel)]="notas"
+            rows="4"
+            class="w-full p-3 border border-gray-300 rounded-lg text-gray-700 placeholder-gray-400"
+            placeholder="Ej. Tengo sensibilidad en las cutículas...">
+          </textarea>
+        </div>
+
+        <!-- Error -->
+        <div *ngIf="error" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          {{ error }}
         </div>
 
         <!-- Confirmación -->
@@ -84,17 +103,73 @@ import { FormsModule } from '@angular/forms';
 
         <!-- Botones -->
         <div class="flex gap-4">
-          <button class="flex-1 border border-gray-300 text-gray-800 rounded-lg py-3 font-semibold hover:bg-gray-50 transition">
+          <button (click)="modificar()" class="flex-1 border border-gray-300 text-gray-800 rounded-lg py-3 font-semibold hover:bg-gray-50 transition">
             Modificar reserva
           </button>
-          <button class="flex-1 bg-red-600 text-white rounded-lg py-3 font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2">
+          <button
+            (click)="confirmar()"
+            [disabled]="enviando"
+            class="flex-1 bg-red-600 text-white rounded-lg py-3 font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2 disabled:opacity-50">
             <span class="material-symbols-outlined">check_circle</span>
-            Confirmar reserva
+            {{ enviando ? 'Confirmando...' : 'Confirmar reserva' }}
           </button>
         </div>
       </div>
     </div>
   `
 })
-export class ConfirmarComponent {}
+export class ConfirmarComponent implements OnInit {
+  estado: Partial<BookingState> = {};
+  notas = '';
+  enviando = false;
+  error = '';
 
+  constructor(
+    private bookingSvc: BookingService,
+    private citaSvc: CitaService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.estado = this.bookingSvc.getEstado();
+    if (!this.estado.servicio || !this.estado.fecha) {
+      this.router.navigate(['/cliente/servicios']);
+    }
+  }
+
+  confirmar(): void {
+    if (this.enviando) return;
+    this.enviando = true;
+    this.error = '';
+    const { servicio, variantes, precioFinal, estilista, fecha, hora } = this.estado;
+
+    const body: any = {
+      servicioId: servicio._id,
+      variantesElegidas: variantes,
+      fecha: fecha,
+      hora: hora!,
+      duracion: servicio.duracion,
+      precioFinal: precioFinal,
+      notas: this.notas
+    };
+
+    if (estilista?._id) {
+      body.estilistaId = estilista._id;
+    }
+
+    this.citaSvc.crear(body).subscribe({
+      next: () => {
+        this.bookingSvc.limpiar();
+        this.router.navigate(['/cliente/mis-citas']);
+      },
+      error: (err: any) => {
+        this.error = err.error?.mensaje || 'El horario ya no está disponible. Elige otro.';
+        this.enviando = false;
+      }
+    });
+  }
+
+  modificar(): void {
+    this.router.navigate(['/cliente/servicios/horario']);
+  }
+}

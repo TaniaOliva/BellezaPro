@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { ServicioService } from '../../../core/services/servicio.service';
+import { BookingService } from '../../../core/services/booking.service';
 import { Servicio } from '../../../core/models';
 
 @Component({
   selector: 'app-cliente-catalogo',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   template: `
     <div class="bg-white min-h-screen">
       <div class="px-8 py-8">
@@ -20,84 +21,30 @@ import { Servicio } from '../../../core/models';
             <span class="material-symbols-outlined text-gray-400">search</span>
             <input type="text" placeholder="Buscar servicio..." class="ml-2 flex-1 outline-none text-gray-700" />
           </div>
-          <button class="px-4 py-2 bg-red-100 text-red-600 rounded-full font-semibold text-sm">Todos</button>
-          <button class="px-4 py-2 text-gray-600 rounded-full font-semibold text-sm border border-gray-300">Manicure</button>
-          <button class="px-4 py-2 text-gray-600 rounded-full font-semibold text-sm border border-gray-300">Pedicure</button>
-          <button class="px-4 py-2 text-gray-600 rounded-full font-semibold text-sm border border-gray-300">Cabello</button>
-          <button class="px-4 py-2 text-gray-600 rounded-full font-semibold text-sm border border-gray-300">Maquillaje</button>
+          <button
+            *ngFor="let cat of categorias"
+            (click)="filtrar(cat)"
+            [class]="categoriaActiva === cat
+              ? 'px-4 py-2 bg-red-100 text-red-600 rounded-full font-semibold text-sm'
+              : 'px-4 py-2 text-gray-600 rounded-full font-semibold text-sm border border-gray-300 hover:bg-gray-50'">
+            {{ cat }}
+          </button>
         </div>
+
+        <!-- Cargando -->
+        <div *ngIf="cargando" class="text-center py-16 text-gray-500">Cargando servicios...</div>
 
         <!-- Grid de servicios -->
         <div class="grid grid-cols-3 gap-6">
-          <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
+          <div *ngFor="let s of serviciosFiltrados" class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
             <div class="bg-gray-300 h-48 relative">
-              <span class="absolute top-3 right-3 bg-white text-gray-700 text-xs font-bold px-3 py-1 rounded">Manicure</span>
+              <span class="absolute top-3 right-3 bg-white text-gray-700 text-xs font-bold px-3 py-1 rounded">{{ s.categoria }}</span>
             </div>
             <div class="p-5">
-              <h3 class="text-lg font-bold text-gray-800 mb-2">Manicure Clásico</h3>
-              <p class="text-sm text-gray-600 mb-2">Cuidado esencial de las manos, incluyendo limpieza, limado, hidratación...</p>
-              <p class="text-red-600 font-bold mb-4">Desde L. 200</p>
-              <button routerLink="/cliente/servicios/opciones" class="w-full bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700 transition">Seleccionar</button>
-            </div>
-          </div>
-
-          <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
-            <div class="bg-gray-300 h-48 relative">
-              <span class="absolute top-3 right-3 bg-white text-gray-700 text-xs font-bold px-3 py-1 rounded">Manicure</span>
-            </div>
-            <div class="p-5">
-              <h3 class="text-lg font-bold text-gray-800 mb-2">Manicure Gel</h3>
-              <p class="text-sm text-gray-600 mb-2">Aplicación de esmalte en gel de larga duración con curado UV. Acabado...</p>
-              <p class="text-red-600 font-bold mb-4">Desde L. 350</p>
-              <button routerLink="/cliente/servicios/opciones" class="w-full bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700 transition">Seleccionar</button>
-            </div>
-          </div>
-
-          <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
-            <div class="bg-gray-300 h-48 relative">
-              <span class="absolute top-3 right-3 bg-white text-gray-700 text-xs font-bold px-3 py-1 rounded">Uñas</span>
-            </div>
-            <div class="p-5">
-              <h3 class="text-lg font-bold text-gray-800 mb-2">Nail Art Sencillo</h3>
-              <p class="text-sm text-gray-600 mb-2">Diseños minimalistas y elegantes aplicados sobre la base preferido...</p>
-              <p class="text-red-600 font-bold mb-4">Desde L. 420</p>
-              <button routerLink="/cliente/servicios/opciones" class="w-full bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700 transition">Seleccionar</button>
-            </div>
-          </div>
-
-          <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
-            <div class="bg-gray-300 h-48 relative">
-              <span class="absolute top-3 right-3 bg-white text-gray-700 text-xs font-bold px-3 py-1 rounded">Pedicure</span>
-            </div>
-            <div class="p-5">
-              <h3 class="text-lg font-bold text-gray-800 mb-2">Pedicure Spa</h3>
-              <p class="text-sm text-gray-600 mb-2">Tratamiento completo para pies cansados. Incluye exfoliación con sales...</p>
-              <p class="text-red-600 font-bold mb-4">Desde L. 300</p>
-              <button routerLink="/cliente/servicios/opciones" class="w-full bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700 transition">Seleccionar</button>
-            </div>
-          </div>
-
-          <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
-            <div class="bg-gray-300 h-48 relative">
-              <span class="absolute top-3 right-3 bg-white text-gray-700 text-xs font-bold px-3 py-1 rounded">Cabello</span>
-            </div>
-            <div class="p-5">
-              <h3 class="text-lg font-bold text-gray-800 mb-2">Corte Clásico</h3>
-              <p class="text-sm text-gray-600 mb-2">Diseño de corte personalizado según tu tipo de rostro y textura cabello. Incluye...</p>
-              <p class="text-red-600 font-bold mb-4">Desde L. 250</p>
-              <button routerLink="/cliente/servicios/opciones" class="w-full bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700 transition">Seleccionar</button>
-            </div>
-          </div>
-
-          <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
-            <div class="bg-gray-300 h-48 relative">
-              <span class="absolute top-3 right-3 bg-white text-gray-700 text-xs font-bold px-3 py-1 rounded">Cabello</span>
-            </div>
-            <div class="p-5">
-              <h3 class="text-lg font-bold text-gray-800 mb-2">Tinte Completo</h3>
-              <p class="text-sm text-gray-600 mb-2">Coloración total con productos de alta gama que protegen la fibra capilar...</p>
-              <p class="text-red-600 font-bold mb-4">Desde L. 600</p>
-              <button routerLink="/cliente/servicios/opciones" class="w-full bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700 transition">Seleccionar</button>
+              <h3 class="text-lg font-bold text-gray-800 mb-2">{{ s.nombre }}</h3>
+              <p class="text-sm text-gray-600 mb-2">{{ s.descripcion }}</p>
+              <p class="text-red-600 font-bold mb-4">Desde L. {{ s.precioBase }}</p>
+              <button (click)="seleccionar(s)" class="w-full bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700 transition">Seleccionar</button>
             </div>
           </div>
         </div>
@@ -112,7 +59,11 @@ export class CatalogoComponent implements OnInit {
   cargando = true;
   categorias = ['Todos', 'Manicure', 'Pedicure', 'Cortes', 'Tintes', 'Maquillaje'];
 
-  constructor(private servicioSvc: ServicioService, private router: Router) {}
+  constructor(
+    private servicioSvc: ServicioService,
+    private bookingSvc: BookingService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.servicioSvc.listar().subscribe({
@@ -133,7 +84,7 @@ export class CatalogoComponent implements OnInit {
   }
 
   seleccionar(servicio: Servicio): void {
-    sessionStorage.setItem('bp_servicio', JSON.stringify(servicio));
+    this.bookingSvc.setServicio(servicio, null, servicio.precioBase);
     this.router.navigate(['/cliente/servicios/opciones']);
   }
 }

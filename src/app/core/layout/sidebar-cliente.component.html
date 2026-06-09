@@ -52,9 +52,13 @@
   </nav>
 
   <!-- Bottom CTA -->
-  <div class="px-4 pb-4 mt-auto">
-    <button class="w-full bg-primary text-on-primary font-label-md py-3 rounded-lg hover:bg-surface-tint transition-colors">
+  <div class="px-4 pb-4 mt-auto space-y-2">
+    <button routerLink="/cliente/servicios" class="w-full bg-primary text-on-primary font-label-md py-3 rounded-lg hover:bg-surface-tint transition-colors">
       Agendar cita
+    </button>
+    <button (click)="logout()" class="w-full flex items-center gap-2 px-4 py-3 text-error font-label-md hover:bg-error-container rounded-lg transition-colors">
+      <span class="material-symbols-outlined text-sm">logout</span>
+      Cerrar sesión
     </button>
   </div>
 </aside>

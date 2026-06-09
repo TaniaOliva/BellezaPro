@@ -6,6 +6,11 @@ const servicioSchema = new mongoose.Schema({
   categoria: { type: String, required: true },
   precioBase: { type: Number, required: true },
   duracion: { type: Number, required: true },
+  variantes: [{
+    tipo:        { type: String, required: true },
+    nombre:      { type: String, required: true },
+    precioExtra: { type: Number, default: 0 }
+  }],
   activo: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now }
 });
