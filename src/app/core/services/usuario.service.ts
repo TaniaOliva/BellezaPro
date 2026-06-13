@@ -12,6 +12,10 @@ export class UsuarioService {
     return this.http.get<Usuario[]>(`${this.apiUrl}/estilistas`);
   }
 
+  listarTodosEstilistas(): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(`${this.apiUrl}/estilistas/admin`);
+  }
+
   listarClientes(): Observable<Usuario[]> {
     return this.http.get<Usuario[]>(`${this.apiUrl}/clientes`);
   }
@@ -34,5 +38,13 @@ export class UsuarioService {
 
   crearEmpleado(datos: Partial<Usuario>): Observable<Usuario> {
     return this.http.post<Usuario>(`${this.apiUrl}/empleados`, datos);
+  }
+
+  actualizarEmpleado(id: string, datos: Partial<Usuario>): Observable<Usuario> {
+    return this.http.put<Usuario>(`${this.apiUrl}/empleados/${id}`, datos);
+  }
+
+  eliminarEmpleado(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/empleados/${id}`);
   }
 }

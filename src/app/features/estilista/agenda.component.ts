@@ -9,97 +9,155 @@ import { Cita } from '../../core/models';
   imports: [CommonModule],
   template: `
     <div class="bg-white min-h-screen">
-      <!-- Header -->
       <div class="bg-red-50 px-8 py-6 border-b border-gray-200">
         <h1 class="text-2xl font-bold text-gray-800">Mi Agenda</h1>
-        <p class="text-gray-600 text-sm mt-1">Gestiona tu horario semanal de citas</p>
+        <p class="text-gray-600 text-sm mt-1 capitalize">{{ hoyFormateado }}</p>
       </div>
 
-      <div class="px-8 py-8">
-        <!-- Navegación de semanas -->
-        <div class="flex items-center justify-between mb-8">
-          <button class="p-2 hover:bg-gray-100 rounded-lg">
-            <span class="material-symbols-outlined">chevron_left</span>
-          </button>
-          <h2 class="text-lg font-bold text-gray-800">Sep 18 - 22, 2023</h2>
-          <button class="p-2 hover:bg-gray-100 rounded-lg">
-            <span class="material-symbols-outlined">chevron_right</span>
-          </button>
-        </div>
+      <div class="px-8 py-8 space-y-10">
 
-        <!-- Resumen de días -->
-        <div class="flex gap-4 mb-8 pb-4 border-b border-gray-200">
-          <div *ngFor="let dia of citasResumenDias" class="text-center">
-            <p class="text-sm font-semibold text-gray-600 mb-2">{{ dia.dia }}</p>
-            <p [class]="dia.esHoy ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-800'" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm">
-              {{ dia.numero }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Grid de horarios -->
-        <div class="grid gap-1 bg-gray-100 p-4 rounded-lg overflow-x-auto">
-          <!-- Encabezado -->
-          <div class="flex gap-1">
-            <div class="w-16 text-right py-2 pr-2 text-xs text-gray-600 font-medium"></div>
-            <div *ngFor="let dia of citasResumenDias" class="flex-1 text-center py-2 font-semibold text-sm text-gray-700 min-w-24">
-              {{ dia.dia }}
-            </div>
+        <!-- ── Citas de hoy ─────────────────────────────────── -->
+        <section>
+          <div class="flex items-center gap-3 mb-4">
+            <h2 class="text-xl font-bold text-gray-800">Citas de hoy</h2>
+            <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">{{ citasHoy.length }}</span>
           </div>
 
-          <!-- Filas de horarios -->
-          <div *ngFor="let hora of horasDisponibles" class="flex gap-1">
-            <div class="w-16 text-right py-2 pr-2 text-xs text-gray-600 font-medium">{{ hora }}</div>
-            <div *ngFor="let cita of [0,1,2,3,4]" class="flex-1 min-w-24">
-              <div [class]="esBloqueado(cita, hora) ? 'bg-amber-50' : 'bg-white'" class="border border-gray-200 rounded p-1 text-xs h-12 relative hover:shadow-md transition">
-                <div *ngIf="obtenerCitaEnHora(cita, hora)" [style.height]="obtenerAltoCita(obtenerCitaEnHora(cita, hora).duracion)" class="bg-red-100 text-red-700 rounded p-1 cursor-pointer text-xs font-semibold overflow-hidden">
-                  {{ obtenerCitaEnHora(cita, hora).cliente }}
+          <div *ngIf="cargando" class="text-gray-400 text-sm py-6 text-center">Cargando...</div>
+
+          <div *ngIf="!cargando && citasHoy.length === 0" class="bg-gray-50 border border-dashed border-gray-200 rounded-xl p-8 text-center">
+            <span class="material-symbols-outlined text-gray-300 text-4xl block mb-2">event_available</span>
+            <p class="text-gray-400 text-sm">No tienes citas para hoy</p>
+          </div>
+
+          <div class="space-y-3">
+            <div *ngFor="let c of citasHoy" class="bg-white border border-gray-200 rounded-xl p-5 flex items-center justify-between hover:shadow-sm transition">
+              <div class="flex items-center gap-4">
+                <div class="text-center w-14">
+                  <p class="text-lg font-bold text-gray-800">{{ c.hora }}</p>
+                  <p class="text-xs text-gray-400">{{ c.servicioId?.duracion ?? '-' }} min</p>
+                </div>
+                <div class="w-px h-10 bg-gray-200"></div>
+                <div>
+                  <p class="font-semibold text-gray-800">{{ c.clienteId?.nombre }} {{ c.clienteId?.apellido }}</p>
+                  <p class="text-sm text-gray-500">{{ c.servicioId?.nombre }}</p>
+                  <p *ngIf="c.notas" class="text-xs text-gray-400 italic mt-0.5">"{{ c.notas }}"</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span [class]="badgeEstado(c.estado)">{{ etiquetaEstado(c.estado) }}</span>
+                <div class="flex gap-2">
+                  <button *ngIf="c.estado === 'confirmada'"
+                    (click)="cambiarEstado(c, 'en_progreso')"
+                    class="text-xs font-semibold px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                    En progreso
+                  </button>
+                  <button *ngIf="c.estado === 'en_progreso'"
+                    (click)="cambiarEstado(c, 'completada')"
+                    class="text-xs font-semibold px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                    Completar
+                  </button>
+                  <button *ngIf="c.estado === 'confirmada' || c.estado === 'en_progreso'"
+                    (click)="confirmarCancelar(c)"
+                    class="text-xs font-semibold px-3 py-1.5 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition">
+                    Cancelar
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        <!-- ── Próximas citas ───────────────────────────────── -->
+        <section>
+          <div class="flex items-center gap-3 mb-4">
+            <h2 class="text-xl font-bold text-gray-800">Próximas citas</h2>
+            <span class="bg-blue-100 text-blue-600 text-xs font-bold px-2 py-0.5 rounded-full">{{ citasProximas.length }}</span>
+          </div>
+
+          <div *ngIf="!cargando && citasProximas.length === 0" class="bg-gray-50 border border-dashed border-gray-200 rounded-xl p-8 text-center">
+            <span class="material-symbols-outlined text-gray-300 text-4xl block mb-2">calendar_month</span>
+            <p class="text-gray-400 text-sm">No tienes citas próximas agendadas</p>
+          </div>
+
+          <div class="space-y-3">
+            <div *ngFor="let c of citasProximas" class="bg-white border border-gray-200 rounded-xl p-5 flex items-center justify-between hover:shadow-sm transition">
+              <div class="flex items-center gap-4">
+                <div class="text-center w-14">
+                  <p class="text-sm font-bold text-gray-500">{{ c.fecha | date:'d MMM':'UTC' }}</p>
+                  <p class="text-lg font-bold text-red-600">{{ c.hora }}</p>
+                </div>
+                <div class="w-px h-10 bg-gray-200"></div>
+                <div>
+                  <p class="font-semibold text-gray-800">{{ c.clienteId?.nombre }} {{ c.clienteId?.apellido }}</p>
+                  <p class="text-sm text-gray-500">{{ c.servicioId?.nombre }}</p>
+                  <p class="text-xs text-gray-400">{{ c.clienteId?.telefono }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span [class]="badgeEstado(c.estado)">{{ etiquetaEstado(c.estado) }}</span>
+                <button (click)="confirmarCancelar(c)"
+                  class="text-xs font-semibold px-3 py-1.5 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition">
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Canceladas hoy ───────────────────────────────── -->
+        <section *ngIf="!cargando && citasCanceladasHoy.length > 0">
+          <div class="flex items-center gap-3 mb-4">
+            <h2 class="text-xl font-bold text-gray-800">Canceladas hoy</h2>
+            <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full">{{ citasCanceladasHoy.length }}</span>
+          </div>
+
+          <div class="space-y-3">
+            <div *ngFor="let c of citasCanceladasHoy" class="bg-gray-50 border border-gray-200 rounded-xl p-5 flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="text-center w-14">
+                  <p class="text-lg font-bold text-gray-400">{{ c.hora }}</p>
+                  <p class="text-xs text-gray-400">{{ c.servicioId?.duracion ?? '-' }} min</p>
+                </div>
+                <div class="w-px h-10 bg-gray-300"></div>
+                <div>
+                  <p class="font-semibold text-gray-500">{{ c.clienteId?.nombre }} {{ c.clienteId?.apellido }}</p>
+                  <p class="text-sm text-gray-400">{{ c.servicioId?.nombre }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span [class]="badgeEstado(c.estado)">Cancelada</span>
+                <button (click)="cambiarEstado(c, 'en_progreso')"
+                  class="text-xs font-semibold px-3 py-1.5 border border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50 transition">
+                  En progreso
+                </button>
+                <button (click)="cambiarEstado(c, 'completada')"
+                  class="text-xs font-semibold px-3 py-1.5 border border-green-300 text-green-600 rounded-lg hover:bg-green-50 transition">
+                  Completada
+                </button>
+              </div>
+            </div>
+          </div>
+          <p class="text-xs text-gray-400 mt-3">Las citas auto-canceladas por inactividad aparecen aquí. Puedes corregir su estado si fue un error.</p>
+        </section>
+
       </div>
 
-      <!-- Modal de detalles de cita -->
-      <div *ngIf="selectedCita" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-lg p-8 max-w-md w-full">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-bold text-gray-800">Detalles de la cita</h3>
-            <button (click)="cerrarCita()" class="text-gray-400 hover:text-gray-600">
-              <span class="material-symbols-outlined">close</span>
-            </button>
-          </div>
-          <div class="space-y-4 mb-6">
-            <div>
-              <p class="text-xs text-gray-600 uppercase font-semibold mb-1">Cliente</p>
-              <p class="text-lg font-semibold text-gray-800">{{ selectedCita.cliente }}</p>
-            </div>
-            <div>
-              <p class="text-xs text-gray-600 uppercase font-semibold mb-1">Servicio</p>
-              <p class="text-gray-800">{{ selectedCita.servicioCompleto }}</p>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <p class="text-xs text-gray-600 uppercase font-semibold mb-1">Duración</p>
-                <p class="text-gray-800">{{ selectedCita.duracionCompleta }}</p>
-              </div>
-              <div>
-                <p class="text-xs text-gray-600 uppercase font-semibold mb-1">Precio</p>
-                <p class="text-gray-800">{{ selectedCita.precio }}</p>
-              </div>
-            </div>
-            <div>
-              <p class="text-xs text-gray-600 uppercase font-semibold mb-1">Estado</p>
-              <p class="text-gray-800 font-semibold">{{ selectedCita.estado }}</p>
-            </div>
-          </div>
+      <!-- Modal confirmar cancelación -->
+      <div *ngIf="citaACancelar" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+          <h3 class="text-lg font-bold text-gray-800 mb-2">¿Cancelar cita?</h3>
+          <p class="text-sm text-gray-500 mb-6">
+            Se cancelará la cita de
+            <strong>{{ citaACancelar.clienteId?.nombre }}</strong>
+            a las <strong>{{ citaACancelar.hora }}</strong>.
+          </p>
           <div class="flex gap-3">
-            <button (click)="cerrarCita()" class="flex-1 border border-gray-300 text-gray-800 rounded-lg py-2 font-semibold hover:bg-gray-50 transition">
-              Cerrar
+            <button (click)="citaACancelar = null" class="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2 font-semibold hover:bg-gray-50 transition">
+              No, mantener
             </button>
-            <button (click)="marcarCompletada()" class="flex-1 bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700 transition">
-              Completada
+            <button (click)="ejecutarCancelacion()" class="flex-1 bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700 transition">
+              Sí, cancelar
             </button>
           </div>
         </div>
@@ -108,64 +166,87 @@ import { Cita } from '../../core/models';
   `
 })
 export class AgendaComponent implements OnInit {
-  selectedCita: any = null;
   citas: Cita[] = [];
   cargando = true;
-  viewMode: 'semana' | 'dia' = 'semana';
+  citaACancelar: Cita | null = null;
 
-  diasSemana = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie'];
-  horasDisponibles = [
-    '08:00', '09:00', '10:00', '11:00', '12:00', '13:00',
-    '14:00', '15:00', '16:00', '17:00'
-  ];
+  citasHoy: Cita[] = [];
+  citasProximas: Cita[] = [];
+  citasCanceladasHoy: Cita[] = [];
 
-  citasHardcodeadas = [
-    { dia: 0, horaInicio: '09:00', duracion: 45, cliente: 'Laura M.', servicio: 'Manicure Clasico', precioCompleto: 'Laura Mendez', servicioCompleto: 'Manicure Clasico', horaCompleta: '09:00', precio: 'L 150', duracionCompleta: '45 min', estado: 'Confirmada' },
-    { dia: 1, horaInicio: '10:30', duracion: 70, cliente: 'Sofia T.', servicio: 'Nail Art', precioCompleto: 'Sofia Torres', servicioCompleto: 'Nail Art Sencillo', horaCompleta: '10:30', precio: 'L 200', duracionCompleta: '70 min', estado: 'Confirmada' },
-    { dia: 2, horaInicio: '09:00', duracion: 60, cliente: 'Carmen R.', servicio: 'Manicure Gel', precioCompleto: 'Carmen Reyes', servicioCompleto: 'Manicure Gel', horaCompleta: '09:00', precio: 'L 180', duracionCompleta: '60 min', estado: 'Confirmada' },
-    { dia: 2, horaInicio: '12:00', duracion: 75, cliente: 'Valeria C.', servicio: 'Pedicure Spa', precioCompleto: 'Valeria Cruz', servicioCompleto: 'Pedicure Spa', horaCompleta: '12:00', precio: 'L 220', duracionCompleta: '75 min', estado: 'Confirmada' },
-    { dia: 3, horaInicio: '14:00', duracion: 70, cliente: 'Ana P.', servicio: 'Manicure premium', precioCompleto: 'Ana P.', servicioCompleto: 'Manicure premium', horaCompleta: '14:00', precio: 'L 250', duracionCompleta: '70 min', estado: 'Confirmada' }
-  ];
-
-  citasResumenDias = [
-    { dia: 'Lun', numero: 1 },
-    { dia: 'Mar', numero: 1 },
-    { dia: 'Mie', numero: 2, esHoy: true },
-    { dia: 'Jue', numero: 1 },
-    { dia: 'Vie', numero: 0 }
-  ];
+  hoyFormateado = new Date().toLocaleDateString('es-HN', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
 
   constructor(private citaSvc: CitaService) {}
 
   ngOnInit(): void {
+    this.cargar();
+  }
+
+  private cargar(): void {
+    this.cargando = true;
     this.citaSvc.miAgenda().subscribe({
-      next: (data: Cita[]) => { this.citas = data; this.cargando = false; },
+      next: (data: Cita[]) => {
+        this.citas = data;
+        this.clasificar();
+        this.cargando = false;
+      },
       error: () => this.cargando = false
     });
   }
 
-  abrirCita(cita: any): void { this.selectedCita = cita; }
+  private clasificar(): void {
+    const hoyStr = new Date().toISOString().slice(0, 10);
 
-  cerrarCita(): void { this.selectedCita = null; }
+    this.citasHoy = this.citas.filter(c =>
+      c.fecha.slice(0, 10) === hoyStr && c.estado !== 'cancelada'
+    );
 
-  marcarCompletada(): void {
-    if (this.selectedCita?._id) {
-      this.citaSvc.actualizarEstado(this.selectedCita._id, 'completada').subscribe((actualizada: Cita) => {
-        this.citas = this.citas.map((c: Cita) => c._id === actualizada._id ? actualizada : c);
-        this.cerrarCita();
-      });
-    } else {
-      this.cerrarCita();
+    this.citasProximas = this.citas.filter(c =>
+      c.fecha.slice(0, 10) > hoyStr && ['confirmada', 'pendiente'].includes(c.estado)
+    );
+
+    this.citasCanceladasHoy = this.citas.filter(c =>
+      c.fecha.slice(0, 10) === hoyStr && c.estado === 'cancelada'
+    );
+  }
+
+  cambiarEstado(cita: Cita, estado: string): void {
+    this.citaSvc.actualizarEstado(cita._id, estado).subscribe(() => this.cargar());
+  }
+
+  confirmarCancelar(cita: Cita): void {
+    this.citaACancelar = cita;
+  }
+
+  ejecutarCancelacion(): void {
+    if (this.citaACancelar) {
+      this.cambiarEstado(this.citaACancelar, 'cancelada');
+      this.citaACancelar = null;
     }
   }
 
-  cancelarCita(): void { this.cerrarCita(); }
-
-  obtenerCitaEnHora(dia: number, hora: string): any {
-    return this.citasHardcodeadas.find(c => c.dia === dia && c.horaInicio === hora);
+  badgeEstado(estado: string): string {
+    const base = 'text-xs font-semibold px-2 py-0.5 rounded-full';
+    const map: Record<string, string> = {
+      confirmada:  `${base} bg-blue-100 text-blue-700`,
+      en_progreso: `${base} bg-orange-100 text-orange-700`,
+      completada:  `${base} bg-green-100 text-green-700`,
+      cancelada:   `${base} bg-gray-100 text-gray-500`,
+      pendiente:   `${base} bg-yellow-100 text-yellow-700`,
+    };
+    return map[estado] ?? `${base} bg-gray-100 text-gray-500`;
   }
 
-  obtenerAltoCita(duracion: number): string { return `${duracion * 0.8}px`; }
-
-  esBloqueado(dia: number, hora: string): boolean { return dia === 4 && hora === '10:00'; }
+  etiquetaEstado(estado: string): string {
+    const map: Record<string, string> = {
+      confirmada:  'Confirmada',
+      en_progreso: 'En progreso',
+      completada:  'Completada',
+      cancelada:   'Cancelada',
+      pendiente:   'Pendiente',
+    };
+    return map[estado] ?? estado;
+  }
 }

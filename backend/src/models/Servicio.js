@@ -9,9 +9,12 @@ const servicioSchema = new mongoose.Schema({
   variantes: [{
     tipo:        { type: String, required: true },
     nombre:      { type: String, required: true },
-    precioExtra: { type: Number, default: 0 }
+    precioExtra: { type: Number, default: 0 },
+    descripcion: { type: String, default: '' }
   }],
   activo: { type: Boolean, default: true },
+  contadorSemana: { type: Number, default: 0 },
+  semanaInicio: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now }
 });
 

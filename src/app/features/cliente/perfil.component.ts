@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { UsuarioService } from '../../core/services/usuario.service';
 import { SolicitudService } from '../../core/services/solicitud.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Usuario, SolicitudEspecial } from '../../core/models';
 
 @Component({
@@ -63,7 +64,7 @@ import { Usuario, SolicitudEspecial } from '../../core/models';
               </div>
             </div>
 
-            <button (click)="guardarPerfil()" [disabled]="guardando"
+            <button (click)="guardarPerfil()" [disabled]="guardando || !hayCambios"
               class="w-full py-3 bg-red-600 text-white rounded-2xl font-semibold hover:bg-red-700 disabled:opacity-50 transition">
               {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
             </button>
@@ -76,7 +77,7 @@ import { Usuario, SolicitudEspecial } from '../../core/models';
               <p class="text-xl font-semibold text-gray-800">Cambiar contraseña</p>
 
               <div *ngIf="mensajePassword"
-                [class]="mensajePassword.includes('actualizada')
+                [class]="mensajePassword === 'Contraseña actualizada'
                   ? 'p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm'
                   : 'p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm'">
                 {{ mensajePassword }}
@@ -91,15 +92,21 @@ import { Usuario, SolicitudEspecial } from '../../core/models';
                 <label class="text-sm text-gray-500 block mb-2">Nueva contraseña</label>
                 <input [(ngModel)]="passwordNueva" type="password"
                   class="w-full rounded-2xl bg-gray-50 border border-gray-200 p-4 focus:outline-none focus:border-red-500">
+                <p *ngIf="passwordNueva && passwordNueva.length < 8" class="text-xs text-red-500 mt-1">
+                  Mínimo 8 caracteres
+                </p>
               </div>
               <div>
                 <label class="text-sm text-gray-500 block mb-2">Confirmar contraseña</label>
                 <input [(ngModel)]="passwordConfirm" type="password"
                   class="w-full rounded-2xl bg-gray-50 border border-gray-200 p-4 focus:outline-none focus:border-red-500">
+                <p *ngIf="passwordConfirm && passwordNueva !== passwordConfirm" class="text-xs text-red-500 mt-1">
+                  Las contraseñas no coinciden
+                </p>
               </div>
-              <button (click)="cambiarPassword()"
-                class="w-full py-3 border border-red-600 text-red-600 rounded-2xl font-semibold hover:bg-red-50 transition">
-                Actualizar contraseña
+              <button (click)="cambiarPassword()" [disabled]="cambiandoPassword"
+                class="w-full py-3 border border-red-600 text-red-600 rounded-2xl font-semibold hover:bg-red-50 disabled:opacity-50 transition">
+                {{ cambiandoPassword ? 'Actualizando...' : 'Actualizar contraseña' }}
               </button>
             </div>
 
@@ -116,7 +123,7 @@ import { Usuario, SolicitudEspecial } from '../../core/models';
                 Sin solicitudes registradas.
               </div>
               <div class="space-y-3">
-                <div *ngFor="let s of solicitudes" class="rounded-2xl bg-gray-50 border border-gray-100 p-4">
+                <div *ngFor="let s of solicitudesVisibles" class="rounded-2xl bg-gray-50 border border-gray-100 p-4">
                   <p class="font-semibold text-gray-800 text-sm">{{ s.descripcion }}</p>
                   <p class="text-xs text-gray-500 mt-1">
                     {{ s.creadoEn | date:'dd MMM yyyy':'UTC' }} ·
@@ -126,6 +133,10 @@ import { Usuario, SolicitudEspecial } from '../../core/models';
                   </p>
                 </div>
               </div>
+              <button *ngIf="solicitudes.length > 3" (click)="verTodas = !verTodas"
+                class="mt-4 w-full text-sm text-red-600 font-semibold hover:underline">
+                {{ verTodas ? 'Ver menos' : 'Ver todas (' + solicitudes.length + ')' }}
+              </button>
             </div>
 
           </div>
@@ -137,14 +148,19 @@ import { Usuario, SolicitudEspecial } from '../../core/models';
 export class PerfilComponent implements OnInit {
   usuario: Usuario | null = null;
   solicitudes: SolicitudEspecial[] = [];
+  verTodas = false;
+
   nombre = ''; apellido = ''; telefono = '';
+  private originalNombre = ''; private originalApellido = ''; private originalTelefono = '';
+
   passwordActual = ''; passwordNueva = ''; passwordConfirm = '';
   mensajePerfil = ''; mensajePassword = '';
-  guardando = false;
+  guardando = false; cambiandoPassword = false;
 
   constructor(
     private usuarioSvc: UsuarioService,
-    private solicitudSvc: SolicitudService
+    private solicitudSvc: SolicitudService,
+    private authSvc: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -153,31 +169,84 @@ export class PerfilComponent implements OnInit {
       this.nombre = u.nombre;
       this.apellido = u.apellido ?? '';
       this.telefono = u.telefono ?? '';
+      this.originalNombre = this.nombre;
+      this.originalApellido = this.apellido;
+      this.originalTelefono = this.telefono;
     });
-    this.solicitudSvc.misSolicitudes().subscribe((s: SolicitudEspecial[]) => this.solicitudes = s.slice(0, 3));
+    this.solicitudSvc.misSolicitudes().subscribe((s: SolicitudEspecial[]) => this.solicitudes = s);
+  }
+
+  get hayCambios(): boolean {
+    return this.nombre !== this.originalNombre ||
+      this.apellido !== this.originalApellido ||
+      this.telefono !== this.originalTelefono;
+  }
+
+  get solicitudesVisibles(): SolicitudEspecial[] {
+    return this.verTodas ? this.solicitudes : this.solicitudes.slice(0, 3);
   }
 
   guardarPerfil(): void {
+    if (!this.nombre.trim()) {
+      this.mostrarMensajePerfil('El nombre es obligatorio');
+      return;
+    }
     this.guardando = true;
     this.mensajePerfil = '';
-    this.usuarioSvc.actualizarPerfil({ nombre: this.nombre, apellido: this.apellido, telefono: this.telefono }).subscribe({
-      next: () => { this.mensajePerfil = 'Cambios guardados'; this.guardando = false; },
-      error: () => { this.mensajePerfil = 'Error al guardar'; this.guardando = false; }
+    this.usuarioSvc.actualizarPerfil({ nombre: this.nombre.trim(), apellido: this.apellido.trim(), telefono: this.telefono.trim() }).subscribe({
+      next: () => {
+        this.originalNombre = this.nombre;
+        this.originalApellido = this.apellido;
+        this.originalTelefono = this.telefono;
+        if (this.usuario) {
+          this.usuario = { ...this.usuario, nombre: this.nombre, apellido: this.apellido, telefono: this.telefono };
+        }
+        this.authSvc.actualizarUsuario({ nombre: this.nombre, apellido: this.apellido, telefono: this.telefono });
+        this.guardando = false;
+        this.mostrarMensajePerfil('Cambios guardados');
+      },
+      error: () => {
+        this.guardando = false;
+        this.mostrarMensajePerfil('Error al guardar');
+      }
     });
   }
 
   cambiarPassword(): void {
-    if (this.passwordNueva !== this.passwordConfirm) {
-      this.mensajePassword = 'Las contraseñas no coinciden';
+    if (!this.passwordActual) {
+      this.mostrarMensajePassword('Ingresa tu contraseña actual');
       return;
     }
+    if (this.passwordNueva.length < 8) {
+      this.mostrarMensajePassword('La nueva contraseña debe tener al menos 8 caracteres');
+      return;
+    }
+    if (this.passwordNueva !== this.passwordConfirm) {
+      this.mostrarMensajePassword('Las contraseñas no coinciden');
+      return;
+    }
+    this.cambiandoPassword = true;
     this.mensajePassword = '';
     this.usuarioSvc.cambiarPassword(this.passwordActual, this.passwordNueva).subscribe({
       next: () => {
-        this.mensajePassword = 'Contraseña actualizada';
+        this.cambiandoPassword = false;
         this.passwordActual = this.passwordNueva = this.passwordConfirm = '';
+        this.mostrarMensajePassword('Contraseña actualizada');
       },
-      error: (err: any) => this.mensajePassword = err.error?.mensaje || 'Error al cambiar contraseña'
+      error: (err: any) => {
+        this.cambiandoPassword = false;
+        this.mostrarMensajePassword(err.error?.mensaje || 'Error al cambiar contraseña');
+      }
     });
+  }
+
+  private mostrarMensajePerfil(msg: string): void {
+    this.mensajePerfil = msg;
+    setTimeout(() => this.mensajePerfil = '', 4000);
+  }
+
+  private mostrarMensajePassword(msg: string): void {
+    this.mensajePassword = msg;
+    setTimeout(() => this.mensajePassword = '', 4000);
   }
 }

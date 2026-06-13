@@ -13,6 +13,14 @@ export class ServicioService {
     return this.http.get<Servicio[]>(`${this.apiUrl}${params}`);
   }
 
+  listarAdmin(): Observable<Servicio[]> {
+    return this.http.get<Servicio[]>(`${this.apiUrl}/admin`);
+  }
+
+  listarPopulares(): Observable<Servicio[]> {
+    return this.http.get<Servicio[]>(`${this.apiUrl}/populares`);
+  }
+
   obtener(id: string): Observable<Servicio> {
     return this.http.get<Servicio>(`${this.apiUrl}/${id}`);
   }
@@ -24,4 +32,5 @@ export class ServicioService {
   actualizar(id: string, datos: Partial<Servicio>): Observable<Servicio> {
     return this.http.put<Servicio>(`${this.apiUrl}/${id}`, datos);
   }
+
 }

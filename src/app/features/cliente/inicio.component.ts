@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { CitaService } from '../../core/services/cita.service';
 import { ServicioService } from '../../core/services/servicio.service';
 import { AuthService } from '../../core/services/auth.service';
+import { BookingService } from '../../core/services/booking.service';
 import { Cita, Servicio } from '../../core/models';
 
 @Component({
@@ -53,16 +54,19 @@ import { Cita, Servicio } from '../../core/models';
               <span class="material-symbols-outlined text-red-600 text-2xl">star</span>
             </div>
             <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Mi calificacion</p>
-            <div class="flex items-center gap-2">
-              <p class="text-2xl font-bold text-gray-800">4.8</p>
-              <div class="flex gap-0.5 text-amber-400">
-                <span class="material-symbols-outlined text-lg">star</span>
-                <span class="material-symbols-outlined text-lg">star</span>
-                <span class="material-symbols-outlined text-lg">star</span>
-                <span class="material-symbols-outlined text-lg">star</span>
-                <span class="material-symbols-outlined text-lg">star_half</span>
+            <ng-container *ngIf="calificacion > 0; else sinCalificacion">
+              <div class="flex items-center gap-2">
+                <p class="text-2xl font-bold text-gray-800">{{ calificacion | number:'1.1-1' }}</p>
+                <div class="flex gap-0.5 text-amber-400">
+                  <span *ngFor="let s of estrellasLlenas" class="material-symbols-outlined text-lg">star</span>
+                  <span *ngIf="tieneMediaEstrella" class="material-symbols-outlined text-lg">star_half</span>
+                </div>
               </div>
-            </div>
+            </ng-container>
+            <ng-template #sinCalificacion>
+              <p class="text-2xl font-bold text-gray-800">0</p>
+              <p class="text-sm text-gray-400 mt-1">Sin calificaciones aun</p>
+            </ng-template>
           </div>
         </div>
 
@@ -81,42 +85,48 @@ import { Cita, Servicio } from '../../core/models';
                 <p class="text-xs text-gray-500 uppercase mb-2">{{ s.categoria }}</p>
                 <p class="text-lg font-bold text-gray-800 mb-2">{{ s.nombre }}</p>
                 <p class="text-sm text-gray-600 mb-4">Desde L. {{ s.precioBase }}</p>
-                <button routerLink="/cliente/servicios" class="w-full text-red-600 border border-red-600 rounded-lg py-2 font-semibold hover:bg-red-50 transition">Agendar</button>
+                <button (click)="agendar(s)" class="w-full text-red-600 border border-red-600 rounded-lg py-2 font-semibold hover:bg-red-50 transition">Agendar</button>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Explora por categoría -->
+        <!-- Mis últimas citas -->
         <div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-6">Explora por categoria</h2>
-          <div class="grid grid-cols-5 gap-4">
-            <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
-              <span class="material-symbols-outlined text-red-600 text-4xl mx-auto block">content_cut</span>
-              <p class="font-bold text-gray-800 mt-4">Cabello</p>
-              <p class="text-xs text-gray-500 mt-1">Cortes y estilo</p>
-            </div>
-            <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
-              <span class="material-symbols-outlined text-red-600 text-4xl mx-auto block">back_hand</span>
-              <p class="font-bold text-gray-800 mt-4">Uñas</p>
-              <p class="text-xs text-gray-500 mt-1">Manicure y pedicure</p>
-            </div>
-            <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
-              <span class="material-symbols-outlined text-red-600 text-4xl mx-auto block">face</span>
-              <p class="font-bold text-gray-800 mt-4">Facial</p>
-              <p class="text-xs text-gray-500 mt-1">Limpieza y mascarilla</p>
-            </div>
-            <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
-              <span class="material-symbols-outlined text-red-600 text-4xl mx-auto block">brush</span>
-              <p class="font-bold text-gray-800 mt-4">Maquillaje</p>
-              <p class="text-xs text-gray-500 mt-1">Diario y eventos</p>
-            </div>
-            <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:bg-gray-50 transition cursor-pointer">
-              <span class="material-symbols-outlined text-red-600 text-4xl mx-auto block">more_horiz</span>
-              <p class="font-bold text-gray-800 mt-4">Mas</p>
-              <p class="text-xs text-gray-500 mt-1">Otros servicios</p>
-            </div>
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Mis últimas citas</h2>
+            <a routerLink="/cliente/mis-citas" class="text-red-600 font-semibold text-sm">Ver todas</a>
           </div>
+
+          <ng-container *ngIf="ultimasCitas.length > 0; else sinHistorial">
+            <div class="grid grid-cols-3 gap-6">
+              <div *ngFor="let c of ultimasCitas" class="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-md transition">
+                <div class="flex justify-between items-start mb-3">
+                  <p class="text-lg font-bold text-gray-800">{{ c.servicioId?.nombre ?? 'Servicio' }}</p>
+                  <span [class]="badgeEstado(c.estado)">{{ c.estado }}</span>
+                </div>
+                <p class="text-sm text-gray-500 mb-1">
+                  <span class="material-symbols-outlined text-xs align-middle mr-1">person</span>
+                  {{ c.estilistaId?.nombre ?? 'Estilista' }} {{ c.estilistaId?.apellido ?? '' }}
+                </p>
+                <p class="text-sm text-gray-500 mb-4">
+                  <span class="material-symbols-outlined text-xs align-middle mr-1">calendar_today</span>
+                  {{ c.fecha | date:'d MMM yyyy':'UTC' }} · {{ c.hora }}
+                </p>
+                <button (click)="agendarDesdeCita(c)" class="w-full bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700 transition text-sm">
+                  Agendar de nuevo
+                </button>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-template #sinHistorial>
+            <div class="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">
+              <span class="material-symbols-outlined text-gray-300 text-5xl block mb-3">history</span>
+              <p class="text-gray-500">Aun no tienes citas registradas</p>
+              <a routerLink="/cliente/servicios" class="text-red-600 font-semibold text-sm mt-2 inline-block hover:underline">Agenda tu primera cita →</a>
+            </div>
+          </ng-template>
         </div>
 
         <!-- Busca algo especial -->
@@ -137,22 +147,68 @@ import { Cita, Servicio } from '../../core/models';
 export class InicioComponent implements OnInit {
   proximaCita: Cita | null = null;
   citasEsteMes = 0;
+  ultimasCitas: Cita[] = [];
   serviciosPopulares: Servicio[] = [];
   nombreUsuario = '';
+  calificacion = 0;
+  estrellasLlenas: number[] = [];
+  tieneMediaEstrella = false;
 
   constructor(
     private citaSvc: CitaService,
     private servicioSvc: ServicioService,
-    private auth: AuthService
+    private auth: AuthService,
+    private bookingSvc: BookingService,
+    private router: Router
   ) {}
+
+  agendar(servicio: Servicio): void {
+    this.bookingSvc.preseleccionarServicio(servicio);
+    this.router.navigate(['/cliente/servicios/opciones']);
+  }
+
+  agendarDesdeCita(cita: Cita): void {
+    const id = cita.servicioId?._id ?? cita.servicioId;
+    this.servicioSvc.obtener(id).subscribe(servicio => {
+      this.bookingSvc.preseleccionarServicio(servicio);
+      this.router.navigate(['/cliente/servicios/opciones']);
+    });
+  }
+
+  badgeEstado(estado: string): string {
+    const base = 'text-xs font-semibold px-2 py-0.5 rounded-full';
+    const colores: Record<string, string> = {
+      pendiente:    `${base} bg-yellow-100 text-yellow-700`,
+      confirmada:   `${base} bg-blue-100 text-blue-700`,
+      en_progreso:  `${base} bg-orange-100 text-orange-700`,
+      completada:   `${base} bg-green-100 text-green-700`,
+      cancelada:    `${base} bg-gray-100 text-gray-500`,
+    };
+    return colores[estado] ?? `${base} bg-gray-100 text-gray-500`;
+  }
+
+  private actualizarEstrellas(): void {
+    this.estrellasLlenas = Array(Math.floor(this.calificacion)).fill(0);
+    this.tieneMediaEstrella = (this.calificacion % 1) >= 0.5;
+  }
 
   ngOnInit(): void {
     const usuario = this.auth.getUsuario();
     this.nombreUsuario = usuario?.nombre ?? 'Cliente';
 
+    this.auth.obtenerPerfil().subscribe(perfil => {
+      this.calificacion = perfil.calificacionPromedio ?? 0;
+      this.actualizarEstrellas();
+      this.auth.actualizarUsuario({ calificacionPromedio: this.calificacion });
+    });
+
     this.citaSvc.misCitas().subscribe((citas: Cita[]) => {
-      const activas = citas.filter((c: Cita) => ['pendiente','confirmada'].includes(c.estado));
-      this.proximaCita = activas.sort((a: Cita,b: Cita) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())[0] ?? null;
+      const ordenadas = [...citas].sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+      this.ultimasCitas = ordenadas.slice(0, 3);
+
+      const activas = citas.filter((c: Cita) => ['pendiente', 'confirmada'].includes(c.estado));
+      this.proximaCita = activas.sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())[0] ?? null;
+
       const hoy = new Date();
       this.citasEsteMes = citas.filter((c: Cita) => {
         const f = new Date(c.fecha);
@@ -160,9 +216,8 @@ export class InicioComponent implements OnInit {
       }).length;
     });
 
-    this.servicioSvc.listar().subscribe((svcs: Servicio[]) => {
-      this.serviciosPopulares = svcs.slice(0, 4);
+    this.servicioSvc.listarPopulares().subscribe((svcs: Servicio[]) => {
+      this.serviciosPopulares = svcs;
     });
   }
 }
-

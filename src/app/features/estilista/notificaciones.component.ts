@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NotificacionService } from '../../core/services/notificacion.service';
+import { Notificacion } from '../../core/models';
 
 @Component({
   selector: 'app-estilista-notificaciones',
@@ -7,36 +9,58 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div class="bg-white min-h-screen">
-      <!-- Header -->
-      <div class="bg-red-50 px-8 py-6 border-b border-gray-200">
-        <h1 class="text-2xl font-bold text-gray-800">Notificaciones</h1>
-        <p class="text-gray-600 text-sm mt-1">Tus alertas y actualizaciones</p>
+      <div class="bg-red-50 px-8 py-6 border-b border-gray-200 flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">Notificaciones</h1>
+          <p class="text-gray-600 text-sm mt-1">Tus alertas y actualizaciones</p>
+        </div>
+        <button (click)="marcarTodas()" [disabled]="noHayNoLeidas"
+          class="text-sm font-semibold text-red-600 hover:underline disabled:opacity-40">
+          Marcar todo leído
+        </button>
       </div>
 
       <div class="px-8 py-8 max-w-2xl">
         <!-- Filtros -->
-        <div class="mb-6 flex gap-2">
-          <button class="px-4 py-2 bg-red-100 text-red-600 rounded-lg font-semibold text-sm">Todas</button>
-          <button class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg font-semibold text-sm hover:bg-gray-50">No leídas</button>
-          <button class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg font-semibold text-sm hover:bg-gray-50">Citas</button>
+        <div class="mb-6 flex gap-2 flex-wrap">
+          <button (click)="filtroActivo = 'todas'"
+            [class]="filtroActivo === 'todas' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
+            class="px-4 py-2 rounded-lg font-semibold text-sm transition">Todas</button>
+          <button (click)="filtroActivo = 'no-leidas'"
+            [class]="filtroActivo === 'no-leidas' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
+            class="px-4 py-2 rounded-lg font-semibold text-sm transition">No leídas</button>
+          <button (click)="filtroActivo = 'cita'"
+            [class]="filtroActivo === 'cita' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
+            class="px-4 py-2 rounded-lg font-semibold text-sm transition">Citas</button>
         </div>
 
-        <!-- Lista de notificaciones -->
+        <!-- Cargando -->
+        <div *ngIf="cargando" class="text-center py-16 text-gray-400">Cargando...</div>
+
+        <!-- Sin notificaciones -->
+        <div *ngIf="!cargando && filtradas.length === 0" class="text-center py-16">
+          <span class="material-symbols-outlined text-gray-300 text-5xl block mb-3">notifications_off</span>
+          <p class="text-gray-400">Sin notificaciones.</p>
+        </div>
+
+        <!-- Lista -->
         <div class="space-y-3">
-          <div *ngFor="let notif of notificaciones" [class]="!notif.leida ? 'bg-red-50 border-red-200' : 'bg-white border-gray-200'" class="border rounded-lg p-4 cursor-pointer hover:shadow-md transition">
+          <div *ngFor="let n of filtradas" (click)="marcarLeida(n)" cursor-pointer
+            [class]="n.leida ? 'bg-white border-gray-200' : 'bg-red-50 border-red-200'"
+            class="border rounded-lg p-4 cursor-pointer hover:shadow-md transition">
             <div class="flex items-start gap-4">
-              <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0">
-                <span class="material-symbols-outlined text-base">{{ notif.icono }}</span>
+              <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-base">{{ n.icono || 'notifications' }}</span>
               </div>
               <div class="flex-1">
-                <div class="flex items-start justify-between">
+                <div class="flex items-start justify-between gap-2">
                   <div>
-                    <p [class]="!notif.leida ? 'font-bold' : ''" class="text-gray-800">{{ notif.titulo }}</p>
-                    <p class="text-sm text-gray-600 mt-1">{{ notif.descripcion }}</p>
+                    <p [class.font-bold]="!n.leida" class="text-gray-800">{{ n.titulo }}</p>
+                    <p class="text-sm text-gray-600 mt-1">{{ n.descripcion }}</p>
                   </div>
-                  <div *ngIf="!notif.leida" class="w-2 h-2 rounded-full bg-red-600 mt-1"></div>
+                  <div *ngIf="!n.leida" class="w-2 h-2 rounded-full bg-red-600 mt-1 shrink-0"></div>
                 </div>
-                <p class="text-xs text-gray-500 mt-2">{{ notif.tiempo }}</p>
+                <p class="text-xs text-gray-500 mt-2">{{ formatFecha(n.creadoEn) }}</p>
               </div>
             </div>
           </div>
@@ -45,61 +69,53 @@ import { CommonModule } from '@angular/common';
     </div>
   `
 })
-export class NotificacionesComponent {
-  notificaciones = [
-    {
-      id: 1,
-      icono: 'calendar_today',
-      iconoColor: 'text-primary-fixed',
-      titulo: 'Nueva cita asignada',
-      descripcion: 'Carmen Reyes agendo Manicure Gel para el 02 May',
-      tiempo: 'hace 10 min',
-      leida: false
-    },
-    {
-      id: 2,
-      icono: 'star',
-      iconoColor: 'text-tertiary-fixed',
-      titulo: 'Nueva calificacion',
-      descripcion: 'Laura Mendez te dio 5 estrellas',
-      tiempo: 'hace 1 h',
-      leida: false
-    },
-    {
-      id: 3,
-      icono: 'cancel',
-      iconoColor: 'text-error-container',
-      titulo: 'Cita cancelada',
-      descripcion: 'Sofia Torres cancelo su cita de hoy',
-      tiempo: 'hace 3 h',
-      leida: true
-    },
-    {
-      id: 4,
-      icono: 'analytics',
-      iconoColor: 'text-secondary-fixed',
-      titulo: 'Reporte semanal',
-      descripcion: 'Esta semana atendiste 18 clientes',
-      tiempo: 'ayer',
-      leida: true
-    },
-    {
-      id: 5,
-      icono: 'warning',
-      iconoColor: 'text-surface-container',
-      titulo: 'Reporte enviado',
-      descripcion: 'Tu reporte sobre Ana P. fue recibido',
-      tiempo: 'hace 2 dias',
-      leida: true
-    }
-  ];
+export class NotificacionesComponent implements OnInit {
+  notificaciones: Notificacion[] = [];
+  filtroActivo = 'todas';
+  cargando = true;
 
-  marcarComoLeida(id: number) {
-    const notif = this.notificaciones.find(n => n.id === id);
-    if (notif) {
-      notif.leida = true;
-    }
+  constructor(private notifSvc: NotificacionService) {}
+
+  ngOnInit(): void { this.cargar(); }
+
+  cargar(): void {
+    this.cargando = true;
+    this.notifSvc.listar().subscribe({
+      next: (data) => { this.notificaciones = data; this.cargando = false; },
+      error: () => this.cargando = false
+    });
+  }
+
+  get filtradas(): Notificacion[] {
+    if (this.filtroActivo === 'no-leidas') return this.notificaciones.filter(n => !n.leida);
+    if (this.filtroActivo === 'todas') return this.notificaciones;
+    return this.notificaciones.filter(n => n.tipo === this.filtroActivo);
+  }
+
+  get noHayNoLeidas(): boolean {
+    return this.notificaciones.every(n => n.leida);
+  }
+
+  marcarLeida(n: Notificacion): void {
+    if (n.leida) return;
+    this.notifSvc.marcarLeida(n._id).subscribe(() => { n.leida = true; });
+  }
+
+  marcarTodas(): void {
+    this.notifSvc.marcarTodas().subscribe(() => {
+      this.notificaciones.forEach(n => n.leida = true);
+    });
+  }
+
+  formatFecha(fecha: string): string {
+    const diff = Date.now() - new Date(fecha).getTime();
+    const min = Math.floor(diff / 60000);
+    if (min < 1)  return 'ahora';
+    if (min < 60) return `hace ${min} min`;
+    const h = Math.floor(min / 60);
+    if (h < 24)   return `hace ${h} h`;
+    const d = Math.floor(h / 24);
+    if (d === 1)  return 'ayer';
+    return `hace ${d} días`;
   }
 }
-
-

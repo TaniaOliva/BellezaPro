@@ -13,6 +13,11 @@ import { AuthService } from '../services/auth.service';
 export class SidebarAdminComponent {
   constructor(private auth: AuthService) {}
 
+  get nombreAdmin(): string {
+    const u = this.auth.getUsuario();
+    return u ? `${u.nombre} ${u.apellido}` : 'Administrador';
+  }
+
   logout(): void {
     this.auth.logout();
   }

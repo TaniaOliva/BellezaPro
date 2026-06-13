@@ -37,6 +37,18 @@ export class AuthService {
     );
   }
 
+  solicitarRecuperacion(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/recuperar`, { email });
+  }
+
+  verificarCodigo(email: string, codigo: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/verificar-codigo`, { email, codigo });
+  }
+
+  nuevaPassword(email: string, codigo: string, password: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/nueva-password`, { email, codigo, password });
+  }
+
   logout(): void {
     localStorage.removeItem('bellezapro_token');
     localStorage.removeItem('bellezapro_usuario');
@@ -52,11 +64,23 @@ export class AuthService {
     return this.usuarioSubject.value;
   }
 
+  obtenerPerfil(): Observable<Usuario> {
+    return this.http.get<Usuario>('/api/usuarios/perfil');
+  }
+
   estaAutenticado(): boolean {
     return !!this.getToken();
   }
 
   get rol(): string | null {
     return this.usuarioSubject.value?.rol ?? null;
+  }
+
+  actualizarUsuario(datos: Partial<Usuario>): void {
+    const actual = this.usuarioSubject.value;
+    if (!actual) return;
+    const actualizado = { ...actual, ...datos };
+    localStorage.setItem('bellezapro_usuario', JSON.stringify(actualizado));
+    this.usuarioSubject.next(actualizado);
   }
 }

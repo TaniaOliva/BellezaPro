@@ -51,7 +51,7 @@ import { Usuario } from '../../../core/models';
           <button
             *ngFor="let e of estilistas"
             (click)="seleccionar(e)"
-            [class]="seleccionada?.id === e.id ? 'bg-red-50 border-2 border-red-600' : 'bg-white border border-gray-200 hover:shadow-lg hover:border-red-600'"
+            [class]="seleccionada?._id === e._id ? 'bg-red-50 border-2 border-red-600' : 'bg-white border border-gray-200 hover:shadow-lg hover:border-red-600'"
             class="rounded-lg p-6 text-center transition">
             <div class="w-24 h-24 bg-gradient-to-br from-red-300 to-red-500 rounded-full mx-auto mb-4 flex items-center justify-center text-white">
               <span class="material-symbols-outlined text-5xl">person</span>

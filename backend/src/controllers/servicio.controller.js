@@ -1,11 +1,18 @@
-const Servicio = require('../models/Servicio');
+const Servicio  = require('../models/Servicio');
+const Categoria = require('../models/Categoria');
 
 const listar = async (req, res) => {
   try {
-    const { categoria } = req.query;
-    const filtro = { activo: true };
-    if (categoria) filtro.categoria = categoria;
-    const servicios = await Servicio.find(filtro);
+    const categoriasActivas = await Categoria.find({ activo: true }).distinct('nombre');
+    const filtro = { activo: true, categoria: { $in: categoriasActivas } };
+    const servicios = await Servicio.find(filtro).sort({ nombre: 1 });
+    res.json(servicios);
+  } catch (err) { res.status(500).json({ mensaje: err.message }); }
+};
+
+const listarAdmin = async (req, res) => {
+  try {
+    const servicios = await Servicio.find({}).sort({ categoria: 1, nombre: 1 });
     res.json(servicios);
   } catch (err) { res.status(500).json({ mensaje: err.message }); }
 };
@@ -32,4 +39,19 @@ const actualizar = async (req, res) => {
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
 };
 
-module.exports = { listar, obtener, crear, actualizar };
+const listarPopulares = async (req, res) => {
+  try {
+    const categoriasActivas = await Categoria.find({ activo: true }).distinct('nombre');
+    const hace7Dias = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    await Servicio.updateMany(
+      { semanaInicio: { $lt: hace7Dias } },
+      { $set: { contadorSemana: 0, semanaInicio: new Date() } }
+    );
+    const populares = await Servicio.find({ activo: true, categoria: { $in: categoriasActivas } })
+      .sort({ contadorSemana: -1 })
+      .limit(4);
+    res.json(populares);
+  } catch (err) { res.status(500).json({ mensaje: err.message }); }
+};
+
+module.exports = { listar, listarAdmin, obtener, crear, actualizar, listarPopulares };

@@ -3,12 +3,16 @@ import { LayoutClienteComponent } from './core/layout/layout-cliente.component';
 import { LayoutBookingComponent } from './core/layout/layout-booking.component';
 import { LayoutEstilistaComponent } from './core/layout/layout-estilista.component';
 import { LayoutAdminComponent } from './core/layout/layout-admin.component';
-import { LoginComponent } from './features/auth/login/login.component';
+import { LoginComponent } from './features/auth/login.component';
+import { RegistroComponent } from './features/auth/registro.component';
+import { RecuperarPasswordComponent } from './features/auth/recuperar-password.component';
 import { rolGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
+  { path: 'registro', component: RegistroComponent },
+  { path: 'recuperar-password', component: RecuperarPasswordComponent },
 
   {
     path: 'cliente',

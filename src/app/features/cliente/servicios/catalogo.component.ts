@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ServicioService } from '../../../core/services/servicio.service';
+import { CategoriaService } from '../../../core/services/categoria.service';
 import { BookingService } from '../../../core/services/booking.service';
 import { Servicio } from '../../../core/models';
 
@@ -16,10 +17,15 @@ import { Servicio } from '../../../core/models';
         <p class="text-gray-600 mb-8">Selecciona el servicio que deseas agendar hoy.</p>
 
         <!-- Buscador y filtros -->
-        <div class="mb-8 flex gap-4 items-center">
-          <div class="flex-1 flex items-center border border-gray-300 rounded-lg px-4 py-2 bg-white">
+        <div class="mb-8 flex gap-4 items-center flex-wrap">
+          <div class="flex-1 min-w-60 flex items-center border border-gray-300 rounded-lg px-4 py-2 bg-white">
             <span class="material-symbols-outlined text-gray-400">search</span>
-            <input type="text" placeholder="Buscar servicio..." class="ml-2 flex-1 outline-none text-gray-700" />
+            <input
+              type="text"
+              placeholder="Buscar servicio..."
+              class="ml-2 flex-1 outline-none text-gray-700"
+              [value]="busqueda"
+              (input)="buscar($any($event.target).value)" />
           </div>
           <button
             *ngFor="let cat of categorias"
@@ -34,8 +40,15 @@ import { Servicio } from '../../../core/models';
         <!-- Cargando -->
         <div *ngIf="cargando" class="text-center py-16 text-gray-500">Cargando servicios...</div>
 
+        <!-- Sin resultados -->
+        <div *ngIf="!cargando && serviciosFiltrados.length === 0" class="text-center py-16">
+          <span class="material-symbols-outlined text-gray-300 text-5xl block mb-3">search_off</span>
+          <p class="text-gray-500">No se encontraron servicios para "{{ busqueda }}"</p>
+          <button (click)="limpiarBusqueda()" class="text-red-600 font-semibold text-sm mt-2 hover:underline">Limpiar búsqueda</button>
+        </div>
+
         <!-- Grid de servicios -->
-        <div class="grid grid-cols-3 gap-6">
+        <div *ngIf="!cargando && serviciosFiltrados.length > 0" class="grid grid-cols-3 gap-6">
           <div *ngFor="let s of serviciosFiltrados" class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
             <div class="bg-gray-300 h-48 relative">
               <span class="absolute top-3 right-3 bg-white text-gray-700 text-xs font-bold px-3 py-1 rounded">{{ s.categoria }}</span>
@@ -55,21 +68,28 @@ import { Servicio } from '../../../core/models';
 export class CatalogoComponent implements OnInit {
   servicios: Servicio[] = [];
   serviciosFiltrados: Servicio[] = [];
+  categorias: string[] = ['Todos'];
   categoriaActiva = 'Todos';
+  busqueda = '';
   cargando = true;
-  categorias = ['Todos', 'Manicure', 'Pedicure', 'Cortes', 'Tintes', 'Maquillaje'];
 
   constructor(
     private servicioSvc: ServicioService,
+    private categoriaSvc: CategoriaService,
     private bookingSvc: BookingService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
+    this.categoriaSvc.listar().subscribe({
+      next: (cats) => {
+        this.categorias = ['Todos', ...cats.map(c => c.nombre)];
+      }
+    });
     this.servicioSvc.listar().subscribe({
       next: (data: Servicio[]) => {
         this.servicios = data;
-        this.serviciosFiltrados = data;
+        this.aplicarFiltros();
         this.cargando = false;
       },
       error: () => this.cargando = false
@@ -78,9 +98,37 @@ export class CatalogoComponent implements OnInit {
 
   filtrar(categoria: string): void {
     this.categoriaActiva = categoria;
-    this.serviciosFiltrados = categoria === 'Todos'
+    this.aplicarFiltros();
+  }
+
+  buscar(texto: string): void {
+    this.busqueda = texto;
+    this.aplicarFiltros();
+  }
+
+  limpiarBusqueda(): void {
+    this.busqueda = '';
+    this.aplicarFiltros();
+  }
+
+  private normalizar(texto: string): string {
+    return texto.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9\s]/gi, '').toLowerCase().trim();
+  }
+
+  private aplicarFiltros(): void {
+    let resultado = this.categoriaActiva === 'Todos'
       ? this.servicios
-      : this.servicios.filter((s: Servicio) => s.categoria === categoria);
+      : this.servicios.filter(s => s.categoria === this.categoriaActiva);
+
+    const termino = this.normalizar(this.busqueda);
+    if (termino) {
+      resultado = resultado.filter(s =>
+        this.normalizar(s.nombre).includes(termino) ||
+        this.normalizar(s.descripcion ?? '').includes(termino)
+      );
+    }
+
+    this.serviciosFiltrados = resultado;
   }
 
   seleccionar(servicio: Servicio): void {
@@ -88,4 +136,3 @@ export class CatalogoComponent implements OnInit {
     this.router.navigate(['/cliente/servicios/opciones']);
   }
 }
-

@@ -20,6 +20,10 @@ export class CitaService {
     return this.http.post<Cita>(this.apiUrl, datos);
   }
 
+  listarTodas(): Observable<Cita[]> {
+    return this.http.get<Cita[]>(this.apiUrl);
+  }
+
   actualizarEstado(id: string, estado: string): Observable<Cita> {
     return this.http.patch<Cita>(`${this.apiUrl}/${id}/estado`, { estado });
   }

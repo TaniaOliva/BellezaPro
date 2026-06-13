@@ -18,6 +18,10 @@ export class BookingService {
     this.estado = { servicio, variantes, precioFinal };
   }
 
+  preseleccionarServicio(servicio: any): void {
+    this.estado = { servicio };
+  }
+
   setEstilista(estilista: any): void {
     this.estado.estilista = estilista;
   }

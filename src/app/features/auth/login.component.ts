@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -35,6 +35,16 @@ import { AuthService } from '../../../core/services/auth.service';
               class="w-full bg-primary text-on-primary font-semibold py-2.5 rounded-lg hover:bg-primary-container transition-colors disabled:opacity-50">
               {{ cargando ? 'Ingresando...' : 'Ingresar' }}
             </button>
+            <button (click)="router.navigate(['/recuperar-password'])"
+              class="w-full text-sm text-primary font-semibold py-1 hover:underline">
+              Olvide mi contrasena
+            </button>
+            <div class="border-t border-outline-variant pt-4">
+              <button (click)="router.navigate(['/registro'])"
+                class="w-full border border-primary text-primary font-semibold py-2.5 rounded-lg hover:bg-primary hover:text-on-primary transition-colors">
+                Crear cuenta nueva
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -47,7 +57,7 @@ export class LoginComponent {
   error = '';
   cargando = false;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, public router: Router) {}
 
   login(): void {
     if (!this.email || !this.password) {
