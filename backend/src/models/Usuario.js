@@ -16,7 +16,8 @@ const usuarioSchema = new mongoose.Schema({
     viernes: { inicio: String, fin: String },
     sabado: { inicio: String, fin: String }
   },
-  estado: { type: String, enum: ['activo', 'inactivo'], default: 'activo' },
+  estado: { type: String, enum: ['activo', 'inactivo', 'suspendido', 'bloqueado'], default: 'activo' },
+  suspensionFin: { type: Date, default: null },
   calificacionPromedio: { type: Number, default: 0 },
   totalCalificaciones: { type: Number, default: 0 },
   codigoRecuperacion: { type: String },

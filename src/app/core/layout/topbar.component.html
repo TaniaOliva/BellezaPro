@@ -20,7 +20,7 @@
     </a>
   </div>
 
-  <!-- Right: Acceder button OR notification bell + avatar -->
+  <!-- Right: Acceder button OR notification bell -->
   <div class="flex items-center gap-3">
     <button *ngIf="showAcceder; else userArea"
             class="bg-primary text-on-primary rounded-lg px-4 py-2 font-label-md flex items-center gap-2 hover:bg-surface-tint transition-colors">
@@ -29,12 +29,57 @@
     </button>
 
     <ng-template #userArea>
-      <div *ngIf="showUserAvatar" class="flex items-center gap-2">
-        <button class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
+      <div *ngIf="showUserAvatar" class="notif-wrapper relative">
+        <!-- Bell button -->
+        <button (click)="toggleDropdown()"
+          class="relative p-2 rounded-full hover:bg-surface-container-high transition-colors">
           <span class="material-symbols-outlined text-secondary hover:text-primary">notifications</span>
+          <span *ngIf="noLeidas > 0"
+            class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
+            {{ noLeidas > 9 ? '9+' : noLeidas }}
+          </span>
         </button>
-        <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant overflow-hidden flex items-center justify-center">
-          <span class="material-symbols-outlined text-sm text-secondary">account_circle</span>
+
+        <!-- Dropdown panel -->
+        <div *ngIf="mostrarDropdown"
+          class="absolute right-0 top-12 w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-[200] overflow-hidden">
+
+          <!-- Header -->
+          <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+            <p class="font-bold text-gray-800 text-sm">Notificaciones</p>
+            <button *ngIf="noLeidas > 0" (click)="marcarTodas()"
+              class="text-xs text-red-600 hover:text-red-700 font-semibold">
+              Marcar todas
+            </button>
+          </div>
+
+          <!-- List -->
+          <div class="max-h-[360px] overflow-y-auto divide-y divide-gray-50">
+            <div *ngIf="notificaciones.length === 0"
+              class="px-4 py-8 text-center text-sm text-gray-400 italic">
+              Sin notificaciones nuevas.
+            </div>
+
+            <div *ngFor="let n of notificaciones"
+              (click)="clickNotificacion(n)"
+              [class.bg-red-50]="!n.leida"
+              class="flex gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition">
+              <div [class.bg-red-100]="!n.leida" [class.bg-gray-100]="n.leida"
+                class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-sm"
+                  [class.text-red-600]="!n.leida" [class.text-gray-400]="n.leida">
+                  {{ iconoPorTipo(n.tipo) }}
+                </span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-800 leading-snug">{{ n.titulo }}</p>
+                <p *ngIf="n.descripcion" class="text-xs text-gray-500 leading-snug mt-0.5 line-clamp-2">{{ n.descripcion }}</p>
+                <p class="text-xs text-gray-400 mt-1">{{ tiempoRelativo(n.creadoEn) }}</p>
+              </div>
+              <div *ngIf="!n.leida" class="w-2 h-2 bg-red-500 rounded-full mt-1.5 shrink-0"></div>
+            </div>
+          </div>
+
         </div>
       </div>
     </ng-template>

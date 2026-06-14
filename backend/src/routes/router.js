@@ -82,8 +82,12 @@ router.patch('/api/notificaciones/marcar-todas',       verificarToken, notificac
 router.patch('/api/notificaciones/:id/leida',          verificarToken, notificacionController.marcarLeida);
 
 // Bloqueos
+router.get('/api/bloqueos',                        verificarToken, soloRol('admin'), bloqueoController.listarTodos);
+router.get('/api/bloqueos/rango',                  verificarToken, soloRol('admin'), bloqueoController.listarEnRango);
 router.post('/api/bloqueos',                       verificarToken, soloRol('admin'), bloqueoController.crear);
+router.post('/api/bloqueos/conflictos',            verificarToken, soloRol('admin'), bloqueoController.verificarConflictos);
 router.get('/api/bloqueos/estilista/:estilistaId', verificarToken,                   bloqueoController.listarPorEstilista);
+router.put('/api/bloqueos/:id',                    verificarToken, soloRol('admin'), bloqueoController.actualizar);
 router.delete('/api/bloqueos/:id',                 verificarToken, soloRol('admin'), bloqueoController.eliminar);
 
 module.exports = router;

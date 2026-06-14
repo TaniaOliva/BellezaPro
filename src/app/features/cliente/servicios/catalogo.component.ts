@@ -50,8 +50,14 @@ import { Servicio } from '../../../core/models';
         <!-- Grid de servicios -->
         <div *ngIf="!cargando && serviciosFiltrados.length > 0" class="grid grid-cols-3 gap-6">
           <div *ngFor="let s of serviciosFiltrados" class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
-            <div class="bg-gray-300 h-48 relative">
-              <span class="absolute top-3 right-3 bg-white text-gray-700 text-xs font-bold px-3 py-1 rounded">{{ s.categoria }}</span>
+            <div class="h-48 relative bg-gray-100 overflow-hidden">
+              <img *ngIf="s.imagenes?.length" [src]="s.imagenes![0]" [alt]="s.nombre"
+                class="w-full h-full object-cover">
+              <div *ngIf="!s.imagenes?.length"
+                class="w-full h-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-gray-300 text-5xl">spa</span>
+              </div>
+              <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-700 text-xs font-bold px-3 py-1 rounded shadow-sm">{{ s.categoria }}</span>
             </div>
             <div class="p-5">
               <h3 class="text-lg font-bold text-gray-800 mb-2">{{ s.nombre }}</h3>

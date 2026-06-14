@@ -37,7 +37,7 @@ const listarTodas = async (req, res) => {
 const responder = async (req, res) => {
   try {
     const { estado, respuesta, precioEstimado, duracionEstimada } = req.body;
-    if (estado === 'aprobada' && (!precioEstimado || !duracionEstimada))
+    if (estado === 'aprobada' && (precioEstimado == null || duracionEstimada == null))
       return res.status(400).json({ mensaje: 'Precio y duracion son obligatorios al aprobar' });
     const solicitud = await SolicitudEspecial.findByIdAndUpdate(
       req.params.id, { estado, respuesta, precioEstimado, duracionEstimada }, { new: true }

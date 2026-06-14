@@ -32,8 +32,8 @@ export class UsuarioService {
     return this.http.put(`${this.apiUrl}/perfil/password`, { passwordActual, passwordNueva });
   }
 
-  actualizarEstado(id: string, estado: string): Observable<Usuario> {
-    return this.http.patch<Usuario>(`${this.apiUrl}/${id}/estado`, { estado });
+  actualizarEstado(id: string, estado: string, suspensionFin?: string | null): Observable<Usuario> {
+    return this.http.patch<Usuario>(`${this.apiUrl}/${id}/estado`, { estado, suspensionFin });
   }
 
   crearEmpleado(datos: Partial<Usuario>): Observable<Usuario> {

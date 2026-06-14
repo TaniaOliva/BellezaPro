@@ -19,8 +19,13 @@ const listarTodosEstilistas = async (req, res) => {
 
 const listarClientes = async (req, res) => {
   try {
+    // Auto-reactivar suspensiones definidas que ya vencieron
+    await Usuario.updateMany(
+      { rol: 'cliente', estado: 'suspendido', suspensionFin: { $lte: new Date(), $ne: null } },
+      { $set: { estado: 'activo', suspensionFin: null } }
+    );
     const clientes = await Usuario.find({ rol: 'cliente' })
-      .select('nombre apellido email telefono estado createdAt');
+      .select('nombre apellido email telefono estado suspensionFin createdAt');
     res.json(clientes);
   } catch (err) { res.status(500).json({ mensaje: err.message }); }
 };
@@ -62,8 +67,15 @@ const cambiarPassword = async (req, res) => {
 
 const actualizarEstado = async (req, res) => {
   try {
+    const { estado, suspensionFin } = req.body;
+    const update = { estado };
+    if (estado === 'suspendido') {
+      update.suspensionFin = suspensionFin ? new Date(suspensionFin) : null;
+    } else {
+      update.suspensionFin = null;
+    }
     const usuario = await Usuario.findByIdAndUpdate(
-      req.params.id, { estado: req.body.estado }, { new: true }
+      req.params.id, update, { new: true }
     ).select('-password');
     res.json(usuario);
   } catch (err) { res.status(400).json({ mensaje: err.message }); }

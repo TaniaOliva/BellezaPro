@@ -1,6 +1,8 @@
 const Cita = require('../models/Cita');
 const Bloqueo = require('../models/Bloqueo');
 const Servicio = require('../models/Servicio');
+const Usuario = require('../models/Usuario');
+const { crearNotificacion } = require('./notificacion.controller');
 
 const verificarDisponibilidad = async (estilistaId, fecha, hora, duracion) => {
   const inicio = new Date(`${fecha}T${hora}`);
@@ -11,9 +13,9 @@ const verificarDisponibilidad = async (estilistaId, fecha, hora, duracion) => {
     $or: [{ hora: { $gte: hora, $lt: fin.toTimeString().slice(0, 5) } }]
   });
   const bloqueado = await Bloqueo.findOne({
-    estilistaId,
     fechaInicio: { $lte: new Date(fecha) },
-    fechaFin: { $gte: new Date(fecha) }
+    fechaFin: { $gte: new Date(fecha) },
+    $or: [{ estilistaId }, { cierreTotalSalon: true }]
   });
   return !conflicto && !bloqueado;
 };
@@ -75,7 +77,22 @@ const crear = async (req, res) => {
 
 const actualizarEstado = async (req, res) => {
   try {
-    const cita = await Cita.findByIdAndUpdate(req.params.id, { estado: req.body.estado }, { new: true });
+    const cita = await Cita.findByIdAndUpdate(req.params.id, { estado: req.body.estado }, { new: true })
+      .populate('clienteId', 'nombre apellido')
+      .populate('servicioId', 'nombre');
+
+    if (req.body.estado === 'cancelada') {
+      const clienteNombre = cita.clienteId?.nombre
+        ? `${cita.clienteId.nombre} ${cita.clienteId.apellido ?? ''}`.trim()
+        : 'Cliente';
+      const servicioNombre = cita.servicioId?.nombre ?? 'servicio';
+      const admins = await Usuario.find({ rol: 'admin' }).select('_id');
+      for (const admin of admins) {
+        await crearNotificacion(admin._id, 'Cita cancelada',
+          `${clienteNombre} canceló su cita de ${servicioNombre}`, 'cita', 'event_busy');
+      }
+    }
+
     res.json(cita);
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
 };

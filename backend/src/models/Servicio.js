@@ -12,6 +12,7 @@ const servicioSchema = new mongoose.Schema({
     precioExtra: { type: Number, default: 0 },
     descripcion: { type: String, default: '' }
   }],
+  imagenes: [{ type: String }],
   activo: { type: Boolean, default: true },
   contadorSemana: { type: Number, default: 0 },
   semanaInicio: { type: Date, default: Date.now },

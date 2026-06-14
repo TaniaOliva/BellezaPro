@@ -21,6 +21,7 @@ export interface Usuario {
   rol: 'admin' | 'estilista' | 'cliente';
   telefono?: string;
   estado: string;
+  suspensionFin?: string | null;
   especialidades?: string[];
   horarioDisponible?: HorarioDisponible;
   calificacionPromedio?: number;
@@ -35,6 +36,7 @@ export interface Servicio {
   precioBase: number;
   duracion: number;
   imagen?: string;
+  imagenes?: string[];
   activo: boolean;
   variantes?: Variante[];
   contadorSemana?: number;
@@ -103,6 +105,21 @@ export interface Notificacion {
   icono: string;
   leida: boolean;
   creadoEn: string;
+}
+
+export interface Bloqueo {
+  _id: string;
+  estilistaId: any;
+  fechaInicio: string;
+  fechaFin: string;
+  razon?: string;
+  cierreTotalSalon: boolean;
+  createdAt?: string;
+}
+
+export interface ConflictoBloqueo {
+  count: number;
+  citas: Cita[];
 }
 
 export interface AuthResponse {

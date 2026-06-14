@@ -11,128 +11,14 @@ interface ServicioBar { nombre: string; count: number; pct: number; color: strin
 interface EstilistaRow { nombre: string; citas: number; calificacion: number; pct: number; }
 interface ClienteRow { nombre: string; visitas: number; gasto: number; iniciales: string; }
 
-const COLORES = ['#dc2626','#7c3aed','#2563eb','#059669','#d97706','#db2777'];
 const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
 @Component({
   selector: 'app-admin-reportes-estadisticas',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="bg-white min-h-screen">
-      <div class="px-8 py-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Reportes y Estadísticas</h1>
-        <p class="text-gray-500 text-sm mb-8">Basado en todas las citas registradas en el sistema.</p>
-
-        <!-- KPI Cards -->
-        <div class="grid grid-cols-4 gap-5 mb-8">
-          <div *ngFor="let k of kpis" class="bg-white border border-gray-200 rounded-xl p-5">
-            <div class="flex items-center justify-between mb-3">
-              <span class="text-gray-500 text-xs uppercase font-bold tracking-wide">{{ k.label }}</span>
-              <div [class]="k.bg + ' rounded-lg p-2.5'">
-                <span [class]="'material-symbols-outlined ' + k.color + ' text-xl'">{{ k.icon }}</span>
-              </div>
-            </div>
-            <p class="text-3xl font-bold text-gray-800 mb-1">{{ k.valor }}</p>
-            <p [class]="'text-xs font-semibold ' + k.color">{{ k.sub }}</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-6 mb-6">
-
-          <!-- Citas por mes (últimos 6 meses) -->
-          <div class="col-span-2 bg-white border border-gray-200 rounded-xl p-6">
-            <h3 class="text-base font-bold text-gray-800 mb-5">Citas por mes</h3>
-            <div *ngIf="cargando" class="text-center py-8 text-gray-400 text-sm">Cargando...</div>
-            <div *ngIf="!cargando && barMeses.length === 0" class="text-center py-8 text-gray-400 text-sm italic">Sin citas registradas.</div>
-            <div *ngIf="!cargando && barMeses.length > 0">
-              <div class="flex items-end gap-3 h-40 mb-2">
-                <div *ngFor="let b of barMeses" class="flex-1 flex flex-col items-center gap-1">
-                  <span class="text-xs font-bold text-gray-600">{{ b.count }}</span>
-                  <div class="w-full bg-red-600 rounded-t transition-all"
-                    [style.height.%]="b.pct || 4"
-                    style="min-height:4px; max-height:100%"></div>
-                </div>
-              </div>
-              <div class="flex gap-3">
-                <div *ngFor="let b of barMeses" class="flex-1 text-center text-xs text-gray-400 font-medium">{{ b.mes }}</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Servicios más reservados -->
-          <div class="bg-white border border-gray-200 rounded-xl p-6">
-            <h3 class="text-base font-bold text-gray-800 mb-5">Servicios más reservados</h3>
-            <div *ngIf="cargando" class="text-center py-8 text-gray-400 text-sm">Cargando...</div>
-            <div *ngIf="!cargando && serviciosBar.length === 0" class="text-center py-8 text-gray-400 text-sm italic">Sin datos.</div>
-            <div class="space-y-3">
-              <div *ngFor="let s of serviciosBar; let i = index">
-                <div class="flex justify-between text-xs mb-1">
-                  <span class="font-semibold text-gray-700 truncate flex-1 mr-2">{{ s.nombre }}</span>
-                  <span class="text-gray-500 shrink-0">{{ s.pct }}% · {{ s.count }} citas</span>
-                </div>
-                <div class="h-2 rounded-full bg-gray-100 overflow-hidden">
-                  <div class="h-full rounded-full" [style.width.%]="s.pct" [style.background]="s.color"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="grid grid-cols-2 gap-6">
-
-          <!-- Desempeño de estilistas -->
-          <div class="bg-white border border-gray-200 rounded-xl p-6">
-            <h3 class="text-base font-bold text-gray-800 mb-5">Desempeño de estilistas</h3>
-            <div *ngIf="cargando" class="text-center py-8 text-gray-400 text-sm">Cargando...</div>
-            <div *ngIf="!cargando && estilistas.length === 0" class="text-center py-8 text-gray-400 text-sm italic">Sin datos de estilistas.</div>
-            <div class="space-y-4">
-              <div *ngFor="let e of estilistas">
-                <div class="flex items-baseline justify-between mb-1">
-                  <span class="text-sm font-semibold text-gray-800 truncate flex-1 mr-2">{{ e.nombre }}</span>
-                  <div class="flex items-center gap-3 shrink-0">
-                    <span class="text-xs text-gray-400">{{ e.citas }} citas</span>
-                    <span *ngIf="e.calificacion > 0" class="text-xs text-amber-500 font-bold flex items-center gap-0.5">
-                      <span class="material-symbols-outlined text-xs">star</span>{{ e.calificacion | number:'1.1-1' }}
-                    </span>
-                  </div>
-                </div>
-                <div class="h-2.5 rounded-full bg-gray-100 overflow-hidden">
-                  <div class="h-full bg-red-600 rounded-full" [style.width.%]="e.pct"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Clientes principales -->
-          <div class="bg-white border border-gray-200 rounded-xl p-6">
-            <h3 class="text-base font-bold text-gray-800 mb-5">Clientes principales</h3>
-            <div *ngIf="cargando" class="text-center py-8 text-gray-400 text-sm">Cargando...</div>
-            <div *ngIf="!cargando && clientes.length === 0" class="text-center py-8 text-gray-400 text-sm italic">Sin clientes con reservas.</div>
-            <div class="space-y-3">
-              <div *ngFor="let c of clientes; let i = index"
-                class="flex items-center justify-between p-3 rounded-lg bg-gray-50">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
-                    [style.background]="COLORES[i % COLORES.length] + '22'"
-                    [style.color]="COLORES[i % COLORES.length]">
-                    {{ c.iniciales }}
-                  </div>
-                  <div>
-                    <p class="font-semibold text-gray-800 text-sm">{{ c.nombre }}</p>
-                    <p class="text-xs text-gray-400">{{ c.visitas }} visita{{ c.visitas !== 1 ? 's' : '' }}</p>
-                  </div>
-                </div>
-                <span *ngIf="c.gasto > 0" class="text-red-600 font-bold text-sm">L. {{ c.gasto | number:'1.0-0' }}</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  `
+  templateUrl: './reportes-estadisticas.component.html',
+  styleUrl: './reportes-estadisticas.component.css'
 })
 export class ReportesEstadisticasComponent implements OnInit {
   cargando = true;
@@ -141,7 +27,8 @@ export class ReportesEstadisticasComponent implements OnInit {
   serviciosBar: ServicioBar[] = [];
   estilistas: EstilistaRow[] = [];
   clientes: ClienteRow[] = [];
-  readonly COLORES = COLORES;
+
+  readonly COLORES = ['#dc2626','#7c3aed','#2563eb','#059669','#d97706','#db2777'];
 
   constructor(
     private citaSvc: CitaService,
@@ -229,7 +116,7 @@ export class ReportesEstadisticasComponent implements OnInit {
       .map(([nombre, count], i) => ({
         nombre, count,
         pct: Math.round(count / total * 100),
-        color: COLORES[i % COLORES.length]
+        color: this.COLORES[i % this.COLORES.length]
       }));
   }
 

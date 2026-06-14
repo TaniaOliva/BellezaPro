@@ -1,0 +1,209 @@
+<div class="bg-white min-h-screen">
+  <div class="px-8 py-8">
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="text-3xl font-bold text-gray-800">Gestionar Clientes</h1>
+    </div>
+
+    <!-- Buscador y filtros -->
+    <div class="mb-6 flex gap-4">
+      <div class="flex-1 flex items-center border border-gray-300 rounded-lg px-4 py-2 bg-white">
+        <span class="material-symbols-outlined text-gray-400">search</span>
+        <input [(ngModel)]="busqueda" type="text" placeholder="Buscar cliente..." class="ml-2 flex-1 outline-none text-gray-700">
+      </div>
+      <button (click)="filtroEstado = 'activo'"
+        [class]="filtroEstado === 'activo' ? 'px-4 py-2 bg-red-100 text-red-600 rounded-lg font-semibold' : 'px-4 py-2 border border-gray-300 text-gray-600 rounded-lg font-semibold hover:bg-gray-50'">
+        Activos
+      </button>
+      <button (click)="filtroEstado = 'suspendido'"
+        [class]="filtroEstado === 'suspendido' ? 'px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg font-semibold' : 'px-4 py-2 border border-gray-300 text-gray-600 rounded-lg font-semibold hover:bg-gray-50'">
+        Suspendidos
+      </button>
+      <button (click)="filtroEstado = 'todos'"
+        [class]="filtroEstado === 'todos' ? 'px-4 py-2 bg-red-100 text-red-600 rounded-lg font-semibold' : 'px-4 py-2 border border-gray-300 text-gray-600 rounded-lg font-semibold hover:bg-gray-50'">
+        Todos
+      </button>
+    </div>
+
+    <!-- Tabla -->
+    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <table class="w-full">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Nombre</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Email</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Teléfono</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Estado</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Registrado</th>
+            <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <tr *ngIf="cargando">
+            <td colspan="6" class="px-6 py-8 text-center text-gray-400">Cargando clientes...</td>
+          </tr>
+          <tr *ngIf="!cargando && clientesFiltrados.length === 0">
+            <td colspan="6" class="px-6 py-8 text-center text-gray-400">Sin resultados.</td>
+          </tr>
+          <tr *ngFor="let c of clientesFiltrados" class="hover:bg-gray-50 transition">
+            <td class="px-6 py-4"><p class="font-semibold text-gray-800">{{ c.nombre }} {{ c.apellido }}</p></td>
+            <td class="px-6 py-4"><p class="text-gray-600">{{ c.email }}</p></td>
+            <td class="px-6 py-4"><p class="text-gray-600">{{ c.telefono || '—' }}</p></td>
+            <td class="px-6 py-4">
+              <span [class]="badgeClase(c.estado)" class="text-xs font-bold px-3 py-1 rounded capitalize">
+                {{ c.estado }}
+              </span>
+              <p *ngIf="c.estado === 'suspendido' && c.suspensionFin" class="text-xs text-gray-400 mt-0.5">
+                hasta {{ c.suspensionFin | date:'dd/MM/yyyy':'UTC' }}
+              </p>
+            </td>
+            <td class="px-6 py-4"><p class="text-gray-500 text-sm">{{ c.createdAt | date:'dd/MM/yyyy' }}</p></td>
+            <td class="px-6 py-4 text-center">
+              <button (click)="abrirDetalle(c)" class="text-red-600 font-semibold text-sm hover:text-red-700">Ver</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay -->
+<div *ngIf="seleccionado" class="fixed inset-0 bg-black/40 z-40" (click)="cerrarDetalle()"></div>
+
+<!-- Drawer detalle cliente -->
+<div *ngIf="seleccionado" class="fixed right-0 top-0 h-full w-[480px] bg-white z-50 shadow-2xl flex flex-col">
+  <div class="flex items-center justify-between px-6 py-5 border-b border-gray-200">
+    <h2 class="text-xl font-bold text-gray-800">{{ seleccionado.nombre }} {{ seleccionado.apellido }}</h2>
+    <button (click)="cerrarDetalle()" class="p-2 hover:bg-gray-100 rounded-lg">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+
+  <div class="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+
+    <div class="space-y-1 text-sm">
+      <p class="text-gray-500">{{ seleccionado.email }}</p>
+      <p class="text-gray-500">{{ seleccionado.telefono || 'Sin teléfono' }}</p>
+      <div class="flex items-center gap-2 mt-1">
+        <span [class]="badgeClase(seleccionado.estado)" class="text-xs font-bold px-3 py-1 rounded capitalize">
+          {{ seleccionado.estado }}
+        </span>
+        <span *ngIf="seleccionado.estado === 'suspendido' && seleccionado.suspensionFin"
+          class="text-xs text-gray-500">
+          hasta {{ seleccionado.suspensionFin | date:'dd/MM/yyyy':'UTC' }}
+        </span>
+        <span *ngIf="seleccionado.estado === 'suspendido' && !seleccionado.suspensionFin"
+          class="text-xs text-gray-500">indefinida</span>
+      </div>
+    </div>
+
+    <div *ngIf="mensajeEstado" class="p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
+      {{ mensajeEstado }}
+    </div>
+
+    <!-- Acciones de estado -->
+    <div class="space-y-2">
+
+      <button *ngIf="seleccionado.estado !== 'activo'" (click)="cambiarEstado('activo')" [disabled]="guardando"
+        class="w-full py-2 bg-green-600 text-white rounded-lg font-semibold text-sm hover:bg-green-700 disabled:opacity-50 transition">
+        Activar cuenta
+      </button>
+
+      <button *ngIf="seleccionado.estado === 'activo'" (click)="cambiarEstado('bloqueado')" [disabled]="guardando"
+        class="w-full py-2 bg-red-600 text-white rounded-lg font-semibold text-sm hover:bg-red-700 disabled:opacity-50 transition">
+        Bloquear
+      </button>
+
+      <div *ngIf="seleccionado.estado !== 'suspendido'">
+        <button (click)="toggleOpcionesSuspension()" [disabled]="guardando"
+          class="w-full py-2 border border-yellow-500 text-yellow-600 rounded-lg font-semibold text-sm hover:bg-yellow-50 disabled:opacity-50 transition flex items-center justify-between px-4">
+          <span>Suspender</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform"
+            [class.rotate-180]="mostrarOpcionesSuspension"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+
+        <div *ngIf="mostrarOpcionesSuspension"
+          class="border border-yellow-200 rounded-lg overflow-hidden mt-1 divide-y divide-yellow-100">
+
+          <button (click)="suspenderIndefinido()" [disabled]="guardando"
+            class="w-full px-4 py-3 text-left text-sm hover:bg-yellow-50 transition flex items-center justify-between">
+            <div>
+              <p class="font-semibold text-gray-800">Suspensión indefinida</p>
+              <p class="text-xs text-gray-400">Permanece suspendido hasta que la quites manualmente</p>
+            </div>
+            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-medium ml-2">Predeterminada</span>
+          </button>
+
+          <div>
+            <button (click)="tipoSuspension = tipoSuspension === 'definida' ? null : 'definida'"
+              [disabled]="guardando"
+              class="w-full px-4 py-3 text-left text-sm hover:bg-yellow-50 transition flex items-center justify-between">
+              <div>
+                <p class="font-semibold text-gray-800">Suspensión definida</p>
+                <p class="text-xs text-gray-400">Elige hasta qué fecha dura la suspensión</p>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 transition-transform"
+                [class.rotate-180]="tipoSuspension === 'definida'"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+
+            <div *ngIf="tipoSuspension === 'definida'" class="px-4 pb-3 space-y-2">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Suspendido hasta</label>
+                <input type="date" [(ngModel)]="suspensionHasta" [min]="hoyStr"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+              </div>
+              <button (click)="suspenderDefinido()" [disabled]="guardando || !suspensionHasta"
+                class="w-full py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg text-sm font-semibold disabled:opacity-40 transition">
+                Confirmar
+              </button>
+            </div>
+          </div>
+
+          <div class="px-4 py-2 bg-gray-50">
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Suspensiones rápidas</p>
+            <div class="flex gap-2">
+              <button (click)="suspenderRapido(7)" [disabled]="guardando"
+                class="flex-1 py-1.5 border border-yellow-300 text-yellow-700 rounded text-xs font-semibold hover:bg-yellow-50 disabled:opacity-50 transition">
+                1 semana
+              </button>
+              <button (click)="suspenderRapido(15)" [disabled]="guardando"
+                class="flex-1 py-1.5 border border-yellow-300 text-yellow-700 rounded text-xs font-semibold hover:bg-yellow-50 disabled:opacity-50 transition">
+                15 días
+              </button>
+              <button (click)="suspenderRapido(30)" [disabled]="guardando"
+                class="flex-1 py-1.5 border border-yellow-300 text-yellow-700 rounded text-xs font-semibold hover:bg-yellow-50 disabled:opacity-50 transition">
+                1 mes
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Reportes del cliente -->
+    <div>
+      <p class="text-sm font-bold text-gray-700 mb-3">Reportes recibidos</p>
+      <div *ngIf="reportesCliente.length === 0" class="text-sm text-gray-400 italic">Sin reportes.</div>
+      <div class="space-y-3">
+        <div *ngFor="let r of reportesCliente" class="rounded-lg border border-gray-200 p-3 text-sm">
+          <div class="flex items-center justify-between mb-1">
+            <p class="font-semibold text-gray-800 capitalize">{{ r.motivo }}</p>
+            <span [class]="r.estado === 'resuelto' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+              class="text-xs font-bold px-2 py-0.5 rounded capitalize">{{ r.estado }}</span>
+          </div>
+          <p class="text-gray-500">{{ r.descripcion }}</p>
+          <p class="text-xs text-gray-400 mt-1">{{ r.creadoEn | date:'dd/MM/yyyy' }}</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

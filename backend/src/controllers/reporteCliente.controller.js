@@ -1,9 +1,18 @@
 const ReporteCliente = require('../models/ReporteCliente');
 const Usuario = require('../models/Usuario');
+const { crearNotificacion } = require('./notificacion.controller');
 
 const crear = async (req, res) => {
   try {
     const reporte = await ReporteCliente.create({ ...req.body, estilistaId: req.usuario.id });
+
+    const estilista = await Usuario.findById(req.usuario.id).select('nombre apellido');
+    const nombreEst = estilista ? `${estilista.nombre} ${estilista.apellido}`.trim() : 'Estilista';
+    const admins = await Usuario.find({ rol: 'admin' }).select('_id');
+    for (const admin of admins) {
+      await crearNotificacion(admin._id, 'Nuevo reporte de cliente', `${nombreEst} reportó un cliente`, 'sistema', 'flag');
+    }
+
     res.status(201).json(reporte);
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
 };
