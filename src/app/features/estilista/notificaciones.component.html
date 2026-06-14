@@ -1,28 +1,55 @@
-<div class="p-stack_lg">
-  <h1 class="font-headline-lg mb-stack_lg">Notificaciones</h1>
+<div class="bg-white min-h-screen">
+  <div class="bg-red-50 px-8 py-6 border-b border-gray-200 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Notificaciones</h1>
+      <p class="text-gray-600 text-sm mt-1">Tus alertas y actualizaciones</p>
+    </div>
+    <button (click)="marcarTodas()" [disabled]="noHayNoLeidas"
+      class="text-sm font-semibold text-red-600 hover:underline disabled:opacity-40">
+      Marcar todo leído
+    </button>
+  </div>
 
-  <div class="space-y-2">
-    <div
-      *ngFor="let notif of notificaciones"
-      [class.bg-surface-container-low]="!notif.leida"
-      [class.bg-surface]="notif.leida"
-      (click)="marcarComoLeida(notif.id)"
-      class="rounded-lg border border-outline-variant p-stack_md flex items-start gap-4 cursor-pointer hover:bg-surface-container-low transition"
-    >
-      <!-- Icono -->
-      <div class="flex-shrink-0 mt-1">
-        <span [class]="'material-symbols-outlined text-2xl ' + notif.iconoColor">{{ notif.icono }}</span>
+  <div class="px-8 py-8 max-w-2xl">
+    <div class="mb-6 flex gap-2 flex-wrap">
+      <button (click)="filtroActivo = 'todas'"
+        [class]="filtroActivo === 'todas' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
+        class="px-4 py-2 rounded-lg font-semibold text-sm transition">Todas</button>
+      <button (click)="filtroActivo = 'no-leidas'"
+        [class]="filtroActivo === 'no-leidas' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
+        class="px-4 py-2 rounded-lg font-semibold text-sm transition">No leídas</button>
+      <button (click)="filtroActivo = 'cita'"
+        [class]="filtroActivo === 'cita' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
+        class="px-4 py-2 rounded-lg font-semibold text-sm transition">Citas</button>
+    </div>
+
+    <div *ngIf="cargando" class="text-center py-16 text-gray-400">Cargando...</div>
+
+    <div *ngIf="!cargando && filtradas.length === 0" class="text-center py-16">
+      <span class="material-symbols-outlined text-gray-300 text-5xl block mb-3">notifications_off</span>
+      <p class="text-gray-400">Sin notificaciones.</p>
+    </div>
+
+    <div class="space-y-3">
+      <div *ngFor="let n of filtradas" (click)="marcarLeida(n)"
+        [class]="n.leida ? 'bg-white border-gray-200' : 'bg-red-50 border-red-200'"
+        class="border rounded-lg p-4 cursor-pointer hover:shadow-md transition">
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-base">{{ n.icono || 'notifications' }}</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p [class.font-bold]="!n.leida" class="text-gray-800">{{ n.titulo }}</p>
+                <p class="text-sm text-gray-600 mt-1">{{ n.descripcion }}</p>
+              </div>
+              <div *ngIf="!n.leida" class="w-2 h-2 rounded-full bg-red-600 mt-1 shrink-0"></div>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">{{ formatFecha(n.creadoEn) }}</p>
+          </div>
+        </div>
       </div>
-
-      <!-- Contenido -->
-      <div class="flex-1 min-w-0">
-        <h3 class="font-body-md font-bold mb-1">{{ notif.titulo }}</h3>
-        <p class="font-body-sm text-secondary mb-1">{{ notif.descripcion }}</p>
-        <p class="font-label-sm text-secondary text-xs">{{ notif.tiempo }}</p>
-      </div>
-
-      <!-- Indicador de no leído -->
-      <div *ngIf="!notif.leida" class="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-2"></div>
     </div>
   </div>
 </div>

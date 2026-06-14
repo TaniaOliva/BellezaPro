@@ -53,13 +53,15 @@ export interface Cita {
   _id: string;
   clienteId: any;
   estilistaId: any;
-  servicioId: any;
+  servicioId?: any;
+  solicitudId?: any;
   fecha: string;
   hora: string;
   duracion: number;
   estado: string;
   precioFinal?: number;
   notas?: string;
+  motivoCancelacion?: string;
   creadoEn: string;
 }
 
@@ -70,10 +72,20 @@ export interface SolicitudEspecial {
   descripcion: string;
   imagenUrl?: string;
   presupuesto?: string;
-  estado: string;
+  estilistaPreferida?: any;
+  estado: 'pendiente' | 'propuesta' | 'contraoferta' | 'aceptada' | 'rechazada';
   respuesta?: string;
   precioEstimado?: number;
   duracionEstimada?: number;
+  // Propuesta admin
+  fechaPropuesta?: string;
+  horaPropuesta?: string;
+  estilistaAsignada?: any;
+  // Contraoferta cliente
+  fechaContraoferta?: string;
+  horaContraoferta?: string;
+  estilistaContraoferta?: any;
+  mensajeContraoferta?: string;
   creadoEn: string;
 }
 
@@ -101,7 +113,7 @@ export interface Notificacion {
   usuarioId: string;
   titulo: string;
   descripcion?: string;
-  tipo: 'cita' | 'solicitud' | 'sistema' | 'promo';
+  tipo: 'cita' | 'solicitud' | 'sistema';
   icono: string;
   leida: boolean;
   creadoEn: string;

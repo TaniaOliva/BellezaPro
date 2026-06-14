@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UsuarioService } from '../../core/services/usuario.service';
-import { CitaService } from '../../core/services/cita.service';
-import { BloqueoService } from '../../core/services/bloqueo.service';
-import { Usuario, Cita, Bloqueo, ConflictoBloqueo } from '../../core/models';
+import { UsuarioService } from '../../../core/services/usuario.service';
+import { CitaService } from '../../../core/services/cita.service';
+import { BloqueoService } from '../../../core/services/bloqueo.service';
+import { Usuario, Cita, Bloqueo, ConflictoBloqueo } from '../../../core/models';
 
 type Vista = 'dia' | 'semana' | 'mes';
 

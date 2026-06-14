@@ -1,5 +1,6 @@
 const Bloqueo = require('../models/Bloqueo');
 const Cita = require('../models/Cita');
+const { crearNotificacion } = require('./notificacion.controller');
 
 const verificarSuperposicion = async (fechaInicio, fechaFin, cierreTotalSalon, estilistaId, excluirId = null) => {
   const ini = new Date(fechaInicio);
@@ -44,6 +45,28 @@ const crear = async (req, res) => {
       razon,
       cierreTotalSalon: !!cierreTotalSalon
     });
+
+    // Auto-cancelar citas que caen dentro del bloqueo
+    const citasQuery = {
+      fecha: { $gte: new Date(fechaInicio), $lte: new Date(fechaFin) },
+      estado: { $in: ['pendiente', 'confirmada', 'en_progreso'] }
+    };
+    if (!cierreTotalSalon && estilistaId) citasQuery.estilistaId = estilistaId;
+    const citasAfectadas = await Cita.find(citasQuery).populate('clienteId', '_id');
+    const motivoBloqueo = `${razon || 'El salón ha bloqueado este período.'} Te invitamos a reagendar tu cita.`;
+    for (const cita of citasAfectadas) {
+      await Cita.findByIdAndUpdate(cita._id, { estado: 'cancelada', motivoCancelacion: motivoBloqueo });
+      if (cita.clienteId?._id) {
+        await crearNotificacion(
+          cita.clienteId._id,
+          'Tu cita fue cancelada',
+          razon ? `${razon} Por favor reagenda tu cita.` : 'El salón bloqueó este período. Por favor reagenda tu cita.',
+          'cita',
+          'event_busy'
+        );
+      }
+    }
+
     res.status(201).json(bloqueo);
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
 };
@@ -118,4 +141,20 @@ const eliminar = async (req, res) => {
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
 };
 
-module.exports = { crear, actualizar, listarTodos, listarEnRango, verificarConflictos, listarPorEstilista, eliminar };
+const listarParaCliente = async (req, res) => {
+  try {
+    const { inicio, fin, estilistaId } = req.query;
+    if (!inicio || !fin) return res.status(400).json({ mensaje: 'Se requieren inicio y fin' });
+    const baseQuery = {
+      fechaInicio: { $lte: new Date(fin) },
+      fechaFin:    { $gte: new Date(inicio) }
+    };
+    const orClause = [{ cierreTotalSalon: true }];
+    if (estilistaId) orClause.push({ estilistaId });
+    const bloqueos = await Bloqueo.find({ ...baseQuery, $or: orClause })
+      .select('fechaInicio fechaFin cierreTotalSalon');
+    res.json(bloqueos);
+  } catch (err) { res.status(500).json({ mensaje: err.message }); }
+};
+
+module.exports = { crear, actualizar, listarTodos, listarEnRango, verificarConflictos, listarPorEstilista, eliminar, listarParaCliente };

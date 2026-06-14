@@ -1,202 +1,89 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { SolicitudService } from '../../core/services/solicitud.service';
 import { CategoriaService } from '../../core/services/categoria.service';
 import { UsuarioService } from '../../core/services/usuario.service';
-import { Usuario } from '../../core/models';
+import { SolicitudEspecial, Usuario } from '../../core/models';
 
 @Component({
   selector: 'app-cliente-solicitud-especial',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `
-    <div class="bg-white min-h-screen">
-      <div class="max-w-2xl mx-auto px-8 py-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Solicitud Especial</h1>
-        <p class="text-gray-600 mb-8">Cuéntanos qué necesitas y nos encargaremos de coordinarlo.</p>
-
-        <!-- Pasos -->
-        <div class="rounded-[32px] bg-surface p-6 mb-8">
-          <div class="flex items-center gap-4 overflow-x-auto">
-            <ng-container *ngFor="let step of steps; let i = index">
-              <div class="flex items-center gap-4">
-                <div class="grid h-10 w-10 place-items-center rounded-full border text-sm font-semibold"
-                  [ngClass]="currentStep === i + 1 ? 'border-primary bg-primary-fixed/10 text-primary' : 'border-outline-variant bg-surface text-secondary'">{{ i + 1 }}</div>
-                <div class="text-label-sm text-secondary">{{ step }}</div>
-              </div>
-              <div *ngIf="i < steps.length - 1" class="h-px flex-1 bg-outline-variant"></div>
-            </ng-container>
-          </div>
-        </div>
-
-        <div class="rounded-[32px] border border-outline-variant bg-surface p-8 space-y-6">
-
-          <!-- Paso 1: Categoría -->
-          <ng-container *ngIf="currentStep === 1">
-            <p class="text-headline-lg font-semibold">Selecciona una categoría</p>
-            <div *ngIf="cargandoCats" class="text-center py-8 text-gray-400">Cargando categorías...</div>
-            <div *ngIf="!cargandoCats" class="grid grid-cols-2 gap-4">
-              <button *ngFor="let cat of categorias" type="button" (click)="selectedCategory = cat"
-                class="rounded-3xl border p-6 text-center transition"
-                [ngClass]="selectedCategory === cat ? 'border-primary bg-secondary-fixed' : 'border-outline-variant bg-surface'">
-                {{ cat }}
-              </button>
-              <button *ngIf="categorias.length === 0" disabled class="col-span-2 rounded-3xl border border-dashed p-6 text-gray-400 text-center">
-                Sin categorías disponibles
-              </button>
-            </div>
-            <div class="flex justify-end">
-              <button type="button" [disabled]="!selectedCategory" (click)="currentStep = 2"
-                class="rounded-2xl bg-primary px-6 py-3 text-on-primary font-semibold disabled:opacity-50">
-                Continuar
-              </button>
-            </div>
-          </ng-container>
-
-          <!-- Paso 2: Descripción -->
-          <ng-container *ngIf="currentStep === 2">
-            <p class="text-headline-lg font-semibold">Describe tu solicitud</p>
-            <textarea rows="5" [(ngModel)]="descripcion"
-              class="w-full rounded-[28px] border border-outline-variant bg-surface p-5 text-body-md"
-              placeholder="Describe el servicio que buscas"></textarea>
-            <div class="rounded-[28px] border-2 border-dashed border-outline-variant bg-surface-container-low h-32 flex flex-col items-center justify-center gap-2 text-center text-secondary">
-              <span class="material-symbols-outlined text-[32px]">upload_file</span>
-              <p>Arrastra una imagen o haz clic</p>
-            </div>
-            <div class="space-y-3">
-              <p class="text-label-sm font-semibold text-secondary">Presupuesto</p>
-              <div class="flex flex-wrap gap-3">
-                <button *ngFor="let budget of budgets" type="button" (click)="selectedBudget = budget"
-                  class="rounded-full border px-4 py-2 text-sm transition"
-                  [ngClass]="selectedBudget === budget ? 'border-primary bg-secondary-fixed text-primary' : 'border-outline-variant text-secondary'">
-                  {{ budget }}
-                </button>
-              </div>
-            </div>
-            <div class="flex justify-between">
-              <button type="button" (click)="currentStep = 1" class="rounded-2xl border border-outline-variant px-6 py-3 text-secondary">Volver</button>
-              <button type="button" (click)="currentStep = 3" class="rounded-2xl bg-primary px-6 py-3 text-on-primary font-semibold">Continuar</button>
-            </div>
-          </ng-container>
-
-          <!-- Paso 3: Estilista -->
-          <ng-container *ngIf="currentStep === 3">
-            <p class="text-headline-lg font-semibold">Elige un estilista</p>
-            <div *ngIf="cargandoEstilistas" class="text-center py-8 text-gray-400">Cargando estilistas...</div>
-            <div *ngIf="!cargandoEstilistas" class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <button type="button"
-                class="rounded-[28px] border p-6 text-left transition"
-                [ngClass]="selectedStylistId === '' ? 'border-primary bg-secondary-fixed' : 'border-outline-variant'"
-                (click)="selectedStylistId = ''">
-                <div class="flex items-center gap-4">
-                  <input type="radio" class="h-4 w-4 text-primary" [checked]="selectedStylistId === ''" />
-                  <div>
-                    <p class="text-label-md font-semibold">Sin preferencia</p>
-                    <p class="text-body-sm text-secondary mt-1">Seleccionaremos el mejor estilista para ti.</p>
-                  </div>
-                </div>
-              </button>
-              <button type="button" *ngFor="let s of estilistas"
-                class="rounded-[28px] border p-6 text-left transition"
-                [ngClass]="selectedStylistId === s._id ? 'border-primary bg-secondary-fixed' : 'border-outline-variant'"
-                (click)="selectedStylistId = s._id">
-                <div class="flex items-center gap-4">
-                  <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-fixed/10 text-primary font-semibold shrink-0">
-                    {{ iniciales(s) }}
-                  </div>
-                  <div>
-                    <p class="text-label-md font-semibold">{{ s.nombre }} {{ s.apellido }}</p>
-                    <p class="text-body-sm text-secondary mt-1">
-                      {{ s.especialidades && s.especialidades.length ? s.especialidades[0] : 'Estilista' }}
-                    </p>
-                    <div *ngIf="s.calificacionPromedio" class="flex items-center gap-1 text-secondary text-sm mt-1">
-                      <span class="material-symbols-outlined text-[16px]">star</span>
-                      <span>{{ s.calificacionPromedio | number:'1.1-1' }}</span>
-                    </div>
-                  </div>
-                </div>
-              </button>
-            </div>
-            <div class="flex justify-between">
-              <button type="button" (click)="currentStep = 2" class="rounded-2xl border border-outline-variant px-6 py-3 text-secondary">Volver</button>
-              <button type="button" (click)="currentStep = 4" class="rounded-2xl bg-primary px-6 py-3 text-on-primary font-semibold">Continuar</button>
-            </div>
-          </ng-container>
-
-          <!-- Paso 4: Resumen -->
-          <ng-container *ngIf="currentStep === 4">
-            <p class="text-headline-lg font-semibold">Resumen de solicitud</p>
-            <div class="rounded-[28px] border border-outline-variant bg-surface p-6 space-y-4">
-              <div>
-                <p class="text-label-sm text-secondary">Categoría</p>
-                <p class="text-label-md font-semibold">{{ selectedCategory || 'No seleccionada' }}</p>
-              </div>
-              <div>
-                <p class="text-label-sm text-secondary">Presupuesto</p>
-                <p class="text-label-md font-semibold">{{ selectedBudget || 'No seleccionado' }}</p>
-              </div>
-              <div>
-                <p class="text-label-sm text-secondary">Estilista</p>
-                <p class="text-label-md font-semibold">{{ nombreEstilistaSeleccionado }}</p>
-              </div>
-              <div>
-                <p class="text-label-sm text-secondary">Descripción</p>
-                <p class="text-body-md text-secondary">{{ descripcion || 'Sin descripción' }}</p>
-              </div>
-            </div>
-            <div class="rounded-[28px] bg-primary-fixed/10 p-4 flex items-center gap-3 text-primary">
-              <span class="material-symbols-outlined">info</span>
-              <p>Respuesta en menos de 24 horas</p>
-            </div>
-            <p *ngIf="error" class="text-red-600 text-sm">{{ error }}</p>
-            <div class="flex justify-between">
-              <button type="button" (click)="currentStep = 3" class="rounded-2xl border border-outline-variant px-6 py-3 text-secondary">Volver</button>
-              <button type="button" (click)="enviar()" [disabled]="enviando"
-                class="rounded-2xl bg-primary px-6 py-3 text-on-primary font-semibold disabled:opacity-50">
-                {{ enviando ? 'Enviando...' : 'Enviar solicitud' }}
-              </button>
-            </div>
-          </ng-container>
-
-        </div>
-      </div>
-    </div>
-  `
+  templateUrl: './solicitud-especial.component.html',
+  styleUrl: './solicitud-especial.component.css'
 })
 export class SolicitudEspecialComponent implements OnInit {
+  vistaActual: 'mis' | 'nueva' = 'mis';
+
+  // Nueva solicitud
   currentStep = 1;
   selectedCategory = '';
-  selectedBudget = '';
+  presupuesto = '';
   selectedStylistId = '';
   descripcion = '';
+  imagenBase64 = '';
+  imagenNombre = '';
   enviando = false;
-  error = '';
+  errorForm = '';
+  exitoEnvio = false;
 
   readonly steps = ['Categoría', 'Descripción', 'Estilista', 'Confirmar'];
-  readonly budgets = ['Hasta L.300', 'L.300-600', 'L.600-1000', 'Más de L.1000'];
 
   categorias: string[] = [];
-  estilistas: Usuario[] = [];
+  todosEstilistas: Usuario[] = [];
   cargandoCats = true;
   cargandoEstilistas = true;
+
+  get estilistas(): Usuario[] {
+    if (!this.selectedCategory) return this.todosEstilistas;
+    return this.todosEstilistas.filter(e =>
+      e.especialidades?.some(esp => esp.toLowerCase() === this.selectedCategory.toLowerCase())
+    );
+  }
+
+  // Mis solicitudes
+  solicitudes: SolicitudEspecial[] = [];
+  cargandoSolicitudes = true;
+
+  // Contraoferta
+  solicitudContraoferta: SolicitudEspecial | null = null;
+  contraFecha = '';
+  contraHora = '';
+  contraEstilistaId = '';
+  contraMensaje = '';
+  enviandoContra = false;
+  errorContra = '';
+
+  readonly HORAS = [
+    '09:00','09:30','10:00','10:30','11:00','11:30',
+    '12:00','12:30','14:00','14:30','15:00','15:30',
+    '16:00','16:30','17:00','17:30'
+  ];
 
   constructor(
     private solicitudSvc: SolicitudService,
     private categoriaSvc: CategoriaService,
-    private usuarioSvc: UsuarioService,
-    private router: Router
+    private usuarioSvc: UsuarioService
   ) {}
 
   ngOnInit(): void {
+    this.cargarSolicitudes();
     this.categoriaSvc.listar().subscribe({
       next: (cats) => { this.categorias = cats.map(c => c.nombre); this.cargandoCats = false; },
       error: () => this.cargandoCats = false
     });
     this.usuarioSvc.listarEstilistas().subscribe({
-      next: (data) => { this.estilistas = data; this.cargandoEstilistas = false; },
+      next: (data) => { this.todosEstilistas = data; this.cargandoEstilistas = false; },
       error: () => this.cargandoEstilistas = false
+    });
+  }
+
+  cargarSolicitudes(): void {
+    this.cargandoSolicitudes = true;
+    this.solicitudSvc.misSolicitudes().subscribe({
+      next: (data) => { this.solicitudes = data; this.cargandoSolicitudes = false; },
+      error: () => this.cargandoSolicitudes = false
     });
   }
 
@@ -210,25 +97,120 @@ export class SolicitudEspecialComponent implements OnInit {
     return s ? `${s.nombre} ${s.apellido}` : 'Sin preferencia';
   }
 
+  onImagenSeleccionada(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+    if (file.size > 5 * 1024 * 1024) { this.errorForm = 'La imagen no puede superar 5 MB.'; return; }
+    this.imagenNombre = file.name;
+    const reader = new FileReader();
+    reader.onload = () => { this.imagenBase64 = reader.result as string; };
+    reader.readAsDataURL(file);
+  }
+
+  quitarImagen(): void {
+    this.imagenBase64 = '';
+    this.imagenNombre = '';
+  }
+
   enviar(): void {
     if (!this.selectedCategory || this.descripcion.length < 10) {
-      this.error = 'Completa la categoría y la descripción (mínimo 10 caracteres)';
+      this.errorForm = 'Completa la categoría y la descripción (mínimo 10 caracteres)';
       return;
     }
     this.enviando = true;
-    this.solicitudSvc.crear({
+    this.errorForm = '';
+    const datos: any = {
       categoria: this.selectedCategory,
       descripcion: this.descripcion,
-      presupuesto: this.selectedBudget
-    } as any).subscribe({
+      presupuesto: this.presupuesto || undefined,
+      estilistaPreferida: this.selectedStylistId || undefined,
+      imagenUrl: this.imagenBase64 || undefined
+    };
+    this.solicitudSvc.crear(datos).subscribe({
       next: () => {
         this.enviando = false;
-        setTimeout(() => this.router.navigate(['/cliente/inicio']), 2000);
+        this.exitoEnvio = true;
+        this.currentStep = 1;
+        this.selectedCategory = '';
+        this.presupuesto = '';
+        this.selectedStylistId = '';
+        this.descripcion = '';
+        this.imagenBase64 = '';
+        this.imagenNombre = '';
+        setTimeout(() => {
+          this.exitoEnvio = false;
+          this.vistaActual = 'mis';
+          this.cargarSolicitudes();
+        }, 2000);
       },
       error: (err: any) => {
-        this.error = err.error?.mensaje || 'Error al enviar';
+        this.errorForm = err.error?.mensaje || 'Error al enviar';
         this.enviando = false;
       }
     });
+  }
+
+  // Acciones del cliente sobre propuestas
+  aceptar(sol: SolicitudEspecial): void {
+    this.solicitudSvc.aceptarPropuesta(sol._id).subscribe({
+      next: () => this.cargarSolicitudes(),
+      error: (err: any) => alert(err.error?.mensaje || 'Error al aceptar')
+    });
+  }
+
+  abrirContraoferta(sol: SolicitudEspecial): void {
+    this.solicitudContraoferta = sol;
+    this.contraFecha = '';
+    this.contraHora = '';
+    this.contraEstilistaId = sol.estilistaAsignada?._id ?? '';
+    this.contraMensaje = '';
+    this.errorContra = '';
+  }
+
+  enviarContraoferta(): void {
+    if (!this.contraFecha || !this.contraHora) { this.errorContra = 'Selecciona fecha y hora'; return; }
+    if (!this.solicitudContraoferta) return;
+    this.enviandoContra = true;
+    this.errorContra = '';
+    this.solicitudSvc.contraproponer(this.solicitudContraoferta._id, {
+      fechaContraoferta: this.contraFecha,
+      horaContraoferta: this.contraHora,
+      estilistaContraoferta: this.contraEstilistaId || undefined,
+      mensajeContraoferta: this.contraMensaje || undefined
+    }).subscribe({
+      next: () => {
+        this.enviandoContra = false;
+        this.solicitudContraoferta = null;
+        this.cargarSolicitudes();
+      },
+      error: (err: any) => {
+        this.errorContra = err.error?.mensaje || 'Error al enviar';
+        this.enviandoContra = false;
+      }
+    });
+  }
+
+  estadoLabel(estado: string): string {
+    const map: Record<string, string> = {
+      pendiente: 'Pendiente', propuesta: 'Propuesta del salón',
+      contraoferta: 'Contraoferta enviada', aceptada: 'Aceptada', rechazada: 'Rechazada'
+    };
+    return map[estado] ?? estado;
+  }
+
+  estadoClase(estado: string): string {
+    const map: Record<string, string> = {
+      pendiente: 'bg-yellow-100 text-yellow-700',
+      propuesta: 'bg-blue-100 text-blue-700',
+      contraoferta: 'bg-orange-100 text-orange-700',
+      aceptada: 'bg-green-100 text-green-700',
+      rechazada: 'bg-red-100 text-red-700'
+    };
+    return map[estado] ?? 'bg-gray-100 text-gray-700';
+  }
+
+  get solicitudesConAccion(): SolicitudEspecial[] {
+    return this.solicitudes.filter(s => s.estado === 'propuesta');
   }
 }

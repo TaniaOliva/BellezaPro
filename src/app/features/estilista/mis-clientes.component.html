@@ -1,88 +1,75 @@
-<div class="p-stack_lg">
-  <!-- Buscador y filtros -->
-  <div class="mb-stack_lg">
-    <input
-      type="text"
-      [(ngModel)]="busqueda"
-      placeholder="Buscar cliente..."
-      class="w-full px-4 py-2 rounded-lg border border-outline-variant font-body-sm mb-stack_md"
-    />
-    <div class="flex gap-2">
-      <button
-        (click)="activeFilter = 'todas'"
-        [class.bg-primary]="activeFilter === 'todas'"
-        [class.text-on-primary]="activeFilter === 'todas'"
-        [class.bg-surface]="activeFilter !== 'todas'"
-        class="px-4 py-2 rounded-full font-label-md border border-outline-variant"
-      >
-        Todas
-      </button>
-      <button
-        (click)="activeFilter = 'frecuentes'"
-        [class.bg-primary]="activeFilter === 'frecuentes'"
-        [class.text-on-primary]="activeFilter === 'frecuentes'"
-        [class.bg-surface]="activeFilter !== 'frecuentes'"
-        class="px-4 py-2 rounded-full font-label-md border border-outline-variant"
-      >
-        Frecuentes
-      </button>
-      <button
-        (click)="activeFilter = 'recientes'"
-        [class.bg-primary]="activeFilter === 'recientes'"
-        [class.text-on-primary]="activeFilter === 'recientes'"
-        [class.bg-surface]="activeFilter !== 'recientes'"
-        class="px-4 py-2 rounded-full font-label-md border border-outline-variant"
-      >
-        Recientes
-      </button>
-    </div>
+<div class="bg-white min-h-screen">
+  <div class="bg-red-50 px-8 py-6 border-b border-gray-200">
+    <h1 class="text-2xl font-bold text-gray-800">Mis Clientes</h1>
+    <p class="text-gray-600 text-sm mt-1">Gestiona tu lista de clientes habituales</p>
   </div>
 
-  <!-- Grid de clientes -->
-  <div class="grid grid-cols-2 gap-gutter">
-    <div
-      *ngFor="let cliente of clientes"
-      class="bg-surface rounded-xl border border-outline-variant p-stack_md h-28"
-    >
-      <div class="flex gap-3 mb-2">
-        <!-- Avatar -->
-        <div class="w-13 h-13 rounded-full bg-primary-fixed flex items-center justify-center flex-shrink-0">
-          <span class="text-on-primary font-bold text-sm">{{ cliente.iniciales }}</span>
-        </div>
+  <div class="px-8 py-8">
+    <div class="mb-6 flex gap-4 items-center">
+      <div class="flex-1 flex items-center border border-gray-300 rounded-lg px-4 py-2 bg-white">
+        <span class="material-symbols-outlined text-gray-400">search</span>
+        <input
+          [(ngModel)]="busqueda"
+          type="text"
+          placeholder="Buscar cliente..."
+          class="ml-2 flex-1 outline-none text-gray-700">
+      </div>
+      <button
+        (click)="activeFilter = 'todas'"
+        [class]="activeFilter === 'todas' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
+        class="px-4 py-2 rounded-lg font-semibold">
+        Todos
+      </button>
+      <button
+        (click)="activeFilter = 'vip'"
+        [class]="activeFilter === 'vip' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
+        class="px-4 py-2 rounded-lg font-semibold">
+        VIP
+      </button>
+    </div>
 
-        <!-- Información -->
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2">
-            <p class="font-body-md font-bold">{{ cliente.nombre }}</p>
-            <span *ngIf="cliente.vip" class="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full">VIP</span>
+    <div class="grid grid-cols-2 gap-6">
+      <div *ngFor="let cliente of clientes" class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition">
+        <div class="flex items-start gap-4 mb-4">
+          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-red-300 to-red-500 flex items-center justify-center text-white font-bold text-lg">
+            {{ cliente.iniciales }}
           </div>
-          <p class="font-label-sm text-secondary text-xs">
-            {{ cliente.visitas }} visitas · {{ cliente.servicioUltimo }}
-          </p>
-          <p class="font-label-sm text-secondary text-xs">hace {{ cliente.hace }}</p>
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <h3 class="font-semibold text-gray-800">{{ cliente.nombre }}</h3>
+              <span *ngIf="cliente.vip" class="material-symbols-outlined text-amber-400 text-lg">star</span>
+            </div>
+            <p class="text-sm text-gray-600">{{ cliente.visitas }} visitas</p>
+          </div>
         </div>
-      </div>
 
-      <!-- Estrellas -->
-      <div class="flex gap-1 mb-2">
-        <span
-          *ngFor="let i of getEstrellas(cliente.estrellas)"
-          class="material-symbols-outlined text-[#F59E0B] text-sm"
-        >
-          star
-        </span>
-        <span
-          *ngFor="let i of getEstrellasVacias(cliente.estrellas)"
-          class="material-symbols-outlined text-[#F59E0B] text-sm"
-        >
-          star_outline
-        </span>
-      </div>
+        <div class="space-y-2 pb-4 border-b border-gray-200 mb-4">
+          <div>
+            <p class="text-xs text-gray-600 uppercase font-semibold">Último servicio</p>
+            <p class="text-sm text-gray-800">{{ cliente.servicioUltimo }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-600 uppercase font-semibold">Hace</p>
+            <p class="text-sm text-gray-800">{{ cliente.hace }}</p>
+          </div>
+        </div>
 
-      <!-- Links -->
-      <div class="flex gap-3">
-        <a href="#" class="text-primary font-label-sm text-xs">Ver perfil</a>
-        <a href="#" class="text-error font-label-sm text-xs">Reportar</a>
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex gap-0.5">
+            <span *ngFor="let star of getEstrellas(cliente.estrellas)" class="material-symbols-outlined text-sm text-amber-400">star</span>
+            <span *ngFor="let star of getEstrellasVacias(cliente.estrellas)" class="material-symbols-outlined text-sm text-gray-300">star</span>
+          </div>
+          <p class="text-sm text-gray-600">{{ cliente.estrellas }}/5</p>
+        </div>
+
+        <div class="flex gap-2">
+          <button class="flex-1 border border-gray-300 text-gray-600 rounded-lg py-2 font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-base">phone</span>
+          </button>
+          <button class="flex-1 bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-base">edit</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>

@@ -48,4 +48,10 @@ export class BloqueoService {
   eliminar(id: string): Observable<{ mensaje: string }> {
     return this.http.delete<{ mensaje: string }>(`${this.apiUrl}/${id}`);
   }
+
+  listarParaCliente(inicio: string, fin: string, estilistaId?: string): Observable<{ fechaInicio: string; fechaFin: string }[]> {
+    const params: Record<string, string> = { inicio, fin };
+    if (estilistaId) params['estilistaId'] = estilistaId;
+    return this.http.get<{ fechaInicio: string; fechaFin: string }[]>(`${this.apiUrl}/disponibles`, { params });
+  }
 }

@@ -108,4 +108,97 @@ const listarTodas = async (req, res) => {
   } catch (err) { res.status(500).json({ mensaje: err.message }); }
 };
 
-module.exports = { listarPorCliente, listarPorEstilista, listarTodas, crear, actualizarEstado };
+const SLOTS_DIA = [
+  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+  '12:00', '12:30', '14:00', '14:30', '15:00', '15:30',
+  '16:00', '16:30', '17:00', '17:30'
+];
+
+const verificarSlotsDisponibles = async (req, res) => {
+  try {
+    const { fecha, estilistaId, duracion } = req.query;
+    if (!fecha || !duracion) return res.status(400).json({ mensaje: 'Se requieren fecha y duracion' });
+
+    const dur = parseInt(duracion);
+    const fechaDate = new Date(fecha);
+
+    const bloqueoTotal = await Bloqueo.findOne({
+      fechaInicio: { $lte: fechaDate },
+      fechaFin: { $gte: fechaDate },
+      cierreTotalSalon: true
+    });
+    if (bloqueoTotal) return res.json({ slots: [], bloqueado: 'salon' });
+
+    if (estilistaId) {
+      const bloqueoEstilista = await Bloqueo.findOne({
+        fechaInicio: { $lte: fechaDate },
+        fechaFin: { $gte: fechaDate },
+        estilistaId
+      });
+      if (bloqueoEstilista) return res.json({ slots: [], bloqueado: 'estilista' });
+    }
+
+    const query = {
+      fecha: fechaDate,
+      estado: { $in: ['pendiente', 'confirmada', 'en_progreso'] }
+    };
+    if (estilistaId) query.estilistaId = estilistaId;
+    const citasExistentes = await Cita.find(query).select('hora duracion');
+
+    const slotsDisponibles = SLOTS_DIA.filter(slot => {
+      const [h, m] = slot.split(':').map(Number);
+      const inicio = h * 60 + m;
+      const fin = inicio + dur;
+      if (fin > 18 * 60) return false;
+      for (const cita of citasExistentes) {
+        const [ch, cm] = cita.hora.split(':').map(Number);
+        const citaInicio = ch * 60 + cm;
+        const citaFin = citaInicio + cita.duracion;
+        if (inicio < citaFin && fin > citaInicio) return false;
+      }
+      return true;
+    });
+
+    res.json({ slots: slotsDisponibles, bloqueado: null });
+  } catch (err) { res.status(500).json({ mensaje: err.message }); }
+};
+
+const cancelarPorCliente = async (req, res) => {
+  try {
+    const { motivo } = req.body;
+    if (!motivo || !motivo.trim()) return res.status(400).json({ mensaje: 'Debes indicar un motivo' });
+    const cita = await Cita.findOne({ _id: req.params.id, clienteId: req.usuario.id });
+    if (!cita) return res.status(404).json({ mensaje: 'Cita no encontrada' });
+    if (!['pendiente', 'confirmada'].includes(cita.estado)) {
+      return res.status(400).json({ mensaje: 'No se puede cancelar esta cita' });
+    }
+    await Cita.findByIdAndUpdate(req.params.id, { estado: 'cancelada', motivoCancelacion: motivo.trim() });
+    await crearNotificacion(cita.estilistaId, 'Cita cancelada por cliente',
+      `El cliente canceló su cita. Motivo: ${motivo.trim()}`, 'cita', 'event_busy');
+    const admins = await Usuario.find({ rol: 'admin' }).select('_id');
+    for (const admin of admins) {
+      await crearNotificacion(admin._id, 'Cita cancelada',
+        `Un cliente canceló su cita. Motivo: ${motivo.trim()}`, 'cita', 'event_busy');
+    }
+    res.json({ mensaje: 'Cita cancelada' });
+  } catch (err) { res.status(400).json({ mensaje: err.message }); }
+};
+
+const reagendar = async (req, res) => {
+  try {
+    const { fecha, hora } = req.body;
+    if (!fecha || !hora) return res.status(400).json({ mensaje: 'Fecha y hora son requeridas' });
+    const cita = await Cita.findOne({ _id: req.params.id, clienteId: req.usuario.id });
+    if (!cita) return res.status(404).json({ mensaje: 'Cita no encontrada' });
+    if (cita.estado !== 'cancelada') return res.status(400).json({ mensaje: 'Solo puedes reagendar citas canceladas' });
+    const disponible = await verificarDisponibilidad(cita.estilistaId.toString(), fecha, hora, cita.duracion);
+    if (!disponible) return res.status(409).json({ mensaje: 'El horario seleccionado no está disponible' });
+    const actualizada = await Cita.findByIdAndUpdate(req.params.id, {
+      $set: { fecha: new Date(fecha), hora, estado: 'pendiente' },
+      $unset: { motivoCancelacion: '' }
+    }, { new: true }).populate('estilistaId', 'nombre apellido').populate('servicioId', 'nombre');
+    res.json(actualizada);
+  } catch (err) { res.status(400).json({ mensaje: err.message }); }
+};
+
+module.exports = { listarPorCliente, listarPorEstilista, listarTodas, crear, actualizarEstado, verificarSlotsDisponibles, cancelarPorCliente, reagendar };

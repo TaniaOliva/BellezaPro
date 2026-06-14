@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UsuarioService } from '../../core/services/usuario.service';
-import { ReporteService } from '../../core/services/reporte.service';
-import { Usuario, ReporteCliente } from '../../core/models';
+import { UsuarioService } from '../../../core/services/usuario.service';
+import { ReporteService } from '../../../core/services/reporte.service';
+import { Usuario, ReporteCliente } from '../../../core/models';
 
 @Component({
   selector: 'app-admin-clientes',

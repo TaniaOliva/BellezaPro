@@ -1,0 +1,191 @@
+<div class="bg-white min-h-screen">
+  <div class="px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">Solicitudes Especiales</h1>
+    <p class="text-gray-600 mb-8">Revisa y gestiona las solicitudes personalizadas de clientes.</p>
+
+    <!-- Tabs -->
+    <div class="flex gap-6 border-b border-gray-200 mb-6 overflow-x-auto">
+      <button *ngFor="let tab of tabs" (click)="filtroEstado = tab.value"
+        [class]="filtroEstado === tab.value
+          ? 'pb-3 border-b-2 border-red-600 text-red-600 font-semibold whitespace-nowrap'
+          : 'pb-3 text-gray-500 font-semibold hover:text-gray-700 whitespace-nowrap'">
+        {{ tab.label }} ({{ contarPorEstado(tab.value) }})
+      </button>
+    </div>
+
+    <div *ngIf="cargando" class="text-center py-12 text-gray-400">Cargando solicitudes...</div>
+    <div *ngIf="!cargando && solicitudesFiltradas.length === 0"
+      class="text-center py-12 text-gray-400 italic">Sin solicitudes en esta categoría.</div>
+
+    <div class="space-y-4">
+      <div *ngFor="let s of solicitudesFiltradas"
+        class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition"
+        [class.border-orange-300]="s.estado === 'contraoferta'">
+
+        <div class="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <p class="text-sm text-red-600 font-bold uppercase">{{ s.categoria }}</p>
+            <p class="text-lg font-bold text-gray-800 mt-0.5">
+              {{ s.descripcion.length > 80 ? (s.descripcion | slice:0:80) + '...' : s.descripcion }}
+            </p>
+            <p class="text-sm text-gray-500 mt-1">
+              Cliente: <span class="font-semibold text-gray-700">{{ s.clienteId?.nombre }} {{ s.clienteId?.apellido }}</span>
+            </p>
+          </div>
+          <span [class]="estadoClase(s.estado)" class="text-xs font-bold px-3 py-1 rounded capitalize shrink-0">
+            {{ estadoLabel(s.estado) }}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-4 text-sm">
+          <div *ngIf="s.presupuesto">
+            <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Presupuesto cliente</p>
+            <p class="text-gray-800 font-semibold">{{ s.presupuesto }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Recibida</p>
+            <p class="text-gray-800">{{ s.creadoEn | date:'dd/MM/yyyy' }}</p>
+          </div>
+          <div *ngIf="s.precioEstimado != null">
+            <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Precio propuesto</p>
+            <p class="text-gray-800 font-semibold">L. {{ s.precioEstimado }}</p>
+          </div>
+          <div *ngIf="s.fechaPropuesta">
+            <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Fecha propuesta</p>
+            <p class="text-gray-800">{{ s.fechaPropuesta }} {{ s.horaPropuesta }}</p>
+          </div>
+        </div>
+
+        <!-- Contraoferta del cliente -->
+        <div *ngIf="s.estado === 'contraoferta'" class="mb-4 p-4 bg-orange-50 rounded-xl border border-orange-200 text-sm">
+          <p class="font-semibold text-orange-800 mb-2">📩 Contraoferta del cliente:</p>
+          <p class="text-gray-700">Fecha: <strong>{{ s.fechaContraoferta }}</strong> — Hora: <strong>{{ s.horaContraoferta }}</strong></p>
+          <p *ngIf="s.estilistaContraoferta" class="text-gray-700">
+            Estilista: <strong>{{ s.estilistaContraoferta.nombre }} {{ s.estilistaContraoferta.apellido }}</strong>
+          </p>
+          <p *ngIf="s.mensajeContraoferta" class="text-gray-600 italic mt-1">{{ s.mensajeContraoferta }}</p>
+        </div>
+
+        <div *ngIf="s.imagenUrl" class="mb-4">
+          <img [src]="s.imagenUrl" alt="Referencia" class="h-32 rounded-lg object-cover border border-gray-200">
+        </div>
+
+        <div *ngIf="s.estado === 'pendiente' || s.estado === 'contraoferta'" class="flex gap-3">
+          <button (click)="abrir(s)"
+            class="bg-red-600 text-white rounded-lg py-2 px-5 font-semibold hover:bg-red-700 transition text-sm">
+            {{ s.estado === 'contraoferta' ? 'Gestionar contraoferta' : 'Responder' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay -->
+<div *ngIf="seleccionada" class="fixed inset-0 bg-black/40 z-40" (click)="seleccionada = null"></div>
+
+<!-- Drawer -->
+<div *ngIf="seleccionada" class="fixed right-0 top-0 h-full w-[520px] bg-white z-50 shadow-2xl flex flex-col">
+  <div class="flex items-center justify-between px-6 py-5 border-b border-gray-200">
+    <h2 class="text-xl font-bold text-gray-800">
+      {{ seleccionada.estado === 'contraoferta' ? 'Gestionar contraoferta' : 'Responder solicitud' }}
+    </h2>
+    <button (click)="seleccionada = null" class="p-2 hover:bg-gray-100 rounded-lg">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+
+  <div class="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+    <!-- Info solicitud -->
+    <div class="bg-gray-50 rounded-xl p-4 text-sm space-y-1">
+      <p class="font-bold text-red-600 uppercase text-xs">{{ seleccionada.categoria }}</p>
+      <p class="text-gray-800 font-semibold">{{ seleccionada.descripcion }}</p>
+      <p class="text-gray-500">Cliente: {{ seleccionada.clienteId?.nombre }} {{ seleccionada.clienteId?.apellido }}</p>
+      <p *ngIf="seleccionada.presupuesto" class="text-gray-500">Presupuesto cliente: {{ seleccionada.presupuesto }}</p>
+    </div>
+
+    <div *ngIf="seleccionada.imagenUrl" class="rounded-xl overflow-hidden border border-gray-200">
+      <img [src]="seleccionada.imagenUrl" alt="Referencia del cliente" class="w-full max-h-56 object-cover">
+    </div>
+
+    <!-- Contraoferta del cliente (si aplica) -->
+    <div *ngIf="seleccionada.estado === 'contraoferta'" class="bg-orange-50 rounded-xl p-4 text-sm border border-orange-200">
+      <p class="font-semibold text-orange-800 mb-2">📩 Propuesta del cliente:</p>
+      <p class="text-gray-700">Fecha: <strong>{{ seleccionada.fechaContraoferta }}</strong> — Hora: <strong>{{ seleccionada.horaContraoferta }}</strong></p>
+      <p *ngIf="seleccionada.estilistaContraoferta" class="text-gray-700">
+        Estilista: <strong>{{ seleccionada.estilistaContraoferta.nombre }} {{ seleccionada.estilistaContraoferta.apellido }}</strong>
+      </p>
+      <p *ngIf="seleccionada.mensajeContraoferta" class="text-gray-600 italic mt-1">{{ seleccionada.mensajeContraoferta }}</p>
+    </div>
+
+    <!-- Mensaje admin -->
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-2">Mensaje para el cliente</label>
+      <textarea [(ngModel)]="respuesta" rows="3" placeholder="Escribe un mensaje al cliente..."
+        class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500 resize-none text-sm"></textarea>
+    </div>
+
+    <!-- Datos de propuesta -->
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Precio (L.) *</label>
+        <input [(ngModel)]="precio" type="number" min="0"
+          class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Duración (min) *</label>
+        <input [(ngModel)]="duracion" type="number" min="0" step="15"
+          class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha propuesta *</label>
+        <input [(ngModel)]="fechaPropuesta" type="date"
+          class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Hora *</label>
+        <select [(ngModel)]="horaPropuesta"
+          class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500">
+          <option value="">Seleccionar...</option>
+          <option *ngFor="let h of HORAS" [value]="h">{{ h }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-2">Estilista asignada</label>
+      <select [(ngModel)]="estilistaAsignadaId"
+        class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500">
+        <option value="">Sin asignar aún</option>
+        <option *ngFor="let e of estilistas" [value]="e._id">{{ e.nombre }} {{ e.apellido }}</option>
+      </select>
+    </div>
+
+    <p *ngIf="error" class="text-red-600 text-sm bg-red-50 p-3 rounded-xl">{{ error }}</p>
+  </div>
+
+  <div class="px-6 py-4 border-t border-gray-200 space-y-3">
+    <!-- Si hay contraoferta: aceptar contraoferta o hacer nueva propuesta -->
+    <div *ngIf="seleccionada.estado === 'contraoferta'" class="flex gap-3">
+      <button (click)="aceptarContraoferta()" [disabled]="guardando"
+        class="flex-1 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 disabled:opacity-50 transition text-sm">
+        {{ guardando ? '...' : 'Aceptar contraoferta' }}
+      </button>
+      <button (click)="proponer()" [disabled]="guardando"
+        class="flex-1 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 disabled:opacity-50 transition text-sm">
+        {{ guardando ? '...' : 'Nueva propuesta' }}
+      </button>
+    </div>
+    <!-- Solicitud pendiente normal: proponer o rechazar -->
+    <div *ngIf="seleccionada.estado === 'pendiente'" class="flex gap-3">
+      <button (click)="rechazar()" [disabled]="guardando || !respuesta"
+        class="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 disabled:opacity-50 transition text-sm">
+        {{ guardando ? '...' : 'Rechazar' }}
+      </button>
+      <button (click)="proponer()" [disabled]="guardando"
+        class="flex-1 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 disabled:opacity-50 transition text-sm">
+        {{ guardando ? 'Guardando...' : 'Enviar propuesta' }}
+      </button>
+    </div>
+  </div>
+</div>

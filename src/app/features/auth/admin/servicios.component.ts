@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ServicioService } from '../../core/services/servicio.service';
-import { CategoriaService } from '../../core/services/categoria.service';
-import { Servicio, Categoria } from '../../core/models';
+import { ServicioService } from '../../../core/services/servicio.service';
+import { CategoriaService } from '../../../core/services/categoria.service';
+import { Servicio, Categoria } from '../../../core/models';
 
 interface VarianteForm { tipo: string; nombre: string; precioExtra: number; descripcion: string; }
 interface CatEdit { nombre: string; confirmDelete: boolean; }

@@ -2,12 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { UsuarioService } from '../../core/services/usuario.service';
-import { ServicioService } from '../../core/services/servicio.service';
-import { CitaService } from '../../core/services/cita.service';
-import { SolicitudService } from '../../core/services/solicitud.service';
-import { ReporteService } from '../../core/services/reporte.service';
-import { Servicio, SolicitudEspecial, ReporteCliente } from '../../core/models';
+import { UsuarioService } from '../../../core/services/usuario.service';
+import { ServicioService } from '../../../core/services/servicio.service';
+import { CitaService } from '../../../core/services/cita.service';
+import { SolicitudService } from '../../../core/services/solicitud.service';
+import { ReporteService } from '../../../core/services/reporte.service';
+import { Servicio, SolicitudEspecial, ReporteCliente } from '../../../core/models';
 
 interface Tarea { tipo: 'solicitud' | 'reporte'; texto: string; fecha: string; }
 interface EstilistaUso { nombre: string; reservas: number; porcentaje: number; }

@@ -27,4 +27,18 @@ export class CitaService {
   actualizarEstado(id: string, estado: string): Observable<Cita> {
     return this.http.patch<Cita>(`${this.apiUrl}/${id}/estado`, { estado });
   }
+
+  getDisponibilidad(fecha: string, duracion: number, estilistaId?: string): Observable<{ slots: string[]; bloqueado: string | null }> {
+    const params: Record<string, string> = { fecha, duracion: duracion.toString() };
+    if (estilistaId) params['estilistaId'] = estilistaId;
+    return this.http.get<{ slots: string[]; bloqueado: string | null }>(`${this.apiUrl}/disponibilidad`, { params });
+  }
+
+  cancelar(id: string, motivo: string): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/${id}/cancelar-cliente`, { motivo });
+  }
+
+  reagendar(id: string, fecha: string, hora: string): Observable<Cita> {
+    return this.http.patch<Cita>(`${this.apiUrl}/${id}/reagendar`, { fecha, hora });
+  }
 }

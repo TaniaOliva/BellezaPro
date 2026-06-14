@@ -51,11 +51,14 @@ router.post('/api/servicios',       verificarToken, soloRol('admin'), servicioCo
 router.put('/api/servicios/:id',    verificarToken, soloRol('admin'), servicioController.actualizar);
 
 // Citas
-router.get('/api/citas',              verificarToken, soloRol('admin'),    citaController.listarTodas);
-router.get('/api/citas/mis-citas',    verificarToken, soloRol('cliente'),  citaController.listarPorCliente);
-router.get('/api/citas/mi-agenda',    verificarToken, soloRol('estilista'),citaController.listarPorEstilista);
-router.post('/api/citas',             verificarToken, soloRol('cliente'),  citaController.crear);
-router.patch('/api/citas/:id/estado', verificarToken,                      citaController.actualizarEstado);
+router.get('/api/citas',                    verificarToken, soloRol('admin'),    citaController.listarTodas);
+router.get('/api/citas/mis-citas',          verificarToken, soloRol('cliente'),  citaController.listarPorCliente);
+router.get('/api/citas/mi-agenda',          verificarToken, soloRol('estilista'),citaController.listarPorEstilista);
+router.get('/api/citas/disponibilidad',     verificarToken,                      citaController.verificarSlotsDisponibles);
+router.post('/api/citas',                   verificarToken, soloRol('cliente'),  citaController.crear);
+router.patch('/api/citas/:id/estado',           verificarToken,                      citaController.actualizarEstado);
+router.patch('/api/citas/:id/cancelar-cliente', verificarToken, soloRol('cliente'),  citaController.cancelarPorCliente);
+router.patch('/api/citas/:id/reagendar',        verificarToken, soloRol('cliente'),  citaController.reagendar);
 
 // Calificaciones
 router.post('/api/calificaciones',                               verificarToken, soloRol('cliente'),  calificacionController.crear);
@@ -63,11 +66,14 @@ router.get('/api/calificaciones/estilista/:estilistaId/promedio',               
 router.get('/api/calificaciones/estilista/:estilistaId',         verificarToken,                      calificacionController.listarPorEstilista);
 
 // Solicitudes especiales
-router.post('/api/solicitudes',           verificarToken, soloRol('cliente'), solicitudController.crear);
-router.get('/api/solicitudes/mis',        verificarToken, soloRol('cliente'), solicitudController.listarPorCliente);
-router.get('/api/solicitudes/pendientes', verificarToken, soloRol('admin'),   solicitudController.listarPendientes);
-router.get('/api/solicitudes',            verificarToken, soloRol('admin'),   solicitudController.listarTodas);
-router.patch('/api/solicitudes/:id',      verificarToken, soloRol('admin'),   solicitudController.responder);
+router.post('/api/solicitudes',                        verificarToken, soloRol('cliente'), solicitudController.crear);
+router.get('/api/solicitudes/mis',                     verificarToken, soloRol('cliente'), solicitudController.listarPorCliente);
+router.get('/api/solicitudes/pendientes',              verificarToken, soloRol('admin'),   solicitudController.listarPendientes);
+router.get('/api/solicitudes',                         verificarToken, soloRol('admin'),   solicitudController.listarTodas);
+router.patch('/api/solicitudes/:id',                   verificarToken, soloRol('admin'),   solicitudController.responder);
+router.patch('/api/solicitudes/:id/aceptar-contrao',   verificarToken, soloRol('admin'),   solicitudController.aceptarContraoferta);
+router.patch('/api/solicitudes/:id/aceptar',           verificarToken, soloRol('cliente'), solicitudController.aceptarPropuesta);
+router.patch('/api/solicitudes/:id/contraoferta',      verificarToken, soloRol('cliente'), solicitudController.contraproponer);
 
 // Reportes de clientes
 router.post('/api/reportes',                    verificarToken, soloRol('estilista'), reporteController.crear);
@@ -84,6 +90,7 @@ router.patch('/api/notificaciones/:id/leida',          verificarToken, notificac
 // Bloqueos
 router.get('/api/bloqueos',                        verificarToken, soloRol('admin'), bloqueoController.listarTodos);
 router.get('/api/bloqueos/rango',                  verificarToken, soloRol('admin'), bloqueoController.listarEnRango);
+router.get('/api/bloqueos/disponibles',            verificarToken,                   bloqueoController.listarParaCliente);
 router.post('/api/bloqueos',                       verificarToken, soloRol('admin'), bloqueoController.crear);
 router.post('/api/bloqueos/conflictos',            verificarToken, soloRol('admin'), bloqueoController.verificarConflictos);
 router.get('/api/bloqueos/estilista/:estilistaId', verificarToken,                   bloqueoController.listarPorEstilista);

@@ -1,0 +1,155 @@
+<div class="bg-white min-h-screen">
+  <div class="max-w-6xl mx-auto px-8 py-8 space-y-8">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Mis Citas</h1>
+        <p class="text-gray-600 mt-2">Administra tus próximas citas y revisa tu historial.</p>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <button type="button" (click)="activeTab = 'proximas'" [ngClass]="activeTab === 'proximas' ? 'bg-primary text-white' : 'bg-surface border border-outline-variant text-secondary'" class="rounded-full px-5 py-3 text-sm font-semibold">Próximas</button>
+        <button type="button" (click)="activeTab = 'historial'" [ngClass]="activeTab === 'historial' ? 'bg-primary text-white' : 'bg-surface border border-outline-variant text-secondary'" class="rounded-full px-5 py-3 text-sm font-semibold">Historial</button>
+      </div>
+    </div>
+
+    <div *ngIf="cargando" class="text-center py-16 text-gray-400">Cargando citas...</div>
+
+    <!-- Próximas -->
+    <ng-container *ngIf="activeTab === 'proximas' && !cargando">
+      <div *ngIf="proximas.length === 0" class="text-center py-16 text-gray-400">No tienes citas próximas.</div>
+      <div class="space-y-6">
+        <div *ngFor="let cita of proximas"
+             class="rounded-[32px] border border-outline-variant bg-surface p-6 grid gap-6 lg:grid-cols-[auto_1fr_auto] items-center">
+          <div class="rounded-[24px] bg-primary-fixed p-4 text-on-primary-container text-center min-w-[64px]">
+            <p class="text-headline-md font-semibold">{{ cita.fecha | date:'dd':'UTC' }}</p>
+            <p class="text-label-sm">{{ cita.fecha | date:'MMM':'UTC' | uppercase }}</p>
+          </div>
+          <div>
+            <p class="text-headline-md font-semibold">{{ cita.servicioId?.nombre ?? 'Servicio especial' }}</p>
+            <p class="text-secondary text-sm mt-2">
+              Estilista: {{ cita.estilistaId?.nombre ?? 'Sin asignar' }}
+              {{ cita.estilistaId?.apellido ? ' ' + cita.estilistaId.apellido : '' }}
+              · {{ cita.hora }}
+            </p>
+          </div>
+          <div class="flex flex-col items-end gap-3">
+            <span [ngClass]="{
+              'bg-primary/10 text-primary': cita.estado === 'confirmada',
+              'bg-yellow-100 text-yellow-700': cita.estado === 'pendiente',
+              'bg-blue-100 text-blue-700': cita.estado === 'en_progreso'
+            }" class="inline-flex rounded-full px-4 py-2 text-sm capitalize">
+              {{ cita.estado }}
+            </span>
+            <button *ngIf="cita.estado === 'pendiente' || cita.estado === 'confirmada'"
+              (click)="abrirCancelar(cita)"
+              class="text-xs font-semibold px-4 py-2 border border-red-300 text-red-600 rounded-full hover:bg-red-50 transition">
+              Cancelar cita
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Historial -->
+    <ng-container *ngIf="activeTab === 'historial' && !cargando">
+      <div *ngIf="historial.length === 0" class="text-center py-16 text-gray-400">No hay citas en el historial.</div>
+      <div class="space-y-6">
+        <div *ngFor="let cita of historial"
+             class="rounded-[32px] border border-outline-variant bg-surface p-6 grid gap-6 lg:grid-cols-[auto_1fr_auto] items-center">
+          <div class="rounded-[24px] bg-surface-container-low p-4 text-secondary text-center min-w-[64px]">
+            <p class="text-headline-md font-semibold">{{ cita.fecha | date:'dd':'UTC' }}</p>
+            <p class="text-label-sm">{{ cita.fecha | date:'MMM':'UTC' | uppercase }}</p>
+          </div>
+          <div>
+            <p class="text-headline-md font-semibold">{{ cita.servicioId?.nombre ?? 'Servicio especial' }}</p>
+            <p class="text-secondary text-sm mt-2">
+              Estilista: {{ cita.estilistaId?.nombre ?? 'Sin asignar' }}
+              {{ cita.estilistaId?.apellido ? ' ' + cita.estilistaId.apellido : '' }}
+              · {{ cita.hora }}
+            </p>
+            <p *ngIf="cita.motivoCancelacion" class="mt-2 text-xs text-orange-600 bg-orange-50 border border-orange-100 rounded-xl px-3 py-2">
+              <strong>Motivo:</strong> {{ cita.motivoCancelacion }}
+            </p>
+          </div>
+          <div class="flex flex-col items-end gap-3">
+            <span [ngClass]="{
+              'bg-green-100 text-green-700': cita.estado === 'completada',
+              'bg-red-100 text-red-700': cita.estado === 'cancelada'
+            }" class="inline-flex rounded-full px-4 py-2 text-sm capitalize">
+              {{ cita.estado }}
+            </span>
+            <button *ngIf="cita.estado === 'cancelada'"
+              (click)="abrirReagendar(cita)"
+              class="text-xs font-semibold px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">
+              Reagendar
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<!-- Modal: Cancelar cita -->
+<div *ngIf="citaACancelar" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+    <h3 class="text-lg font-bold text-gray-800 mb-1">Cancelar cita</h3>
+    <p class="text-sm text-gray-500 mb-4">
+      {{ citaACancelar.servicioId?.nombre ?? 'Servicio especial' }} · {{ citaACancelar.hora }} ·
+      {{ citaACancelar.fecha | date:'dd MMM yyyy':'UTC' }}
+    </p>
+    <div class="mb-4">
+      <label class="block text-sm font-semibold text-gray-700 mb-2">Motivo de cancelación *</label>
+      <textarea [(ngModel)]="motivoCancelacion" rows="3" placeholder="Escribe el motivo..."
+        class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500 resize-none text-sm">
+      </textarea>
+    </div>
+    <p *ngIf="errorCancelar" class="text-red-600 text-sm mb-3">{{ errorCancelar }}</p>
+    <div class="flex gap-3">
+      <button (click)="citaACancelar = null"
+        class="flex-1 border border-gray-300 text-gray-700 rounded-xl py-2.5 font-semibold hover:bg-gray-50 transition text-sm">
+        Volver
+      </button>
+      <button (click)="confirmarCancelacion()" [disabled]="cancelando"
+        class="flex-1 bg-red-600 text-white rounded-xl py-2.5 font-semibold hover:bg-red-700 disabled:opacity-50 transition text-sm">
+        {{ cancelando ? 'Cancelando...' : 'Confirmar' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Reagendar cita -->
+<div *ngIf="citaAReagendar" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+    <h3 class="text-lg font-bold text-gray-800 mb-1">Reagendar cita</h3>
+    <p class="text-sm text-gray-500 mb-4">
+      {{ citaAReagendar.servicioId?.nombre ?? 'Servicio especial' }} —
+      Estilista: {{ citaAReagendar.estilistaId?.nombre }} {{ citaAReagendar.estilistaId?.apellido }}
+    </p>
+    <div class="space-y-4 mb-4">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Nueva fecha *</label>
+        <input type="date" [(ngModel)]="reagendarFecha" [min]="hoyStr"
+          class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500 text-sm">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Nueva hora *</label>
+        <select [(ngModel)]="reagendarHora"
+          class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500 text-sm">
+          <option value="">Seleccionar hora...</option>
+          <option *ngFor="let h of HORAS" [value]="h">{{ h }}</option>
+        </select>
+      </div>
+    </div>
+    <p *ngIf="errorReagendar" class="text-red-600 text-sm mb-3">{{ errorReagendar }}</p>
+    <div class="flex gap-3">
+      <button (click)="citaAReagendar = null"
+        class="flex-1 border border-gray-300 text-gray-700 rounded-xl py-2.5 font-semibold hover:bg-gray-50 transition text-sm">
+        Volver
+      </button>
+      <button (click)="confirmarReagendar()" [disabled]="reagendando"
+        class="flex-1 bg-red-600 text-white rounded-xl py-2.5 font-semibold hover:bg-red-700 disabled:opacity-50 transition text-sm">
+        {{ reagendando ? 'Guardando...' : 'Reagendar' }}
+      </button>
+    </div>
+  </div>
+</div>

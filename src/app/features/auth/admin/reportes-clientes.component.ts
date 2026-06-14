@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReporteService } from '../../core/services/reporte.service';
-import { ReporteCliente } from '../../core/models';
+import { ReporteService } from '../../../core/services/reporte.service';
+import { ReporteCliente } from '../../../core/models';
 
 @Component({
   selector: 'app-admin-reportes-clientes',

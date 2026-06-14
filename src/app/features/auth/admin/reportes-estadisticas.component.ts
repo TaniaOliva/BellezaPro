@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { CitaService } from '../../core/services/cita.service';
-import { UsuarioService } from '../../core/services/usuario.service';
+import { CitaService } from '../../../core/services/cita.service';
+import { UsuarioService } from '../../../core/services/usuario.service';
 
 interface KpiCard { label: string; valor: string; sub: string; icon: string; bg: string; color: string; }
 interface BarMes { mes: string; count: number; pct: number; }
