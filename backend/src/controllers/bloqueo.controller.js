@@ -46,7 +46,6 @@ const crear = async (req, res) => {
       cierreTotalSalon: !!cierreTotalSalon
     });
 
-    // Auto-cancelar citas que caen dentro del bloqueo
     const citasQuery = {
       fecha: { $gte: new Date(fechaInicio), $lte: new Date(fechaFin) },
       estado: { $in: ['pendiente', 'confirmada', 'en_progreso'] }
@@ -152,7 +151,7 @@ const listarParaCliente = async (req, res) => {
     const orClause = [{ cierreTotalSalon: true }];
     if (estilistaId) orClause.push({ estilistaId });
     const bloqueos = await Bloqueo.find({ ...baseQuery, $or: orClause })
-      .select('fechaInicio fechaFin cierreTotalSalon');
+      .select('fechaInicio fechaFin cierreTotalSalon razon');
     res.json(bloqueos);
   } catch (err) { res.status(500).json({ mensaje: err.message }); }
 };

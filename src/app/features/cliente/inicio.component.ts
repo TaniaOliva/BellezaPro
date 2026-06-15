@@ -45,14 +45,23 @@ export class InicioComponent implements OnInit {
     });
   }
 
+  labelEstado(estado: string): string {
+    const map: Record<string, string> = {
+      confirmada: 'Confirmada',
+      terminada:  'Completada',
+      cancelada:  'Cancelada',
+      pendiente:  'Pendiente',
+    };
+    return map[estado] ?? estado;
+  }
+
   badgeEstado(estado: string): string {
     const base = 'text-xs font-semibold px-2 py-0.5 rounded-full';
     const colores: Record<string, string> = {
-      pendiente:    `${base} bg-yellow-100 text-yellow-700`,
-      confirmada:   `${base} bg-blue-100 text-blue-700`,
-      en_progreso:  `${base} bg-orange-100 text-orange-700`,
-      completada:   `${base} bg-green-100 text-green-700`,
-      cancelada:    `${base} bg-gray-100 text-gray-500`,
+      confirmada: `${base} bg-blue-100 text-blue-700`,
+      terminada:  `${base} bg-green-100 text-green-700`,
+      cancelada:  `${base} bg-gray-100 text-gray-500`,
+      pendiente:  `${base} bg-yellow-100 text-yellow-700`,
     };
     return colores[estado] ?? `${base} bg-gray-100 text-gray-500`;
   }
@@ -73,16 +82,21 @@ export class InicioComponent implements OnInit {
     });
 
     this.citaSvc.misCitas().subscribe((citas: Cita[]) => {
-      const ordenadas = [...citas].sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+      const validas = citas.filter((c: Cita) => ['confirmada', 'terminada', 'cancelada'].includes(c.estado));
+
+      const terminadas = validas.filter((c: Cita) => c.estado === 'terminada');
+      const ordenadas = [...terminadas].sort((a, b) => (b._id > a._id ? 1 : -1));
       this.ultimasCitas = ordenadas.slice(0, 3);
 
-      const activas = citas.filter((c: Cita) => ['pendiente', 'confirmada'].includes(c.estado));
+      const hoyDate = new Date();
+      const hoyStr = hoyDate.toISOString().slice(0, 10);
+      const activas = validas.filter((c: Cita) => c.estado === 'confirmada' && c.fecha.slice(0, 10) >= hoyStr);
       this.proximaCita = activas.sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())[0] ?? null;
 
-      const hoy = new Date();
-      this.citasEsteMes = citas.filter((c: Cita) => {
+      this.citasEsteMes = validas.filter((c: Cita) => {
+        if (c.estado === 'cancelada') return false;
         const f = new Date(c.fecha);
-        return f.getMonth() === hoy.getMonth() && f.getFullYear() === hoy.getFullYear();
+        return f.getMonth() === hoyDate.getMonth() && f.getFullYear() === hoyDate.getFullYear();
       }).length;
     });
 

@@ -10,11 +10,22 @@ const crear = async (req, res) => {
     const nombreEst = estilista ? `${estilista.nombre} ${estilista.apellido}`.trim() : 'Estilista';
     const admins = await Usuario.find({ rol: 'admin' }).select('_id');
     for (const admin of admins) {
-      await crearNotificacion(admin._id, 'Nuevo reporte de cliente', `${nombreEst} reportó un cliente`, 'sistema', 'flag');
+      await crearNotificacion(admin._id, 'Nuevo reporte de cliente', `${nombreEst} reportó un cliente`, 'sistema', 'flag', reporte._id.toString());
     }
 
     res.status(201).json(reporte);
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
+};
+
+const obtener = async (req, res) => {
+  try {
+    const reporte = await ReporteCliente.findById(req.params.id)
+      .populate('estilistaId', 'nombre apellido')
+      .populate('clienteId', 'nombre apellido email')
+      .populate('citaId', 'fecha hora');
+    if (!reporte) return res.status(404).json({ mensaje: 'Reporte no encontrado' });
+    res.json(reporte);
+  } catch (err) { res.status(500).json({ mensaje: err.message }); }
 };
 
 const listarPendientes = async (req, res) => {
@@ -66,4 +77,14 @@ const listarPorCliente = async (req, res) => {
   } catch (err) { res.status(500).json({ mensaje: err.message }); }
 };
 
-module.exports = { crear, listarPendientes, listarTodos, resolver, listarPorCliente };
+const listarPorEstilista = async (req, res) => {
+  try {
+    const reportes = await ReporteCliente.find({ estilistaId: req.usuario.id })
+      .populate('clienteId', 'nombre apellido')
+      .populate('citaId', 'fecha hora')
+      .sort({ creadoEn: -1 });
+    res.json(reportes);
+  } catch (err) { res.status(500).json({ mensaje: err.message }); }
+};
+
+module.exports = { crear, obtener, listarPendientes, listarTodos, resolver, listarPorCliente, listarPorEstilista };

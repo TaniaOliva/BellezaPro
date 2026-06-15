@@ -49,7 +49,6 @@ export const routes: Routes = [
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       { path: 'inicio',           loadComponent: () => import('./features/estilista/inicio.component').then(m => m.InicioComponent) },
       { path: 'agenda',           loadComponent: () => import('./features/estilista/agenda.component').then(m => m.AgendaComponent) },
-      { path: 'mis-clientes',     loadComponent: () => import('./features/estilista/mis-clientes.component').then(m => m.MisClientesComponent) },
       { path: 'reportar-cliente', loadComponent: () => import('./features/estilista/reportar-cliente.component').then(m => m.ReportarClienteComponent) },
       { path: 'perfil',           loadComponent: () => import('./features/estilista/perfil.component').then(m => m.PerfilComponent) },
       { path: 'notificaciones',   loadComponent: () => import('./features/estilista/notificaciones.component').then(m => m.NotificacionesComponent) },
@@ -70,7 +69,8 @@ export const routes: Routes = [
       { path: 'solicitudes-especiales',  loadComponent: () => import('./features/auth/admin/solicitudes-especiales.component').then(m => m.SolicitudesEspecialesComponent) },
       { path: 'reportes-clientes',       loadComponent: () => import('./features/auth/admin/reportes-clientes.component').then(m => m.ReportesClientesComponent) },
       { path: 'reportes-estadisticas',   loadComponent: () => import('./features/auth/admin/reportes-estadisticas.component').then(m => m.ReportesEstadisticasComponent) },
-      { path: 'configuracion',           loadComponent: () => import('./features/auth/admin/configuracion.component').then(m => m.ConfiguracionComponent) },
+      { path: 'configuracion',    loadComponent: () => import('./features/auth/admin/configuracion.component').then(m => m.ConfiguracionComponent) },
+      { path: 'notificaciones',   loadComponent: () => import('./features/auth/admin/notificaciones.component').then(m => m.NotificacionesAdminComponent) },
     ]
   },
 

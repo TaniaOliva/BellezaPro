@@ -1,5 +1,7 @@
 const SolicitudEspecial = require('../models/SolicitudEspecial');
 const Cita = require('../models/Cita');
+const Usuario = require('../models/Usuario');
+const { crearNotificacion } = require('./notificacion.controller');
 
 const POPULATE_OPTS = [
   { path: 'estilistaPreferida',    select: 'nombre apellido' },
@@ -10,6 +12,11 @@ const POPULATE_OPTS = [
 const crear = async (req, res) => {
   try {
     const solicitud = await SolicitudEspecial.create({ ...req.body, clienteId: req.usuario.id });
+    const admins = await Usuario.find({ rol: 'admin' }).select('_id');
+    for (const admin of admins) {
+      await crearNotificacion(admin._id, 'Nueva solicitud especial',
+        `Nuevo pedido de ${req.body.categoria || 'servicio personalizado'}.`, 'solicitud', 'star');
+    }
     res.status(201).json(solicitud);
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
 };
@@ -43,7 +50,6 @@ const listarTodas = async (req, res) => {
   } catch (err) { res.status(500).json({ mensaje: err.message }); }
 };
 
-// Admin: proponer (precio + duración + fecha + hora + estilista) o rechazar
 const responder = async (req, res) => {
   try {
     const { estado, respuesta, precioEstimado, duracionEstimada, fechaPropuesta, horaPropuesta, estilistaAsignada } = req.body;
@@ -63,11 +69,18 @@ const responder = async (req, res) => {
       .populate('clienteId', 'nombre apellido')
       .populate(POPULATE_OPTS);
 
+    if (solicitud?.clienteId?._id) {
+      const titulo = estado === 'propuesta' ? 'Tienes una propuesta del salon' : 'Tu solicitud fue rechazada';
+      const desc   = estado === 'propuesta'
+        ? `El salon propuso una fecha para tu solicitud. Revisa y acepta o contraoferta.`
+        : `Tu solicitud fue rechazada. ${respuesta || ''}`;
+      await crearNotificacion(solicitud.clienteId._id, titulo, desc, 'solicitud', estado === 'propuesta' ? 'star' : 'cancel');
+    }
+
     res.json(solicitud);
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
 };
 
-// Admin: aceptar contraoferta del cliente → crea cita
 const aceptarContraoferta = async (req, res) => {
   try {
     const sol = await SolicitudEspecial.findById(req.params.id).populate('clienteId');
@@ -99,7 +112,6 @@ const aceptarContraoferta = async (req, res) => {
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
 };
 
-// Cliente: aceptar propuesta del admin → crea cita
 const aceptarPropuesta = async (req, res) => {
   try {
     const sol = await SolicitudEspecial.findById(req.params.id);
@@ -126,7 +138,6 @@ const aceptarPropuesta = async (req, res) => {
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
 };
 
-// Cliente: contraoferta (cambia fecha/hora/estilista, NO precio)
 const contraproponer = async (req, res) => {
   try {
     const { fechaContraoferta, horaContraoferta, estilistaContraoferta, mensajeContraoferta } = req.body;
@@ -142,8 +153,27 @@ const contraproponer = async (req, res) => {
       { new: true }
     ).populate(POPULATE_OPTS);
 
+    const admins = await Usuario.find({ rol: 'admin' }).select('_id');
+    for (const admin of admins) {
+      await crearNotificacion(admin._id, 'Contraoferta de cliente',
+        `Un cliente envio una contraoferta para su solicitud especial.`, 'solicitud', 'star');
+    }
+
     res.json(updated);
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
 };
 
-module.exports = { crear, listarPorCliente, listarPendientes, listarTodas, responder, aceptarPropuesta, contraproponer, aceptarContraoferta };
+const cancelarSolicitud = async (req, res) => {
+  try {
+    const sol = await SolicitudEspecial.findById(req.params.id);
+    if (!sol) return res.status(404).json({ mensaje: 'Solicitud no encontrada' });
+    if (sol.clienteId.toString() !== req.usuario.id) return res.status(403).json({ mensaje: 'No autorizado' });
+    if (['aceptada', 'cancelada'].includes(sol.estado)) {
+      return res.status(400).json({ mensaje: 'No se puede cancelar esta solicitud' });
+    }
+    await SolicitudEspecial.findByIdAndUpdate(req.params.id, { estado: 'cancelada' });
+    res.json({ mensaje: 'Solicitud cancelada' });
+  } catch (err) { res.status(400).json({ mensaje: err.message }); }
+};
+
+module.exports = { crear, listarPorCliente, listarPendientes, listarTodas, responder, aceptarPropuesta, contraproponer, aceptarContraoferta, cancelarSolicitud };

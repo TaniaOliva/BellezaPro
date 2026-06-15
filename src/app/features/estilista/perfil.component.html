@@ -70,42 +70,6 @@
     </div>
 
     <div class="bg-white border border-gray-200 rounded-lg p-6">
-      <h2 class="text-xl font-bold text-gray-800 mb-4">Horario de Trabajo</h2>
-
-      <div *ngIf="mensajeHorario"
-        [class]="mensajeHorario === 'Horario guardado'
-          ? 'mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm'
-          : 'mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm'">
-        {{ mensajeHorario }}
-      </div>
-
-      <div class="space-y-3 mb-5">
-        <div *ngFor="let h of horario; let i = index"
-          class="flex items-center gap-4 pb-4 border-b border-gray-100 last:border-b-0">
-          <div class="w-24 font-semibold text-gray-700">{{ h.dia }}</div>
-          <input type="checkbox" [checked]="h.activo" (change)="toggleHorario(i)"
-            class="w-4 h-4 border border-gray-300 rounded accent-red-600">
-          <ng-container *ngIf="h.activo">
-            <input type="time" [(ngModel)]="h.inicio"
-              class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-red-600">
-            <span class="text-gray-400">—</span>
-            <input type="time" [(ngModel)]="h.fin"
-              class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-red-600">
-            <span *ngIf="h.inicio && h.fin && h.fin <= h.inicio" class="text-xs text-red-500">
-              La hora de fin debe ser mayor al inicio
-            </span>
-          </ng-container>
-          <span *ngIf="!h.activo" class="text-sm text-gray-400">No disponible</span>
-        </div>
-      </div>
-
-      <button (click)="guardarHorario()" [disabled]="guardandoHorario || !horarioValido"
-        class="bg-red-600 text-white rounded-lg px-6 py-2 font-semibold hover:bg-red-700 disabled:opacity-50 transition">
-        {{ guardandoHorario ? 'Guardando...' : 'Guardar horario' }}
-      </button>
-    </div>
-
-    <div class="bg-white border border-gray-200 rounded-lg p-6">
       <h2 class="text-xl font-bold text-gray-800 mb-4">Cambiar Contraseña</h2>
 
       <div *ngIf="mensajePassword"

@@ -51,13 +51,13 @@
           <button
             *ngFor="let dia of diasMes"
             (click)="seleccionarFecha(dia)"
-            [disabled]="esPasado(dia) || esBloqueado(dia)"
+            [disabled]="esPasado(dia)"
             [class]="getFechaStr(dia) === fechaSeleccionada
               ? 'p-2 bg-red-100 text-red-600 text-sm font-bold rounded border-2 border-red-600 relative'
               : esPasado(dia)
                 ? 'p-2 text-gray-300 text-sm cursor-not-allowed'
                 : esBloqueado(dia)
-                  ? 'p-2 text-gray-300 text-sm cursor-not-allowed relative'
+                  ? 'p-2 text-gray-400 text-sm hover:bg-red-50 rounded relative'
                   : 'p-2 text-gray-600 text-sm hover:bg-gray-100 rounded'">
             {{ dia.getDate() }}
             <span *ngIf="esBloqueado(dia) && !esPasado(dia)"
@@ -66,47 +66,70 @@
           </button>
         </div>
 
+        <!-- Horarios -->
         <div *ngIf="fechaSeleccionada">
-          <h3 class="text-lg font-bold text-gray-800 mb-4">Horarios disponibles</h3>
+          <h3 class="text-lg font-bold text-gray-800 mb-1">Horarios disponibles</h3>
+          <p class="text-xs text-gray-400 mb-4">
+            Servicio de {{ duracionServicio }} min · Los cupos en gris no están disponibles para esta duración
+          </p>
 
           <div *ngIf="cargandoSlots" class="text-center py-8 text-gray-500">
             <span class="material-symbols-outlined animate-spin text-red-600 text-3xl block mx-auto mb-2">autorenew</span>
             Verificando disponibilidad...
           </div>
 
+          <!-- Día bloqueado: solo mensaje -->
           <div *ngIf="!cargandoSlots && mensajeBloqueo"
             class="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-center gap-2">
             <span class="material-symbols-outlined text-red-600">event_busy</span>
             {{ mensajeBloqueo }}
           </div>
 
-          <div *ngIf="!cargandoSlots && !mensajeBloqueo" class="grid grid-cols-4 gap-3">
-            <button
-              *ngFor="let slot of slotsDisponibles"
-              (click)="seleccionarHora(slot)"
-              [class]="horaSeleccionada === slot
-                ? 'p-3 border-2 border-red-600 bg-red-50 text-red-600 rounded-lg text-sm font-semibold'
-                : 'p-3 border border-gray-300 rounded-lg text-sm font-semibold hover:border-red-600 hover:bg-red-50'">
-              {{ slot }}
-            </button>
-          </div>
+          <!-- Todos los cupos (disponibles e indisponibles) -->
+          <ng-container *ngIf="!cargandoSlots && !mensajeBloqueo && todosSlots.length > 0">
+            <div *ngIf="sinDisponibles"
+              class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm flex items-center gap-2">
+              <span class="material-symbols-outlined text-amber-500 text-base">schedule</span>
+              No hay cupos disponibles para un servicio de {{ duracionServicio }} min en este día. Prueba con otra fecha.
+            </div>
+
+            <div class="grid grid-cols-4 gap-3">
+              <button
+                *ngFor="let slot of todosSlots"
+                (click)="seleccionarHora(slot)"
+                [disabled]="!slot.disponible"
+                [class]="horaSeleccionada === slot.hora
+                  ? 'p-3 border-2 border-red-600 bg-red-50 text-red-600 rounded-lg text-sm font-semibold'
+                  : slot.disponible
+                    ? 'p-3 border border-gray-300 rounded-lg text-sm font-semibold hover:border-red-600 hover:bg-red-50 transition'
+                    : 'p-3 border border-gray-100 rounded-lg text-sm font-semibold text-gray-300 bg-gray-50 cursor-not-allowed'">
+                {{ slot.hora }}
+                <span *ngIf="!slot.disponible" class="block text-[9px] text-gray-300 leading-none mt-0.5">No disponible</span>
+              </button>
+            </div>
+          </ng-container>
         </div>
       </div>
 
+      <!-- Panel de resumen -->
       <div>
         <div class="bg-white border border-gray-200 rounded-lg p-6 sticky top-8">
           <h4 class="font-bold text-gray-800 mb-4">Resumen de la cita</h4>
 
           <div class="space-y-3 pb-4 border-b border-gray-200">
             <div>
-              <p class="text-xs text-gray-600 uppercase font-semibold">Servicio</p>
+              <p class="text-xs text-gray-500 uppercase font-semibold">Servicio</p>
               <p class="text-sm font-semibold text-gray-800">{{ estado.servicio?.nombre }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 uppercase font-semibold">Duración</p>
+              <p class="text-sm font-semibold text-gray-800">{{ duracionServicio }} min</p>
             </div>
           </div>
 
           <div class="space-y-3 py-4 border-b border-gray-200">
             <div>
-              <p class="text-xs text-gray-600 uppercase font-semibold">Estilista</p>
+              <p class="text-xs text-gray-500 uppercase font-semibold">Estilista</p>
               <p class="text-sm font-semibold text-gray-800">
                 {{ estado.estilista ? (estado.estilista.nombre + ' ' + estado.estilista.apellido) : 'Sin preferencia' }}
               </p>
@@ -115,9 +138,15 @@
 
           <div class="space-y-3 py-4">
             <div>
-              <p class="text-xs text-gray-600 uppercase font-semibold">Fecha y hora</p>
+              <p class="text-xs text-gray-500 uppercase font-semibold">Fecha</p>
               <p class="text-sm font-semibold text-gray-800">{{ fechaSeleccionada || 'No seleccionada' }}</p>
-              <p *ngIf="horaSeleccionada" class="text-sm font-semibold text-red-600">{{ horaSeleccionada }}</p>
+            </div>
+            <div *ngIf="horaSeleccionada">
+              <p class="text-xs text-gray-500 uppercase font-semibold">Hora</p>
+              <p class="text-sm font-semibold text-red-600">
+                {{ horaSeleccionada }} – {{ horaFin }}
+                <span class="text-xs text-gray-400 font-normal">({{ duracionServicio }} min)</span>
+              </p>
             </div>
           </div>
 

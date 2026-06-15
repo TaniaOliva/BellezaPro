@@ -59,8 +59,6 @@ export class AgendaGeneralComponent implements OnInit {
     this.bloqueoSvc.listarTodos().subscribe(data => { this.bloqueos = data; });
   }
 
-  // Navegación
-
   irAnterior(): void {
     const d = new Date(this.fechaBase);
     if (this.vistaActual === 'dia') d.setDate(d.getDate() - 1);
@@ -83,8 +81,6 @@ export class AgendaGeneralComponent implements OnInit {
     this.fechaBase = new Date(dia);
     this.vistaActual = 'dia';
   }
-
-  // Fechas
 
   get tituloRango(): string {
     const f = this.fechaBase;
@@ -148,8 +144,6 @@ export class AgendaGeneralComponent implements OnInit {
     return `${this.DIAS_CORTO[d.getDay()]} ${d.getDate()}`;
   }
 
-  // Citas
-
   get citasFiltradas(): Cita[] {
     if (this.filtroEstilista === 'todas') return this.citas;
     return this.citas.filter(c => (c.estilistaId?._id ?? c.estilistaId) === this.filtroEstilista);
@@ -160,7 +154,7 @@ export class AgendaGeneralComponent implements OnInit {
     return this.citas.filter(c => c.fecha?.slice(0, 10) === hoy).length;
   }
 
-  get citasPendientes(): number { return this.citas.filter(c => c.estado === 'pendiente').length; }
+  get citasTerminadas(): number { return this.citas.filter(c => c.estado === 'terminada').length; }
   get citasConfirmadas(): number { return this.citas.filter(c => c.estado === 'confirmada').length; }
 
   getCitasParaCelda(dia: Date, hora: string): Cita[] {
@@ -187,15 +181,12 @@ export class AgendaGeneralComponent implements OnInit {
     return this.estilistas.filter(e => e._id === this.filtroEstilista);
   }
 
-  // Colores
-
   getColorHex(idOrIndex: string | number): string {
     if (typeof idOrIndex === 'number') return this.PALETA[idOrIndex % this.PALETA.length];
     const idx = this.estilistas.findIndex(e => e._id === idOrIndex);
     return this.PALETA[Math.max(0, idx) % this.PALETA.length];
   }
 
-  // Bloqueos
   // Usa comparación de strings para evitar desfase de timezone UTC→local
   getBloqueoPara(dia: Date, estilistaId: string | null): Bloqueo | null {
     const dStr = this.toDateStr(dia);

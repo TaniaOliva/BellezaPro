@@ -34,15 +34,16 @@
             <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Teléfono</th>
             <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Estado</th>
             <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Registrado</th>
+            <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase">Reportes</th>
             <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase">Acciones</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
           <tr *ngIf="cargando">
-            <td colspan="6" class="px-6 py-8 text-center text-gray-400">Cargando clientes...</td>
+            <td colspan="7" class="px-6 py-8 text-center text-gray-400">Cargando clientes...</td>
           </tr>
           <tr *ngIf="!cargando && clientesFiltrados.length === 0">
-            <td colspan="6" class="px-6 py-8 text-center text-gray-400">Sin resultados.</td>
+            <td colspan="7" class="px-6 py-8 text-center text-gray-400">Sin resultados.</td>
           </tr>
           <tr *ngFor="let c of clientesFiltrados" class="hover:bg-gray-50 transition">
             <td class="px-6 py-4"><p class="font-semibold text-gray-800">{{ c.nombre }} {{ c.apellido }}</p></td>
@@ -57,6 +58,14 @@
               </p>
             </td>
             <td class="px-6 py-4"><p class="text-gray-500 text-sm">{{ c.createdAt | date:'dd/MM/yyyy' }}</p></td>
+            <td class="px-6 py-4 text-center">
+              <span *ngIf="(c.reportesCount ?? 0) > 0"
+                class="inline-flex items-center gap-1 bg-red-100 text-red-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                <span class="material-symbols-outlined text-xs" style="font-size:13px">flag</span>
+                {{ c.reportesCount }}
+              </span>
+              <span *ngIf="(c.reportesCount ?? 0) === 0" class="text-gray-300 text-xs">—</span>
+            </td>
             <td class="px-6 py-4 text-center">
               <button (click)="abrirDetalle(c)" class="text-red-600 font-semibold text-sm hover:text-red-700">Ver</button>
             </td>

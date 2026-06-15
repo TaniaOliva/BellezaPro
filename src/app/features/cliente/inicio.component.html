@@ -62,6 +62,10 @@
       <div class="grid grid-cols-4 gap-6">
         <div *ngFor="let s of serviciosPopulares" class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition">
           <div class="relative bg-gray-200 h-48">
+            <img *ngIf="s.imagen || (s.imagenes && s.imagenes.length > 0)"
+              [src]="s.imagen ?? s.imagenes![0]"
+              [alt]="s.nombre"
+              class="w-full h-full object-cover">
             <span class="absolute top-3 left-3 bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</span>
           </div>
           <div class="p-5">
@@ -85,7 +89,7 @@
           <div *ngFor="let c of ultimasCitas" class="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-md transition">
             <div class="flex justify-between items-start mb-3">
               <p class="text-lg font-bold text-gray-800">{{ c.servicioId?.nombre ?? 'Servicio' }}</p>
-              <span [class]="badgeEstado(c.estado)">{{ c.estado }}</span>
+              <span [class]="badgeEstado(c.estado)">{{ labelEstado(c.estado) }}</span>
             </div>
             <p class="text-sm text-gray-500 mb-1">
               <span class="material-symbols-outlined text-xs align-middle mr-1">person</span>

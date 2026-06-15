@@ -19,4 +19,8 @@ export class NotificacionService {
   marcarTodas(): Observable<any> {
     return this.http.patch(`${this.apiUrl}/marcar-todas`, {});
   }
+
+  marcarPorTipo(tipo: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/tipo/${tipo}/leida`, {});
+  }
 }

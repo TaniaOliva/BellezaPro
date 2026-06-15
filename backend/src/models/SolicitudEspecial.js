@@ -7,10 +7,10 @@ const solicitudEspecialSchema = new mongoose.Schema({
   imagenUrl:             { type: String },
   presupuesto:           { type: String },
   estilistaPreferida:    { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
-  // Estados: pendiente → propuesta (admin) → contraoferta (cliente) → aceptada / rechazada
+  // Estados: pendiente → propuesta (admin) → contraoferta (cliente) → aceptada / rechazada / cancelada
   estado: {
     type: String,
-    enum: ['pendiente', 'propuesta', 'contraoferta', 'aceptada', 'rechazada'],
+    enum: ['pendiente', 'propuesta', 'contraoferta', 'aceptada', 'rechazada', 'cancelada'],
     default: 'pendiente'
   },
   respuesta:             { type: String },
@@ -20,6 +20,9 @@ const solicitudEspecialSchema = new mongoose.Schema({
   fechaPropuesta:        { type: String },
   horaPropuesta:         { type: String },
   estilistaAsignada:     { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
+  // Fecha sugerida por el cliente al crear
+  fechaSugerida:         { type: String },
+  horaSugerida:          { type: String },
   // Contraoferta del cliente
   fechaContraoferta:     { type: String },
   horaContraoferta:      { type: String },

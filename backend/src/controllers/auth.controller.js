@@ -19,7 +19,7 @@ const registrar = async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
     const usuario = await Usuario.create({ nombre, apellido, email, password: hash, telefono, rol: 'cliente' });
     const token = jwt.sign({ id: usuario._id, rol: usuario.rol }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.status(201).json({ token, usuario: { id: usuario._id, nombre, apellido, email, rol: usuario.rol, calificacionPromedio: 0 } });
+    res.status(201).json({ token, usuario: { _id: usuario._id, id: usuario._id, nombre, apellido, email, rol: usuario.rol, calificacionPromedio: 0 } });
   } catch (err) {
     res.status(500).json({ mensaje: err.message });
   }
@@ -34,7 +34,7 @@ const login = async (req, res) => {
     if (!valido) return res.status(400).json({ mensaje: 'Credenciales incorrectas' });
     if (usuario.estado === 'bloqueado') return res.status(403).json({ mensaje: 'Cuenta bloqueada' });
     const token = jwt.sign({ id: usuario._id, rol: usuario.rol }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, usuario: { id: usuario._id, nombre: usuario.nombre, apellido: usuario.apellido, email, rol: usuario.rol, calificacionPromedio: usuario.calificacionPromedio } });
+    res.json({ token, usuario: { _id: usuario._id, id: usuario._id, nombre: usuario.nombre, apellido: usuario.apellido, email, rol: usuario.rol, calificacionPromedio: usuario.calificacionPromedio } });
   } catch (err) {
     res.status(500).json({ mensaje: err.message });
   }

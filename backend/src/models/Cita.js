@@ -9,9 +9,11 @@ const citaSchema = new mongoose.Schema({
   hora:        { type: String, required: true },
   duracion:    { type: Number, default: 60 },
   precioFinal: { type: Number },
-  estado:           { type: String, default: 'pendiente', enum: ['pendiente', 'confirmada', 'en_progreso', 'completada', 'cancelada'] },
-  notas:            { type: String },
-  motivoCancelacion: { type: String },
+  estado:           { type: String, default: 'confirmada', enum: ['confirmada', 'cancelada', 'terminada'] },
+  notas:              { type: String },
+  motivoCancelacion:  { type: String },
+  valoracionEstilista: { type: Number, min: 1, max: 5 },
+  comentarioEstilista: { type: String },
   createdAt:   { type: Date, default: Date.now }
 });
 

@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SolicitudService } from '../../../core/services/solicitud.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
+import { BloqueoService } from '../../../core/services/bloqueo.service';
+import { NotificacionService } from '../../../core/services/notificacion.service';
+import { CitaService } from '../../../core/services/cita.service';
 import { SolicitudEspecial, Usuario } from '../../../core/models';
 
 @Component({
@@ -18,7 +21,6 @@ export class SolicitudesEspecialesComponent implements OnInit {
   cargando = true;
   estilistas: Usuario[] = [];
 
-  // Campos de propuesta
   precio = 0;
   duracion = 0;
   respuesta = '';
@@ -30,6 +32,18 @@ export class SolicitudesEspecialesComponent implements OnInit {
   guardando = false;
   filtroEstado = 'pendiente';
 
+  bloqueos: { fechaInicio: string; fechaFin: string; cierreTotalSalon: boolean; estilistaId?: any }[] = [];
+
+  mesActual = new Date();
+  diasMes: Date[] = [];
+  spacers: null[] = [];
+  diasBloqueadosSet: Set<string> = new Set();
+  razonesBloqueoMap: Map<string, string> = new Map();
+
+  todosSlots: { hora: string; disponible: boolean }[] = [];
+  cargandoSlots = false;
+  mensajeBloqueoFecha = '';
+
   readonly tabs = [
     { label: 'Pendientes / Contraoferta', value: 'pendiente' },
     { label: 'Propuestas',  value: 'propuesta' },
@@ -37,20 +51,28 @@ export class SolicitudesEspecialesComponent implements OnInit {
     { label: 'Rechazadas',  value: 'rechazada' },
   ];
 
-  readonly HORAS = [
-    '09:00','09:30','10:00','10:30','11:00','11:30',
-    '12:00','12:30','14:00','14:30','15:00','15:30',
-    '16:00','16:30','17:00','17:30'
-  ];
-
   constructor(
     private solicitudSvc: SolicitudService,
-    private usuarioSvc: UsuarioService
+    private usuarioSvc: UsuarioService,
+    private bloqueoSvc: BloqueoService,
+    private notifSvc: NotificacionService,
+    private citaSvc: CitaService
   ) {}
 
   ngOnInit(): void {
     this.cargar();
     this.usuarioSvc.listarEstilistas().subscribe({ next: (data) => this.estilistas = data });
+    this.notifSvc.marcarPorTipo('solicitud').subscribe();
+    const hoy = new Date();
+    const inicio = hoy.toISOString().slice(0, 10);
+    const finAnio = new Date(hoy.getFullYear() + 1, hoy.getMonth(), hoy.getDate()).toISOString().slice(0, 10);
+    this.bloqueoSvc.listarEnRango(inicio, finAnio).subscribe({
+      next: (data: any[]) => {
+        this.bloqueos = data;
+        if (this.seleccionada) this.computarDiasBloqueados();
+      },
+      error: () => {}
+    });
   }
 
   cargar(): void {
@@ -100,6 +122,156 @@ export class SolicitudesEspecialesComponent implements OnInit {
     this.horaPropuesta = s.horaPropuesta ?? '';
     this.estilistaAsignadaId = s.estilistaAsignada?._id ?? '';
     this.error = '';
+    this.todosSlots = [];
+    this.mensajeBloqueoFecha = '';
+
+    if (this.fechaPropuesta) {
+      const [y, m] = this.fechaPropuesta.split('-').map(Number);
+      this.mesActual = new Date(y, m - 1, 1);
+    } else {
+      this.mesActual = new Date();
+    }
+    this.generarDias();
+    this.computarDiasBloqueados();
+
+    if (this.fechaPropuesta && this.duracion > 0) {
+      this.cargarSlots();
+    }
+  }
+
+  generarDias(): void {
+    const inicio = new Date(this.mesActual.getFullYear(), this.mesActual.getMonth(), 1);
+    const fin = new Date(this.mesActual.getFullYear(), this.mesActual.getMonth() + 1, 0);
+    this.diasMes = [];
+    for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
+      this.diasMes.push(new Date(d));
+    }
+    this.spacers = Array(inicio.getDay()).fill(null);
+  }
+
+  getFechaStr(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
+  }
+
+  esPasado(dia: Date): boolean {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    return dia < hoy;
+  }
+
+  esBloqueado(dia: Date): boolean {
+    return this.diasBloqueadosSet.has(this.getFechaStr(dia));
+  }
+
+  computarDiasBloqueados(): void {
+    const set = new Set<string>();
+    const reasons = new Map<string, string>();
+    const inicioMes = new Date(this.mesActual.getFullYear(), this.mesActual.getMonth(), 1);
+    const finMes = new Date(this.mesActual.getFullYear(), this.mesActual.getMonth() + 1, 0);
+
+    for (const b of this.bloqueos) {
+      const bid = typeof b.estilistaId === 'object' ? b.estilistaId?._id : b.estilistaId;
+      const esRelevante = b.cierreTotalSalon || (this.estilistaAsignadaId && bid === this.estilistaAsignadaId);
+      if (!esRelevante) continue;
+
+      const razon = (b as any).razon
+        || (b.cierreTotalSalon ? 'El salón está cerrado este período.' : 'La estilista no está disponible.');
+
+      const bIni = new Date(b.fechaInicio.slice(0, 10) + 'T12:00:00');
+      const bFin = new Date(b.fechaFin.slice(0, 10) + 'T12:00:00');
+      const cur = new Date(Math.max(bIni.getTime(), inicioMes.getTime()));
+      const end = new Date(Math.min(bFin.getTime(), finMes.getTime()));
+
+      while (cur <= end) {
+        const key = this.getFechaStr(cur);
+        set.add(key);
+        reasons.set(key, razon);
+        cur.setDate(cur.getDate() + 1);
+      }
+    }
+
+    this.diasBloqueadosSet = set;
+    this.razonesBloqueoMap = reasons;
+  }
+
+  mesSiguiente(): void {
+    this.mesActual = new Date(this.mesActual.getFullYear(), this.mesActual.getMonth() + 1, 1);
+    this.generarDias();
+    this.computarDiasBloqueados();
+  }
+
+  mesAnterior(): void {
+    this.mesActual = new Date(this.mesActual.getFullYear(), this.mesActual.getMonth() - 1, 1);
+    this.generarDias();
+    this.computarDiasBloqueados();
+  }
+
+  seleccionarFechaCalendario(dia: Date): void {
+    if (this.esPasado(dia)) return;
+    const fechaStr = this.getFechaStr(dia);
+    this.fechaPropuesta = fechaStr;
+    this.horaPropuesta = '';
+    this.todosSlots = [];
+    this.mensajeBloqueoFecha = '';
+
+    if (this.esBloqueado(dia)) {
+      this.mensajeBloqueoFecha = this.razonesBloqueoMap.get(fechaStr) || 'Este día no está disponible.';
+      return;
+    }
+
+    if (this.duracion > 0) {
+      this.cargarSlots();
+    }
+  }
+
+  cargarSlots(): void {
+    if (!this.fechaPropuesta || this.duracion <= 0) return;
+    this.cargandoSlots = true;
+    this.todosSlots = [];
+    const estilistaId = this.estilistaAsignadaId || undefined;
+    this.citaSvc.getDisponibilidad(this.fechaPropuesta, this.duracion, estilistaId).subscribe({
+      next: (res) => {
+        this.cargandoSlots = false;
+        if (res.bloqueado === 'salon') {
+          this.mensajeBloqueoFecha = 'El salón está cerrado ese día.';
+        } else if (res.bloqueado === 'estilista') {
+          this.mensajeBloqueoFecha = 'La estilista no está disponible ese día.';
+        } else {
+          this.todosSlots = res.todos;
+        }
+      },
+      error: () => { this.cargandoSlots = false; }
+    });
+  }
+
+  seleccionarHoraSlot(slot: { hora: string; disponible: boolean }): void {
+    if (!slot.disponible) return;
+    this.horaPropuesta = slot.hora;
+  }
+
+  get sinDisponibles(): boolean {
+    return this.todosSlots.length > 0 && this.todosSlots.every(s => !s.disponible);
+  }
+
+  onEstilistaChange(): void {
+    this.computarDiasBloqueados();
+    this.horaPropuesta = '';
+    this.todosSlots = [];
+    this.mensajeBloqueoFecha = '';
+    if (this.fechaPropuesta && this.duracion > 0) {
+      this.cargarSlots();
+    }
+  }
+
+  onDuracionChange(): void {
+    this.horaPropuesta = '';
+    this.todosSlots = [];
+    if (this.fechaPropuesta && this.duracion > 0) {
+      this.cargarSlots();
+    }
   }
 
   proponer(): void {

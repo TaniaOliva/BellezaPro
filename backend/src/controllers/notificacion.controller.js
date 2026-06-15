@@ -28,11 +28,19 @@ const marcarTodas = async (req, res) => {
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
 };
 
-// Función interna para crear notificaciones desde otros controladores
-const crearNotificacion = async (usuarioId, titulo, descripcion, tipo = 'sistema', icono = 'notifications') => {
+const marcarPorTipo = async (req, res) => {
   try {
-    await Notificacion.create({ usuarioId, titulo, descripcion, tipo, icono });
+    await Notificacion.updateMany({ usuarioId: req.usuario.id, tipo: req.params.tipo, leida: false }, { leida: true });
+    res.json({ mensaje: 'ok' });
+  } catch (err) { res.status(400).json({ mensaje: err.message }); }
+};
+
+const crearNotificacion = async (usuarioId, titulo, descripcion, tipo = 'sistema', icono = 'notifications', referencia = null) => {
+  try {
+    const doc = { usuarioId, titulo, descripcion, tipo, icono };
+    if (referencia) doc.referencia = referencia;
+    await Notificacion.create(doc);
   } catch (_) {}
 };
 
-module.exports = { listar, marcarLeida, marcarTodas, crearNotificacion };
+module.exports = { listar, marcarLeida, marcarTodas, marcarPorTipo, crearNotificacion };

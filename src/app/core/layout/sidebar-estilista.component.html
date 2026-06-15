@@ -1,29 +1,14 @@
 <aside class="hidden md:flex flex-col fixed left-0 top-0 h-full w-[240px] bg-surface border-r border-outline-variant z-40 pt-[64px]">
-  <!-- User Section -->
   <div class="px-4 mb-4 flex items-center gap-3">
     <div class="w-12 h-12 rounded-full bg-surface-container-high border border-outline-variant overflow-hidden flex items-center justify-center">
       <span class="material-symbols-outlined text-2xl text-secondary">account_circle</span>
     </div>
     <div class="flex flex-col">
-      <span class="font-label-md text-on-surface">Estilista Name</span>
+      <span class="font-label-md text-on-surface">{{ nombre }}</span>
       <span class="font-label-sm text-secondary">Estilista</span>
     </div>
   </div>
 
-  <!-- Availability Toggle -->
-  <div class="px-4 py-3 border-b border-outline-variant">
-    <div class="flex items-center justify-between">
-      <span class="font-label-sm text-secondary">Disponibilidad</span>
-      <div class="w-10 h-6 rounded-full bg-primary relative">
-        <div class="w-5 h-5 rounded-full bg-white shadow-sm absolute right-1 top-1"></div>
-      </div>
-    </div>
-    <div class="mt-2 text-center">
-      <span class="font-label-sm text-primary">En línea</span>
-    </div>
-  </div>
-
-  <!-- Nav Links -->
   <nav class="flex-1 px-2 space-y-1 mt-4">
     <a routerLink="/estilista/inicio"
        routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
@@ -36,12 +21,6 @@
        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
       <span class="material-symbols-outlined">calendar_month</span>
       <span class="flex-1">Mi Agenda</span>
-    </a>
-    <a routerLink="/estilista/mis-clientes"
-       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
-       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
-      <span class="material-symbols-outlined">group</span>
-      <span class="flex-1">Mis Clientes</span>
     </a>
     <a routerLink="/estilista/reportar-cliente"
        routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
@@ -63,7 +42,6 @@
     </a>
   </nav>
 
-  <!-- Logout -->
   <div class="px-4 pb-4">
     <button (click)="logout()" class="w-full flex items-center gap-2 px-4 py-3 text-error font-label-md hover:bg-error-container rounded-lg transition-colors">
       <span class="material-symbols-outlined text-sm">logout</span>

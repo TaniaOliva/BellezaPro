@@ -5,6 +5,11 @@ import { BookingService } from '../../../core/services/booking.service';
 import { CitaService } from '../../../core/services/cita.service';
 import { BloqueoService } from '../../../core/services/bloqueo.service';
 
+export interface SlotInfo {
+  hora: string;
+  disponible: boolean;
+}
+
 @Component({
   selector: 'app-cliente-horario',
   standalone: true,
@@ -20,11 +25,12 @@ export class HorarioComponent implements OnInit {
   spacers: null[] = [];
   estado: any = {};
 
-  slotsDisponibles: string[] = [];
+  todosSlots: SlotInfo[] = [];
   cargandoSlots = false;
   mensajeBloqueo = '';
 
   diasBloqueados: Set<string> = new Set();
+  razonesBloqueo: Map<string, string> = new Map();
   cargandoBloqueos = false;
 
   constructor(
@@ -39,6 +45,23 @@ export class HorarioComponent implements OnInit {
     if (!this.estado.servicio) { this.router.navigate(['/cliente/servicios']); return; }
     this.generarDias();
     this.cargarDiasBloqueados();
+  }
+
+  get duracionServicio(): number {
+    return this.estado.servicio?.duracion ?? 60;
+  }
+
+  get horaFin(): string {
+    if (!this.horaSeleccionada) return '';
+    const [h, m] = this.horaSeleccionada.split(':').map(Number);
+    const finMin = h * 60 + m + this.duracionServicio;
+    const hh = Math.floor(finMin / 60).toString().padStart(2, '0');
+    const mm = (finMin % 60).toString().padStart(2, '0');
+    return `${hh}:${mm}`;
+  }
+
+  get sinDisponibles(): boolean {
+    return this.todosSlots.length > 0 && this.todosSlots.every(s => !s.disponible);
   }
 
   generarDias(): void {
@@ -60,19 +83,26 @@ export class HorarioComponent implements OnInit {
 
     this.cargandoBloqueos = true;
     this.diasBloqueados = new Set();
+    this.razonesBloqueo = new Map();
 
     this.bloqueoSvc.listarParaCliente(inicioStr, finStr, estilistaId).subscribe({
       next: (bloqueos) => {
         const set = new Set<string>();
+        const reasons = new Map<string, string>();
         for (const b of bloqueos) {
-          let cur = new Date(b.fechaInicio);
-          const end = new Date(b.fechaFin);
+          const cur = new Date(b.fechaInicio.slice(0, 10) + 'T12:00:00');
+          const end = new Date(b.fechaFin.slice(0, 10) + 'T12:00:00');
+          const razon = (b as any).razon
+            || (b.cierreTotalSalon ? 'El salón está cerrado este período.' : 'La estilista no está disponible este período.');
           while (cur <= end) {
-            set.add(this.getFechaStr(cur));
+            const key = this.getFechaStr(cur);
+            set.add(key);
+            reasons.set(key, razon);
             cur.setDate(cur.getDate() + 1);
           }
         }
         this.diasBloqueados = set;
+        this.razonesBloqueo = reasons;
         this.cargandoBloqueos = false;
       },
       error: () => { this.cargandoBloqueos = false; }
@@ -97,15 +127,21 @@ export class HorarioComponent implements OnInit {
   }
 
   seleccionarFecha(dia: Date): void {
-    if (this.esPasado(dia) || this.esBloqueado(dia)) return;
+    if (this.esPasado(dia)) return;
+
     const fechaStr = this.getFechaStr(dia);
     this.fechaSeleccionada = fechaStr;
     this.horaSeleccionada = '';
-    this.slotsDisponibles = [];
+    this.todosSlots = [];
     this.mensajeBloqueo = '';
-    this.cargandoSlots = true;
 
-    const duracion = this.estado.servicio?.duracion ?? 60;
+    if (this.esBloqueado(dia)) {
+      this.mensajeBloqueo = this.razonesBloqueo.get(fechaStr) || 'Este día no está disponible.';
+      return;
+    }
+
+    this.cargandoSlots = true;
+    const duracion = this.duracionServicio;
     const estilistaId = this.estado.estilista?._id;
 
     this.citaSvc.getDisponibilidad(fechaStr, duracion, estilistaId).subscribe({
@@ -116,10 +152,7 @@ export class HorarioComponent implements OnInit {
         } else if (res.bloqueado === 'estilista') {
           this.mensajeBloqueo = 'La estilista no está disponible ese día.';
         } else {
-          this.slotsDisponibles = res.slots;
-          if (res.slots.length === 0) {
-            this.mensajeBloqueo = 'No hay horarios disponibles para ese día con la duración requerida del servicio.';
-          }
+          this.todosSlots = res.todos;
         }
       },
       error: () => {
@@ -129,8 +162,9 @@ export class HorarioComponent implements OnInit {
     });
   }
 
-  seleccionarHora(hora: string): void {
-    this.horaSeleccionada = hora;
+  seleccionarHora(slot: SlotInfo): void {
+    if (!slot.disponible) return;
+    this.horaSeleccionada = slot.hora;
   }
 
   mesSiguiente(): void {
@@ -138,7 +172,7 @@ export class HorarioComponent implements OnInit {
     this.generarDias();
     this.fechaSeleccionada = '';
     this.horaSeleccionada = '';
-    this.slotsDisponibles = [];
+    this.todosSlots = [];
     this.mensajeBloqueo = '';
     this.cargarDiasBloqueados();
   }
@@ -148,7 +182,7 @@ export class HorarioComponent implements OnInit {
     this.generarDias();
     this.fechaSeleccionada = '';
     this.horaSeleccionada = '';
-    this.slotsDisponibles = [];
+    this.todosSlots = [];
     this.mensajeBloqueo = '';
     this.cargarDiasBloqueados();
   }

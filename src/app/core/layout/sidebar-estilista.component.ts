@@ -8,10 +8,15 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './sidebar-estilista.component.html',
-  styleUrls: ['./sidebar-estilista.component.css']
+  styleUrl: './sidebar-estilista.component.css'
 })
 export class SidebarEstilistaComponent {
-  constructor(private auth: AuthService) {}
+  nombre = '';
+
+  constructor(private auth: AuthService) {
+    const u = this.auth.getUsuario();
+    this.nombre = u ? `${u.nombre} ${u.apellido ?? ''}`.trim() : 'Estilista';
+  }
 
   logout(): void {
     this.auth.logout();

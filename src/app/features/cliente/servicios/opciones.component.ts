@@ -39,6 +39,29 @@ export class OpcionesComponent implements OnInit {
   selecciones: Record<string, string> = {};
   decoracionesActivas: string[] = [];
   precioFinal = 0;
+  imagenActualIdx = 0;
+
+  get imagenes(): string[] {
+    const imgs: string[] = this.servicio?.imagenes ?? [];
+    if (imgs.length === 0 && this.servicio?.imagen) return [this.servicio.imagen];
+    return imgs;
+  }
+
+  get imagenActual(): string {
+    return this.imagenes[this.imagenActualIdx] ?? '';
+  }
+
+  anteriorImagen(): void {
+    this.imagenActualIdx = this.imagenActualIdx > 0
+      ? this.imagenActualIdx - 1
+      : this.imagenes.length - 1;
+  }
+
+  siguienteImagen(): void {
+    this.imagenActualIdx = this.imagenActualIdx < this.imagenes.length - 1
+      ? this.imagenActualIdx + 1
+      : 0;
+  }
 
   constructor(private bookingSvc: BookingService, private router: Router, public location: Location) {}
 

@@ -65,15 +65,14 @@ export class InicioComponent implements OnInit {
         const servicio  = c.servicioId?.nombre ?? 'servicio';
         const estilista = c.estilistaId?.nombre ? `${c.estilistaId.nombre} ${c.estilistaId.apellido ?? ''}`.trim() : '';
         const estadoColor: Record<string, string> = {
-          pendiente:   'text-yellow-600',
-          confirmada:  'text-green-600',
-          cancelada:   'text-red-600',
-          completada:  'text-gray-500',
+          confirmada: 'text-green-600',
+          cancelada:  'text-red-600',
+          terminada:  'text-gray-500',
         };
         return {
           tipo: 'Nueva cita',
           texto: `${cliente} reservó ${servicio}${estilista ? ' con ' + estilista : ''}`,
-          hora: this.tiempoRelativo(c.creadoEn),
+          hora: this.tiempoRelativo(c.createdAt),
           color: estadoColor[c.estado] ?? 'text-gray-500',
         };
       });
@@ -110,7 +109,7 @@ export class InicioComponent implements OnInit {
         .map(e => ({ nombre: e.nombre, reservas: e.count, porcentaje: Math.round(e.count / totalCitas * 100) }));
 
       const usoPorCli = new Map<string, { nombre: string; count: number }>();
-      for (const c of citas as any[]) {
+      for (const c of (citas as any[]).filter((c: any) => c.estado !== 'cancelada')) {
         if (!c.clienteId) continue;
         const id     = typeof c.clienteId === 'string' ? c.clienteId : c.clienteId._id;
         const nombre = typeof c.clienteId === 'object'
@@ -122,7 +121,7 @@ export class InicioComponent implements OnInit {
       }
       this.clientesFrecuentes = Array.from(usoPorCli.values())
         .sort((a, b) => b.count - a.count)
-        .slice(0, 4)
+        .slice(0, 3)
         .map(e => ({ nombre: e.nombre, reservas: e.count }));
 
       this.serviciosPopulares = (servicios as Servicio[]).filter(s => (s.contadorSemana ?? 0) > 0).slice(0, 4);

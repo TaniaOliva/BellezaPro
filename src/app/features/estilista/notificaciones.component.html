@@ -12,15 +12,12 @@
 
   <div class="px-8 py-8 max-w-2xl">
     <div class="mb-6 flex gap-2 flex-wrap">
-      <button (click)="filtroActivo = 'todas'"
-        [class]="filtroActivo === 'todas' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
-        class="px-4 py-2 rounded-lg font-semibold text-sm transition">Todas</button>
       <button (click)="filtroActivo = 'no-leidas'"
         [class]="filtroActivo === 'no-leidas' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
         class="px-4 py-2 rounded-lg font-semibold text-sm transition">No leídas</button>
-      <button (click)="filtroActivo = 'cita'"
-        [class]="filtroActivo === 'cita' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
-        class="px-4 py-2 rounded-lg font-semibold text-sm transition">Citas</button>
+      <button (click)="filtroActivo = 'todas'"
+        [class]="filtroActivo === 'todas' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
+        class="px-4 py-2 rounded-lg font-semibold text-sm transition">Todas</button>
     </div>
 
     <div *ngIf="cargando" class="text-center py-16 text-gray-400">Cargando...</div>

@@ -20,15 +20,37 @@
     <div class="grid grid-cols-2 gap-8">
       <div>
         <button (click)="location.back()" class="text-red-600 font-semibold text-sm mb-4 block">← Atrás</button>
-        <div class="h-72 rounded-lg bg-gray-200 relative overflow-hidden">
-          <img *ngIf="servicio?.imagenes?.[0] || servicio?.imagen"
-            [src]="servicio?.imagenes?.[0] || servicio?.imagen"
+        <div class="rounded-lg bg-gray-200 relative overflow-hidden">
+          <!-- Imagen activa -->
+          <img *ngIf="imagenActual"
+            [src]="imagenActual"
             [alt]="servicio?.nombre"
-            class="w-full h-full object-cover">
-          <div *ngIf="!servicio?.imagenes?.[0] && !servicio?.imagen"
-            class="w-full h-full flex items-center justify-center">
+            class="w-full object-contain max-h-96">
+          <div *ngIf="!imagenActual"
+            class="w-full h-48 flex items-center justify-center">
             <span class="material-symbols-outlined text-gray-400 text-6xl">spa</span>
           </div>
+
+          <!-- Flechas del carrusel -->
+          <ng-container *ngIf="imagenes.length > 1">
+            <button (click)="anteriorImagen()"
+              class="absolute left-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full w-9 h-9 flex items-center justify-center shadow transition">
+              <span class="material-symbols-outlined text-gray-700 text-xl">chevron_left</span>
+            </button>
+            <button (click)="siguienteImagen()"
+              class="absolute right-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full w-9 h-9 flex items-center justify-center shadow transition">
+              <span class="material-symbols-outlined text-gray-700 text-xl">chevron_right</span>
+            </button>
+            <!-- Indicadores de puntos -->
+            <div class="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
+              <span *ngFor="let img of imagenes; let i = index"
+                class="w-2 h-2 rounded-full bg-white transition"
+                [class.opacity-100]="i === imagenActualIdx"
+                [class.opacity-40]="i !== imagenActualIdx">
+              </span>
+            </div>
+          </ng-container>
+
           <span class="absolute top-4 left-4 bg-white text-gray-700 text-xs font-bold px-3 py-1 rounded shadow-sm">
             {{ servicio?.categoria | uppercase }}
           </span>

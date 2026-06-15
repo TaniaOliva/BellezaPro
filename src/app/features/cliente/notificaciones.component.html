@@ -18,12 +18,12 @@
       <button type="button" (click)="filtroActivo = 'cita'"
         [class]="filtroActivo === 'cita' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
         class="rounded-full px-4 py-2 text-sm font-semibold transition">Citas</button>
+      <button type="button" (click)="filtroActivo = 'calificacion'"
+        [class]="filtroActivo === 'calificacion' ? 'bg-yellow-100 text-yellow-700' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
+        class="rounded-full px-4 py-2 text-sm font-semibold transition">Calificaciones</button>
       <button type="button" (click)="filtroActivo = 'solicitud'"
         [class]="filtroActivo === 'solicitud' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
         class="rounded-full px-4 py-2 text-sm font-semibold transition">Solicitudes</button>
-      <button type="button" (click)="filtroActivo = 'sistema'"
-        [class]="filtroActivo === 'sistema' ? 'bg-red-100 text-red-600' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'"
-        class="rounded-full px-4 py-2 text-sm font-semibold transition">Sistema</button>
     </div>
 
     <div *ngIf="cargando" class="text-center py-16 text-gray-400">Cargando notificaciones...</div>
@@ -34,7 +34,7 @@
     </div>
 
     <div class="space-y-3">
-      <div *ngFor="let n of filtradas" (click)="marcarLeida(n)"
+      <div *ngFor="let n of filtradas" (click)="manejarClick(n)"
         [class]="n.leida ? 'border-gray-200 bg-white' : 'border-red-200 bg-red-50 border-l-4 border-l-red-500'"
         class="flex items-start gap-4 rounded-2xl border p-5 cursor-pointer hover:shadow-sm transition">
         <div class="flex h-10 w-10 items-center justify-center rounded-2xl shrink-0"
@@ -46,12 +46,60 @@
         <div class="flex-1 min-w-0">
           <p class="font-semibold text-gray-800" [class.font-bold]="!n.leida">{{ n.titulo }}</p>
           <p class="text-sm text-gray-600 mt-1">{{ n.descripcion }}</p>
+          <p *ngIf="n.tipo === 'calificacion' && !n.leida" class="text-xs text-yellow-600 font-semibold mt-1">
+            Toca para calificar →
+          </p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
           <p class="text-xs text-gray-400">{{ formatFecha(n.creadoEn) }}</p>
           <div *ngIf="!n.leida" class="w-2 h-2 rounded-full bg-red-500"></div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: calificar estilista -->
+<div *ngIf="citaACalificar" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+    <h3 class="text-lg font-bold text-gray-800 mb-1">Califica tu experiencia</h3>
+    <p class="text-sm text-gray-500 mb-5">¿Cómo fue tu servicio? Tu opinión ayuda a mejorar.</p>
+
+    <!-- Estrellas -->
+    <div class="flex gap-2 justify-center mb-3">
+      <button
+        *ngFor="let s of rangoEstrellas"
+        (mouseenter)="estrellaHover = s"
+        (mouseleave)="estrellaHover = 0"
+        (click)="estrellasSeleccionadas = s"
+        class="text-4xl leading-none transition-transform hover:scale-110 focus:outline-none">
+        <span [class]="(estrellaHover > 0 ? s <= estrellaHover : s <= estrellasSeleccionadas) ? 'text-yellow-400' : 'text-gray-300'">★</span>
+      </button>
+    </div>
+    <p class="text-center text-xs text-gray-400 mb-4">
+      {{ estrellasSeleccionadas === 0 ? 'Selecciona una puntuación' : estrellasSeleccionadas + ' de 5 estrellas' }}
+    </p>
+
+    <!-- Comentario -->
+    <textarea
+      [(ngModel)]="comentarioCalificacion"
+      placeholder="¿Algo que quieras comentar? (opcional)"
+      rows="2"
+      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-red-500 resize-none mb-2">
+    </textarea>
+
+    <p *ngIf="errorCalificacion" class="text-xs text-red-600 mb-3">{{ errorCalificacion }}</p>
+
+    <div class="flex gap-3 mt-3">
+      <button (click)="cerrarCalificacion()"
+        class="flex-1 border border-gray-300 text-gray-600 rounded-lg py-2 font-semibold text-sm hover:bg-gray-50 transition">
+        Cerrar
+      </button>
+      <button (click)="enviarCalificacion()"
+        [disabled]="estrellasSeleccionadas === 0 || enviandoCalificacion"
+        class="flex-1 bg-red-600 text-white rounded-lg py-2 font-semibold text-sm hover:bg-red-700 disabled:opacity-50 transition">
+        {{ enviandoCalificacion ? 'Enviando...' : 'Enviar' }}
+      </button>
     </div>
   </div>
 </div>

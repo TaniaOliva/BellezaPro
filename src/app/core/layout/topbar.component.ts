@@ -16,7 +16,7 @@ export interface NavLink {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './topbar.component.html',
-  styleUrls: ['./topbar.component.css']
+  styleUrl: './topbar.component.css'
 })
 export class TopbarComponent implements OnInit, OnChanges {
   @Input() navLinks: NavLink[] = [];
@@ -58,6 +58,12 @@ export class TopbarComponent implements OnInit, OnChanges {
     if (this.mostrarDropdown) this.cargarNotificaciones();
   }
 
+  get notificacionesMostradas(): Notificacion[] {
+    const u = this.authSvc.getUsuario();
+    if (u?.rol === 'admin') return this.notificaciones.filter(n => !n.leida);
+    return this.notificaciones;
+  }
+
   clickNotificacion(notif: Notificacion): void {
     if (!notif.leida) {
       this.notificacionSvc.marcarLeida(notif._id).subscribe({
@@ -69,25 +75,26 @@ export class TopbarComponent implements OnInit, OnChanges {
       });
     }
     this.mostrarDropdown = false;
-    this.navegarPorTipo(notif.tipo);
+    const u = this.authSvc.getUsuario();
+    if (u?.rol === 'admin') {
+      this.router.navigate(['/admin/notificaciones']);
+    } else {
+      this.navegarPorTipo(notif.tipo, notif.referencia);
+    }
   }
 
-  private navegarPorTipo(tipo: string): void {
-    const u = this.authSvc.getUsuario();
-    const isAdmin = u?.rol === 'admin';
-
-    if (isAdmin) {
-      const rutasAdmin: Record<string, string> = {
-        cita:      '/admin/agenda-general',
-        sistema:   '/admin/reportes-clientes',
-        solicitud: '/admin/solicitudes-especiales',
-        promo:     '/admin/inicio',
-      };
-      const ruta = rutasAdmin[tipo] ?? '/admin/inicio';
-      this.router.navigate([ruta]);
-    } else {
-      this.router.navigate(['/cliente/inicio']);
+  private navegarPorTipo(tipo: string, referencia?: string): void {
+    if (tipo === 'calificacion') {
+      const extras = referencia ? { queryParams: { calificar: referencia } } : {};
+      this.router.navigate(['/cliente/notificaciones'], extras);
+      return;
     }
+    const rutasCliente: Record<string, string> = {
+      cita:      '/cliente/mis-citas',
+      solicitud: '/cliente/solicitud-especial',
+      sistema:   '/cliente/inicio',
+    };
+    this.router.navigate([rutasCliente[tipo] ?? '/cliente/inicio']);
   }
 
   marcarTodas(): void {
@@ -110,10 +117,11 @@ export class TopbarComponent implements OnInit, OnChanges {
 
   iconoPorTipo(tipo: string): string {
     const mapa: Record<string, string> = {
-      cita:     'event_busy',
-      solicitud:'star',
-      sistema:  'flag',
-      promo:    'local_offer',
+      cita:         'event_busy',
+      solicitud:    'auto_awesome',
+      sistema:      'flag',
+      promo:        'local_offer',
+      calificacion: 'star',
     };
     return mapa[tipo] ?? 'notifications';
   }

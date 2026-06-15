@@ -52,7 +52,7 @@ export class ReportesEstadisticasComponent implements OnInit {
   }
 
   private calcularKpis(citas: any[], ests: any[]): void {
-    const completadas = citas.filter(c => c.estado === 'completada');
+    const completadas = citas.filter(c => c.estado === 'terminada');
     const ingresos = completadas.reduce((sum, c) => sum + (c.precioFinal ?? c.servicioId?.precioBase ?? 0), 0);
     const clientesUnicos = new Set(citas.map(c => typeof c.clienteId === 'object' ? c.clienteId?._id : c.clienteId)).size;
     const califs = ests.filter(e => e.calificacionPromedio > 0).map(e => e.calificacionPromedio);
@@ -62,11 +62,11 @@ export class ReportesEstadisticasComponent implements OnInit {
       {
         label: 'Ingresos totales',
         valor: ingresos > 0 ? `L. ${ingresos.toLocaleString('es-HN', { maximumFractionDigits: 0 })}` : 'L. 0',
-        sub: `${completadas.length} citas completadas`,
+        sub: `${completadas.length} citas terminadas`,
         icon: 'trending_up', bg: 'bg-green-100', color: 'text-green-600'
       },
       {
-        label: 'Citas completadas',
+        label: 'Citas terminadas',
         valor: completadas.length.toString(),
         sub: `de ${citas.length} en total`,
         icon: 'check_circle', bg: 'bg-blue-100', color: 'text-blue-600'

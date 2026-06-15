@@ -12,6 +12,10 @@ export class ReporteService {
     return this.http.post<ReporteCliente>(this.apiUrl, datos);
   }
 
+  listarMios(): Observable<ReporteCliente[]> {
+    return this.http.get<ReporteCliente[]>(`${this.apiUrl}/mis`);
+  }
+
   listarPendientes(): Observable<ReporteCliente[]> {
     return this.http.get<ReporteCliente[]>(`${this.apiUrl}/pendientes`);
   }
@@ -22,6 +26,10 @@ export class ReporteService {
 
   resolver(id: string, accionTomada: string): Observable<ReporteCliente> {
     return this.http.patch<ReporteCliente>(`${this.apiUrl}/${id}/resolver`, { accionTomada });
+  }
+
+  obtener(id: string): Observable<ReporteCliente> {
+    return this.http.get<ReporteCliente>(`${this.apiUrl}/${id}`);
   }
 
   porCliente(clienteId: string): Observable<ReporteCliente[]> {

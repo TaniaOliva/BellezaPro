@@ -57,8 +57,11 @@ router.get('/api/citas/mi-agenda',          verificarToken, soloRol('estilista')
 router.get('/api/citas/disponibilidad',     verificarToken,                      citaController.verificarSlotsDisponibles);
 router.post('/api/citas',                   verificarToken, soloRol('cliente'),  citaController.crear);
 router.patch('/api/citas/:id/estado',           verificarToken,                      citaController.actualizarEstado);
-router.patch('/api/citas/:id/cancelar-cliente', verificarToken, soloRol('cliente'),  citaController.cancelarPorCliente);
-router.patch('/api/citas/:id/reagendar',        verificarToken, soloRol('cliente'),  citaController.reagendar);
+router.patch('/api/citas/:id/cancelar-cliente',   verificarToken, soloRol('cliente'),   citaController.cancelarPorCliente);
+router.patch('/api/citas/:id/cancelar-estilista', verificarToken, soloRol('estilista'), citaController.cancelarPorEstilista);
+router.patch('/api/citas/:id/reagendar',          verificarToken, soloRol('cliente'),   citaController.reagendar);
+router.patch('/api/citas/:id/valorar-cliente',    verificarToken, soloRol('estilista'), citaController.valorarCliente);
+router.get('/api/citas/:id',                      verificarToken, soloRol('admin'),    citaController.obtenerPorAdmin);
 
 // Calificaciones
 router.post('/api/calificaciones',                               verificarToken, soloRol('cliente'),  calificacionController.crear);
@@ -74,18 +77,22 @@ router.patch('/api/solicitudes/:id',                   verificarToken, soloRol('
 router.patch('/api/solicitudes/:id/aceptar-contrao',   verificarToken, soloRol('admin'),   solicitudController.aceptarContraoferta);
 router.patch('/api/solicitudes/:id/aceptar',           verificarToken, soloRol('cliente'), solicitudController.aceptarPropuesta);
 router.patch('/api/solicitudes/:id/contraoferta',      verificarToken, soloRol('cliente'), solicitudController.contraproponer);
+router.patch('/api/solicitudes/:id/cancelar',          verificarToken, soloRol('cliente'), solicitudController.cancelarSolicitud);
 
 // Reportes de clientes
 router.post('/api/reportes',                    verificarToken, soloRol('estilista'), reporteController.crear);
+router.get('/api/reportes/mis',                 verificarToken, soloRol('estilista'), reporteController.listarPorEstilista);
 router.get('/api/reportes/pendientes',          verificarToken, soloRol('admin'),     reporteController.listarPendientes);
 router.get('/api/reportes',                     verificarToken, soloRol('admin'),     reporteController.listarTodos);
 router.patch('/api/reportes/:id/resolver',      verificarToken, soloRol('admin'),     reporteController.resolver);
 router.get('/api/reportes/cliente/:clienteId',  verificarToken, soloRol('admin'),     reporteController.listarPorCliente);
+router.get('/api/reportes/:id',                 verificarToken, soloRol('admin'),     reporteController.obtener);
 
 // Notificaciones
-router.get('/api/notificaciones',                      verificarToken, notificacionController.listar);
-router.patch('/api/notificaciones/marcar-todas',       verificarToken, notificacionController.marcarTodas);
-router.patch('/api/notificaciones/:id/leida',          verificarToken, notificacionController.marcarLeida);
+router.get('/api/notificaciones',                          verificarToken, notificacionController.listar);
+router.patch('/api/notificaciones/marcar-todas',           verificarToken, notificacionController.marcarTodas);
+router.patch('/api/notificaciones/tipo/:tipo/leida',       verificarToken, notificacionController.marcarPorTipo);
+router.patch('/api/notificaciones/:id/leida',              verificarToken, notificacionController.marcarLeida);
 
 // Bloqueos
 router.get('/api/bloqueos',                        verificarToken, soloRol('admin'), bloqueoController.listarTodos);

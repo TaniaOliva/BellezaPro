@@ -1,5 +1,4 @@
 <nav class="fixed top-0 left-0 right-0 z-50 bg-surface border-b border-outline-variant shadow-sm h-[64px] flex justify-between items-center px-[32px]">
-  <!-- Left: Logo -->
   <div class="flex items-center gap-2">
     <span class="material-symbols-outlined text-primary text-2xl">content_cut</span>
     <div class="flex flex-col">
@@ -7,7 +6,6 @@
     </div>
   </div>
 
-  <!-- Center: Nav links -->
   <div class="hidden md:flex gap-[24px]" *ngIf="showAcceder || navLinks.length > 0">
     <a *ngFor="let link of navLinks"
        [href]="link.href"
@@ -20,7 +18,6 @@
     </a>
   </div>
 
-  <!-- Right: Acceder button OR notification bell -->
   <div class="flex items-center gap-3">
     <button *ngIf="showAcceder; else userArea"
             class="bg-primary text-on-primary rounded-lg px-4 py-2 font-label-md flex items-center gap-2 hover:bg-surface-tint transition-colors">
@@ -30,7 +27,6 @@
 
     <ng-template #userArea>
       <div *ngIf="showUserAvatar" class="notif-wrapper relative">
-        <!-- Bell button -->
         <button (click)="toggleDropdown()"
           class="relative p-2 rounded-full hover:bg-surface-container-high transition-colors">
           <span class="material-symbols-outlined text-secondary hover:text-primary">notifications</span>
@@ -40,11 +36,9 @@
           </span>
         </button>
 
-        <!-- Dropdown panel -->
         <div *ngIf="mostrarDropdown"
           class="absolute right-0 top-12 w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-[200] overflow-hidden">
 
-          <!-- Header -->
           <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
             <p class="font-bold text-gray-800 text-sm">Notificaciones</p>
             <button *ngIf="noLeidas > 0" (click)="marcarTodas()"
@@ -53,14 +47,13 @@
             </button>
           </div>
 
-          <!-- List -->
           <div class="max-h-[360px] overflow-y-auto divide-y divide-gray-50">
-            <div *ngIf="notificaciones.length === 0"
+            <div *ngIf="notificacionesMostradas.length === 0"
               class="px-4 py-8 text-center text-sm text-gray-400 italic">
               Sin notificaciones nuevas.
             </div>
 
-            <div *ngFor="let n of notificaciones"
+            <div *ngFor="let n of notificacionesMostradas"
               (click)="clickNotificacion(n)"
               [class.bg-red-50]="!n.leida"
               class="flex gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition">

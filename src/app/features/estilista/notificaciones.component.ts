@@ -12,7 +12,7 @@ import { Notificacion } from '../../core/models';
 })
 export class NotificacionesComponent implements OnInit {
   notificaciones: Notificacion[] = [];
-  filtroActivo = 'todas';
+  filtroActivo = 'no-leidas';
   cargando = true;
 
   constructor(private notifSvc: NotificacionService) {}

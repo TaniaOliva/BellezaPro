@@ -93,34 +93,6 @@
           </button>
         </div>
 
-        <div class="rounded-3xl border border-gray-200 p-8">
-          <div class="flex items-center justify-between mb-4">
-            <p class="text-xl font-semibold text-gray-800">Solicitudes especiales</p>
-            <a routerLink="/cliente/solicitud-especial"
-              class="rounded-2xl bg-red-600 px-4 py-2 text-white font-semibold text-sm hover:bg-red-700 transition">
-              Nueva
-            </a>
-          </div>
-          <div *ngIf="solicitudes.length === 0" class="text-sm text-gray-400 text-center py-4">
-            Sin solicitudes registradas.
-          </div>
-          <div class="space-y-3">
-            <div *ngFor="let s of solicitudesVisibles" class="rounded-2xl bg-gray-50 border border-gray-100 p-4">
-              <p class="font-semibold text-gray-800 text-sm">{{ s.descripcion }}</p>
-              <p class="text-xs text-gray-500 mt-1">
-                {{ s.creadoEn | date:'dd MMM yyyy':'UTC' }} ·
-                <span [class]="s.estado === 'aceptada' ? 'text-green-600' : s.estado === 'rechazada' ? 'text-red-600' : 'text-yellow-600'" class="font-semibold capitalize">
-                  {{ s.estado }}
-                </span>
-              </p>
-            </div>
-          </div>
-          <button *ngIf="solicitudes.length > 3" (click)="verTodas = !verTodas"
-            class="mt-4 w-full text-sm text-red-600 font-semibold hover:underline">
-            {{ verTodas ? 'Ver menos' : 'Ver todas (' + solicitudes.length + ')' }}
-          </button>
-        </div>
-
       </div>
     </div>
   </div>

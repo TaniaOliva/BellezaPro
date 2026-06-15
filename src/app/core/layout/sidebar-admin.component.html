@@ -1,5 +1,4 @@
 <aside class="hidden md:flex flex-col fixed left-0 top-0 h-full w-[240px] bg-surface border-r border-outline-variant z-40 pt-[64px]">
-  <!-- User Section -->
   <div class="px-4 mb-4 flex items-center gap-3">
     <div class="w-12 h-12 rounded-full bg-surface-container-high border border-outline-variant overflow-hidden flex items-center justify-center">
       <span class="material-symbols-outlined text-2xl text-secondary">account_circle</span>
@@ -12,8 +11,7 @@
     </div>
   </div>
 
-  <!-- Nav Links -->
-  <nav class="flex-1 px-2 space-y-1">
+  <nav class="flex-1 px-2 space-y-1 overflow-y-auto">
     <a routerLink="/admin/inicio"
        routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
@@ -62,6 +60,16 @@
       <span class="material-symbols-outlined">analytics</span>
       <span class="flex-1">Reportes y Estadisticas</span>
     </a>
+    <a routerLink="/admin/notificaciones"
+       routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
+       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
+      <span class="material-symbols-outlined">notifications</span>
+      <span class="flex-1">Notificaciones</span>
+      <span *ngIf="noLeidas > 0"
+        class="bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+        {{ noLeidas > 9 ? '9+' : noLeidas }}
+      </span>
+    </a>
     <a routerLink="/admin/configuracion"
        routerLinkActive="bg-secondary-fixed text-primary border-l-[3px] border-primary opacity-90 rounded-r-lg"
        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-label-md text-secondary hover:bg-surface-container-high hover:text-primary">
@@ -70,7 +78,6 @@
     </a>
   </nav>
 
-  <!-- Logout -->
   <div class="px-4 pb-4">
     <button (click)="logout()" class="w-full flex items-center gap-2 px-4 py-3 text-error font-label-md hover:bg-error-container rounded-lg transition-colors">
       <span class="material-symbols-outlined text-sm">logout</span>

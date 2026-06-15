@@ -19,14 +19,26 @@ const listarTodosEstilistas = async (req, res) => {
 
 const listarClientes = async (req, res) => {
   try {
-    // Auto-reactivar suspensiones definidas que ya vencieron
+    const ReporteCliente = require('../models/ReporteCliente');
     await Usuario.updateMany(
       { rol: 'cliente', estado: 'suspendido', suspensionFin: { $lte: new Date(), $ne: null } },
       { $set: { estado: 'activo', suspensionFin: null } }
     );
     const clientes = await Usuario.find({ rol: 'cliente' })
       .select('nombre apellido email telefono estado suspensionFin createdAt');
-    res.json(clientes);
+
+    const conteos = await ReporteCliente.aggregate([
+      { $group: { _id: '$clienteId', total: { $sum: 1 } } }
+    ]);
+    const mapaConteos = {};
+    for (const r of conteos) mapaConteos[r._id.toString()] = r.total;
+
+    const resultado = clientes.map(c => ({
+      ...c.toObject(),
+      reportesCount: mapaConteos[c._id.toString()] ?? 0
+    }));
+
+    res.json(resultado);
   } catch (err) { res.status(500).json({ mensaje: err.message }); }
 };
 

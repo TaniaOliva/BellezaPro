@@ -25,6 +25,7 @@ export interface Usuario {
   especialidades?: string[];
   horarioDisponible?: HorarioDisponible;
   calificacionPromedio?: number;
+  reportesCount?: number;
   createdAt?: string;
 }
 
@@ -73,15 +74,15 @@ export interface SolicitudEspecial {
   imagenUrl?: string;
   presupuesto?: string;
   estilistaPreferida?: any;
-  estado: 'pendiente' | 'propuesta' | 'contraoferta' | 'aceptada' | 'rechazada';
+  estado: 'pendiente' | 'propuesta' | 'contraoferta' | 'aceptada' | 'rechazada' | 'cancelada';
   respuesta?: string;
   precioEstimado?: number;
   duracionEstimada?: number;
-  // Propuesta admin
+  fechaSugerida?: string;
+  horaSugerida?: string;
   fechaPropuesta?: string;
   horaPropuesta?: string;
   estilistaAsignada?: any;
-  // Contraoferta cliente
   fechaContraoferta?: string;
   horaContraoferta?: string;
   estilistaContraoferta?: any;
@@ -113,9 +114,10 @@ export interface Notificacion {
   usuarioId: string;
   titulo: string;
   descripcion?: string;
-  tipo: 'cita' | 'solicitud' | 'sistema';
+  tipo: 'cita' | 'solicitud' | 'sistema' | 'calificacion';
   icono: string;
   leida: boolean;
+  referencia?: string;
   creadoEn: string;
 }
 

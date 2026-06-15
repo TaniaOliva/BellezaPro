@@ -6,6 +6,7 @@
 
   <div class="px-8 py-8 space-y-10">
 
+    <!-- Citas de hoy -->
     <section>
       <div class="flex items-center gap-3 mb-4">
         <h2 class="text-xl font-bold text-gray-800">Citas de hoy</h2>
@@ -37,16 +38,11 @@
             <span [class]="badgeEstado(c.estado)">{{ etiquetaEstado(c.estado) }}</span>
             <div class="flex gap-2">
               <button *ngIf="c.estado === 'confirmada'"
-                (click)="cambiarEstado(c, 'en_progreso')"
-                class="text-xs font-semibold px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                En progreso
-              </button>
-              <button *ngIf="c.estado === 'en_progreso'"
-                (click)="cambiarEstado(c, 'completada')"
+                (click)="marcarTerminada(c)"
                 class="text-xs font-semibold px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                Completar
+                Marcar terminada
               </button>
-              <button *ngIf="c.estado === 'confirmada' || c.estado === 'en_progreso'"
+              <button *ngIf="c.estado === 'confirmada'"
                 (click)="confirmarCancelar(c)"
                 class="text-xs font-semibold px-3 py-1.5 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition">
                 Cancelar
@@ -57,6 +53,7 @@
       </div>
     </section>
 
+    <!-- Próximas citas -->
     <section>
       <div class="flex items-center gap-3 mb-4">
         <h2 class="text-xl font-bold text-gray-800">Próximas citas</h2>
@@ -84,100 +81,91 @@
           </div>
           <div class="flex items-center gap-3">
             <span [class]="badgeEstado(c.estado)">{{ etiquetaEstado(c.estado) }}</span>
-            <button (click)="confirmarCancelar(c)"
-              class="text-xs font-semibold px-3 py-1.5 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition">
-              Cancelar
-            </button>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <section *ngIf="!cargando && citasCanceladasHoy.length > 0">
-      <div class="flex items-center gap-3 mb-4">
-        <h2 class="text-xl font-bold text-gray-800">Canceladas hoy</h2>
-        <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full">{{ citasCanceladasHoy.length }}</span>
-      </div>
-
-      <div class="space-y-3">
-        <div *ngFor="let c of citasCanceladasHoy" class="bg-gray-50 border border-gray-200 rounded-xl p-5">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
-              <div class="text-center w-14">
-                <p class="text-lg font-bold text-gray-400">{{ c.hora }}</p>
-                <p class="text-xs text-gray-400">{{ c.servicioId?.duracion ?? '-' }} min</p>
-              </div>
-              <div class="w-px h-10 bg-gray-300"></div>
-              <div>
-                <p class="font-semibold text-gray-500">{{ c.clienteId?.nombre }} {{ c.clienteId?.apellido }}</p>
-                <p class="text-sm text-gray-400">{{ c.servicioId?.nombre }}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <span [class]="badgeEstado(c.estado)">Cancelada</span>
-              <button (click)="cambiarEstado(c, 'en_progreso')"
-                class="text-xs font-semibold px-3 py-1.5 border border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50 transition">
-                En progreso
-              </button>
-              <button (click)="cambiarEstado(c, 'completada')"
-                class="text-xs font-semibold px-3 py-1.5 border border-green-300 text-green-600 rounded-lg hover:bg-green-50 transition">
-                Completada
-              </button>
-            </div>
-          </div>
-          <p *ngIf="c.motivoCancelacion" class="mt-3 text-xs text-orange-600 bg-orange-50 border border-orange-100 rounded-lg px-3 py-2">
-            <strong>Motivo:</strong> {{ c.motivoCancelacion }}
-          </p>
-        </div>
-      </div>
-      <p class="text-xs text-gray-400 mt-3">Las citas auto-canceladas por inactividad aparecen aquí. Puedes corregir su estado si fue un error.</p>
-    </section>
-
-    <section *ngIf="!cargando && citasCanceladasFuturas.length > 0">
-      <div class="flex items-center gap-3 mb-4">
-        <h2 class="text-xl font-bold text-gray-800">Citas futuras canceladas</h2>
-        <span class="bg-orange-100 text-orange-600 text-xs font-bold px-2 py-0.5 rounded-full">{{ citasCanceladasFuturas.length }}</span>
-      </div>
-      <div class="space-y-3">
-        <div *ngFor="let c of citasCanceladasFuturas" class="bg-orange-50 border border-orange-200 rounded-xl p-5">
-          <div class="flex items-center gap-4 mb-2">
-            <div class="text-center w-14">
-              <p class="text-sm font-bold text-gray-500">{{ c.fecha | date:'d MMM':'UTC' }}</p>
-              <p class="text-lg font-bold text-orange-500">{{ c.hora }}</p>
-            </div>
-            <div class="w-px h-10 bg-orange-200"></div>
-            <div class="flex-1">
-              <p class="font-semibold text-gray-700">{{ c.clienteId?.nombre }} {{ c.clienteId?.apellido }}</p>
-              <p class="text-sm text-gray-500">{{ c.servicioId?.nombre }}</p>
-              <p class="text-xs text-gray-400">{{ c.clienteId?.telefono }}</p>
-            </div>
-            <span [class]="badgeEstado(c.estado)">Cancelada</span>
-          </div>
-          <p *ngIf="c.motivoCancelacion" class="text-xs text-orange-700 bg-orange-100 border border-orange-200 rounded-lg px-3 py-2">
-            <strong>Motivo:</strong> {{ c.motivoCancelacion }}
-          </p>
         </div>
       </div>
     </section>
 
   </div>
 
+  <!-- Modal: confirmar cancelación -->
   <div *ngIf="citaACancelar" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
-      <h3 class="text-lg font-bold text-gray-800 mb-2">¿Cancelar cita?</h3>
-      <p class="text-sm text-gray-500 mb-6">
-        Se cancelará la cita de
-        <strong>{{ citaACancelar.clienteId?.nombre }}</strong>
-        a las <strong>{{ citaACancelar.hora }}</strong>.
+      <h3 class="text-lg font-bold text-gray-800 mb-1">Cancelar cita</h3>
+      <p class="text-sm text-gray-500 mb-4">
+        Cita de <strong>{{ citaACancelar.clienteId?.nombre }} {{ citaACancelar.clienteId?.apellido }}</strong>
+        a las <strong>{{ citaACancelar.hora }}</strong>. El cliente recibirá una notificación con el motivo.
       </p>
-      <div class="flex gap-3">
-        <button (click)="citaACancelar = null" class="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2 font-semibold hover:bg-gray-50 transition">
+
+      <label class="block text-xs font-semibold text-gray-700 mb-1">Motivo de cancelación <span class="text-red-500">*</span></label>
+      <textarea
+        [(ngModel)]="motivoCancelacion"
+        placeholder="Ej: Emergencia personal, enfermedad, etc."
+        rows="3"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-red-500 resize-none mb-2">
+      </textarea>
+
+      <p *ngIf="errorCancelacion" class="text-xs text-red-600 mb-3">{{ errorCancelacion }}</p>
+
+      <div class="flex gap-3 mt-2">
+        <button (click)="citaACancelar = null; motivoCancelacion = ''; errorCancelacion = ''"
+          class="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2 font-semibold hover:bg-gray-50 transition text-sm">
           No, mantener
         </button>
-        <button (click)="ejecutarCancelacion()" class="flex-1 bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700 transition">
-          Sí, cancelar
+        <button (click)="ejecutarCancelacion()"
+          [disabled]="!motivoCancelacion.trim() || enviandoCancelacion"
+          class="flex-1 bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700 disabled:opacity-50 transition text-sm">
+          {{ enviandoCancelacion ? 'Cancelando...' : 'Sí, cancelar' }}
         </button>
       </div>
     </div>
   </div>
+
+  <!-- Modal: calificar cliente -->
+  <div *ngIf="citaACalificar" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+      <h3 class="text-lg font-bold text-gray-800 mb-1">¿Deseas calificar al cliente?</h3>
+      <p class="text-sm text-gray-500 mb-5">
+        Puedes dejar una valoración de
+        <strong>{{ citaACalificar.clienteId?.nombre }} {{ citaACalificar.clienteId?.apellido }}</strong>.
+        Es completamente opcional.
+      </p>
+
+      <!-- Estrellas -->
+      <div class="flex gap-2 justify-center mb-4">
+        <button
+          *ngFor="let s of rangoEstrellas"
+          (mouseenter)="estrellaHover = s"
+          (mouseleave)="estrellaHover = 0"
+          (click)="estrellasSeleccionadas = s"
+          class="text-4xl leading-none transition-transform hover:scale-110 focus:outline-none">
+          <span [class]="(estrellaHover > 0 ? s <= estrellaHover : s <= estrellasSeleccionadas) ? 'text-yellow-400' : 'text-gray-300'">★</span>
+        </button>
+      </div>
+      <p class="text-center text-xs text-gray-400 mb-4">
+        {{ estrellasSeleccionadas === 0 ? 'Selecciona una puntuación' : estrellasSeleccionadas + ' de 5 estrellas' }}
+      </p>
+
+      <!-- Comentario opcional -->
+      <textarea
+        [(ngModel)]="comentarioCalificacion"
+        placeholder="Comentario opcional..."
+        rows="2"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-red-500 resize-none mb-5">
+      </textarea>
+
+      <div class="flex gap-3">
+        <button (click)="cerrarCalificacion()"
+          class="flex-1 border border-gray-300 text-gray-600 rounded-lg py-2 font-semibold text-sm hover:bg-gray-50 transition">
+          Omitir
+        </button>
+        <button (click)="enviarCalificacion()"
+          [disabled]="estrellasSeleccionadas === 0 || enviandoCalificacion"
+          class="flex-1 bg-red-600 text-white rounded-lg py-2 font-semibold text-sm hover:bg-red-700 disabled:opacity-50 transition">
+          {{ enviandoCalificacion ? 'Guardando...' : 'Calificar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>

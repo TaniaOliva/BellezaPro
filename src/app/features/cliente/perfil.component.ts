@@ -1,23 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { UsuarioService } from '../../core/services/usuario.service';
-import { SolicitudService } from '../../core/services/solicitud.service';
 import { AuthService } from '../../core/services/auth.service';
-import { Usuario, SolicitudEspecial } from '../../core/models';
+import { Usuario } from '../../core/models';
 
 @Component({
   selector: 'app-cliente-perfil',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './perfil.component.html',
   styleUrl: './perfil.component.css'
 })
 export class PerfilComponent implements OnInit {
   usuario: Usuario | null = null;
-  solicitudes: SolicitudEspecial[] = [];
-  verTodas = false;
 
   nombre = ''; apellido = ''; telefono = '';
   private originalNombre = ''; private originalApellido = ''; private originalTelefono = '';
@@ -28,7 +24,6 @@ export class PerfilComponent implements OnInit {
 
   constructor(
     private usuarioSvc: UsuarioService,
-    private solicitudSvc: SolicitudService,
     private authSvc: AuthService
   ) {}
 
@@ -42,17 +37,12 @@ export class PerfilComponent implements OnInit {
       this.originalApellido = this.apellido;
       this.originalTelefono = this.telefono;
     });
-    this.solicitudSvc.misSolicitudes().subscribe((s: SolicitudEspecial[]) => this.solicitudes = s);
   }
 
   get hayCambios(): boolean {
     return this.nombre !== this.originalNombre ||
       this.apellido !== this.originalApellido ||
       this.telefono !== this.originalTelefono;
-  }
-
-  get solicitudesVisibles(): SolicitudEspecial[] {
-    return this.verTodas ? this.solicitudes : this.solicitudes.slice(0, 3);
   }
 
   guardarPerfil(): void {

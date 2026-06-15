@@ -39,4 +39,8 @@ export class SolicitudService {
   contraproponer(id: string, datos: { fechaContraoferta: string; horaContraoferta: string; estilistaContraoferta?: string; mensajeContraoferta?: string }): Observable<SolicitudEspecial> {
     return this.http.patch<SolicitudEspecial>(`${this.apiUrl}/${id}/contraoferta`, datos);
   }
+
+  cancelar(id: string): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/${id}/cancelar`, {});
+  }
 }

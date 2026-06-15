@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CitaService } from '../../core/services/cita.service';
+import { ServicioService } from '../../core/services/servicio.service';
+import { BookingService } from '../../core/services/booking.service';
 import { Cita } from '../../core/models';
 
 @Component({
@@ -18,31 +21,22 @@ export class MisCitasComponent implements OnInit {
   activeTab = 'proximas';
   cargando = true;
 
-  // Cancel
   citaACancelar: Cita | null = null;
   motivoCancelacion = '';
   cancelando = false;
   errorCancelar = '';
-
-  // Reagendar
-  citaAReagendar: Cita | null = null;
-  reagendarFecha = '';
-  reagendarHora = '';
-  reagendando = false;
-  errorReagendar = '';
-
-  readonly HORAS = [
-    '09:00','09:30','10:00','10:30','11:00','11:30',
-    '12:00','12:30','14:00','14:30','15:00','15:30',
-    '16:00','16:30','17:00','17:30'
-  ];
 
   get hoyStr(): string {
     const hoy = new Date();
     return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
   }
 
-  constructor(private citaSvc: CitaService) {}
+  constructor(
+    private citaSvc: CitaService,
+    private router: Router,
+    private servicioSvc: ServicioService,
+    private bookingSvc: BookingService
+  ) {}
 
   ngOnInit(): void {
     this.cargar();
@@ -58,14 +52,14 @@ export class MisCitasComponent implements OnInit {
         this.proximas = data
           .filter((c: Cita) => {
             const fechaStr = c.fecha.substring(0, 10);
-            return ['confirmada', 'pendiente', 'en_progreso'].includes(c.estado) && fechaStr >= hoy;
+            return c.estado === 'confirmada' && fechaStr >= hoy;
           })
           .sort((a: Cita, b: Cita) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
 
         this.historial = data
           .filter((c: Cita) => {
             const fechaStr = c.fecha.substring(0, 10);
-            return c.estado === 'completada' || c.estado === 'cancelada' || fechaStr < hoy;
+            return c.estado === 'terminada' || c.estado === 'cancelada' || fechaStr < hoy;
           })
           .sort((a: Cita, b: Cita) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
 
@@ -92,21 +86,16 @@ export class MisCitasComponent implements OnInit {
     });
   }
 
-  abrirReagendar(cita: Cita): void {
-    this.citaAReagendar = cita;
-    this.reagendarFecha = '';
-    this.reagendarHora = '';
-    this.errorReagendar = '';
-  }
-
-  confirmarReagendar(): void {
-    if (!this.reagendarFecha || !this.reagendarHora) { this.errorReagendar = 'Selecciona fecha y hora'; return; }
-    if (!this.citaAReagendar) return;
-    this.reagendando = true;
-    this.errorReagendar = '';
-    this.citaSvc.reagendar(this.citaAReagendar._id, this.reagendarFecha, this.reagendarHora).subscribe({
-      next: () => { this.reagendando = false; this.citaAReagendar = null; this.cargar(); },
-      error: (err: any) => { this.errorReagendar = err.error?.mensaje || 'Error al reagendar'; this.reagendando = false; }
+  reagendar(cita: Cita): void {
+    const servicioRef = cita.servicioId as any;
+    const servicioId = servicioRef?._id ?? (typeof servicioRef === 'string' ? servicioRef : null);
+    if (!servicioId) { this.router.navigate(['/cliente/servicios']); return; }
+    this.servicioSvc.obtener(servicioId).subscribe({
+      next: (servicio) => {
+        this.bookingSvc.preseleccionarServicio(servicio);
+        this.router.navigate(['/cliente/servicios/opciones']);
+      },
+      error: () => this.router.navigate(['/cliente/servicios'])
     });
   }
 }
