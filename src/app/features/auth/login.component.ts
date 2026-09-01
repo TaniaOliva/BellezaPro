@@ -39,4 +39,18 @@ export class LoginComponent {
       }
     });
   }
+
+  // TEMPORAL - SOLO DESARROLLO: eliminar junto con el boton en el HTML y
+  // devLoginAdmin() en auth.service.ts / auth.controller.js.
+  entrarComoAdminDev(): void {
+    this.error = '';
+    this.cargando = true;
+    this.auth.devLoginAdmin().subscribe({
+      next: () => this.router.navigate(['/admin/inicio']),
+      error: err => {
+        this.error = err.error?.mensaje || 'No se pudo entrar como admin de desarrollo';
+        this.cargando = false;
+      }
+    });
+  }
 }

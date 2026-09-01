@@ -5,6 +5,8 @@ import { UsuarioService } from '../../../core/services/usuario.service';
 import { CategoriaService } from '../../../core/services/categoria.service';
 import { Usuario, Categoria } from '../../../core/models';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 @Component({
   selector: 'app-admin-empleados',
   standalone: true,
@@ -27,6 +29,10 @@ export class EmpleadosComponent implements OnInit {
   mostrarDropdownEsp = false;
   guardando = false;
   error = '';
+
+  confirmandoReset = false;
+  reseteandoPassword = false;
+  mensajeReset = '';
 
   constructor(private usuarioSvc: UsuarioService, private categoriaSvc: CategoriaService) {}
 
@@ -57,6 +63,8 @@ export class EmpleadosComponent implements OnInit {
     this.especialidades = [];
     this.mostrarDropdownEsp = false;
     this.error = '';
+    this.confirmandoReset = false;
+    this.mensajeReset = '';
     this.mostrarDrawer = true;
   }
 
@@ -66,6 +74,8 @@ export class EmpleadosComponent implements OnInit {
     this.especialidades = [...(e.especialidades ?? [])];
     this.mostrarDropdownEsp = false;
     this.error = '';
+    this.confirmandoReset = false;
+    this.mensajeReset = '';
     this.mostrarDrawer = true;
   }
 
@@ -80,6 +90,10 @@ export class EmpleadosComponent implements OnInit {
   guardar(): void {
     if (!this.form.nombre || !this.form.apellido || !this.form.email) {
       this.error = 'Nombre, apellido y correo son obligatorios';
+      return;
+    }
+    if (!EMAIL_REGEX.test(this.form.email.trim())) {
+      this.error = 'Ingresa un correo electrónico válido';
       return;
     }
     this.guardando = true;
@@ -105,6 +119,24 @@ export class EmpleadosComponent implements OnInit {
     this.usuarioSvc.eliminarEmpleado(id).subscribe({
       next: () => { this.confirmandoEliminarId = null; this.cargar(); },
       error: () => { this.confirmandoEliminarId = null; }
+    });
+  }
+
+  resetearPassword(): void {
+    if (!this.seleccionado) return;
+    this.reseteandoPassword = true;
+    this.usuarioSvc.resetearPasswordEmpleado(this.seleccionado._id).subscribe({
+      next: () => {
+        this.reseteandoPassword = false;
+        this.confirmandoReset = false;
+        this.mensajeReset = 'Contraseña restablecida a 12345678';
+        setTimeout(() => this.mensajeReset = '', 5000);
+      },
+      error: (err: any) => {
+        this.reseteandoPassword = false;
+        this.confirmandoReset = false;
+        this.error = err.error?.mensaje || 'Error al restablecer la contraseña';
+      }
     });
   }
 }

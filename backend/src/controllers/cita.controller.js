@@ -67,32 +67,24 @@ const listarPorCliente = async (req, res) => {
   } catch (err) { res.status(500).json({ mensaje: err.message }); }
 };
 
+// Cierra las citas confirmadas de dias anteriores que el estilista nunca
+// marco como terminada. Se le da todo el dia de la cita como margen (no se
+// toca mientras siga siendo "hoy"); solo se cancelan automaticamente al
+// cambiar de fecha, para que no queden como 'confirmada' para siempre.
 const autoCancelarVencidas = async (estilistaId) => {
-  const ahora = new Date();
-  const hoy = new Date(ahora); hoy.setHours(0, 0, 0, 0);
-  const manana = new Date(hoy); manana.setDate(manana.getDate() + 1);
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
 
-  const confirmadas = await Cita.find({
-    estilistaId, estado: 'confirmada',
-    fecha: { $gte: hoy, $lt: manana }
-  });
-
-  for (const cita of confirmadas) {
-    const [h, m] = cita.hora.split(':').map(Number);
-    const horaCita = new Date(cita.fecha);
-    horaCita.setHours(h, m, 0, 0);
-    const limite = new Date(horaCita.getTime() + 2 * 60 * 60 * 1000);
-    if (ahora > limite) {
-      await Cita.findByIdAndUpdate(cita._id, { estado: 'cancelada' });
-    }
-  }
+  await Cita.updateMany(
+    { estilistaId, estado: 'confirmada', fecha: { $lt: hoy } },
+    { estado: 'cancelada', motivoCancelacion: 'No se registro asistencia' }
+  );
 };
 
 const listarPorEstilista = async (req, res) => {
   try {
     await autoCancelarVencidas(req.usuario.id);
     const citas = await Cita.find({ estilistaId: req.usuario.id, estado: { $in: ['confirmada', 'cancelada', 'terminada'] } })
-      .populate('clienteId', 'nombre apellido telefono')
+      .populate('clienteId', 'nombre apellido telefono calificacionPromedio')
       .populate('servicioId', 'nombre duracion precioBase')
       .sort({ fecha: 1, hora: 1 });
     res.json(citas);
@@ -112,11 +104,27 @@ const crear = async (req, res) => {
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
 };
 
+const ESTADOS_CITA = ['confirmada', 'cancelada', 'terminada'];
+
 const actualizarEstado = async (req, res) => {
   try {
-    const cita = await Cita.findByIdAndUpdate(req.params.id, { estado: req.body.estado }, { new: true })
+    const { estado } = req.body;
+    if (!ESTADOS_CITA.includes(estado)) {
+      return res.status(400).json({ mensaje: 'Estado no valido' });
+    }
+
+    // Solo el estilista dueno de la cita puede cambiarle el estado; el admin puede cualquiera
+    const filtro = { _id: req.params.id };
+    if (req.usuario.rol === 'estilista') {
+      filtro.estilistaId = req.usuario.id;
+    } else if (req.usuario.rol !== 'admin') {
+      return res.status(403).json({ mensaje: 'No autorizado' });
+    }
+
+    const cita = await Cita.findOneAndUpdate(filtro, { estado }, { new: true })
       .populate('clienteId', 'nombre apellido')
       .populate('servicioId', 'nombre');
+    if (!cita) return res.status(404).json({ mensaje: 'Cita no encontrada' });
 
     if (req.body.estado === 'cancelada') {
       const clienteNombre = cita.clienteId?.nombre

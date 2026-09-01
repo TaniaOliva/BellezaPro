@@ -38,7 +38,7 @@ export class MisClientesComponent implements OnInit {
               visitas,
               servicioUltimo: c.servicioId?.nombre ?? '',
               hace: c.fecha,
-              estrellas: 5,
+              estrellas: Math.round(c.clienteId.calificacionPromedio ?? 0),
               vip: visitas >= 5
             });
           }
@@ -47,6 +47,15 @@ export class MisClientesComponent implements OnInit {
         this.cargando = false;
       },
       error: () => this.cargando = false
+    });
+  }
+
+  get clientesFiltrados(): any[] {
+    return this.clientes.filter(c => {
+      const coincideBusqueda = !this.busqueda ||
+        c.nombre.toLowerCase().includes(this.busqueda.toLowerCase());
+      const coincideFiltro = this.activeFilter === 'todas' || (this.activeFilter === 'vip' && c.vip);
+      return coincideBusqueda && coincideFiltro;
     });
   }
 

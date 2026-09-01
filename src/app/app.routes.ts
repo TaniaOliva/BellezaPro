@@ -49,6 +49,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       { path: 'inicio',           loadComponent: () => import('./features/estilista/inicio.component').then(m => m.InicioComponent) },
       { path: 'agenda',           loadComponent: () => import('./features/estilista/agenda.component').then(m => m.AgendaComponent) },
+      { path: 'mis-clientes',     loadComponent: () => import('./features/estilista/mis-clientes.component').then(m => m.MisClientesComponent) },
       { path: 'reportar-cliente', loadComponent: () => import('./features/estilista/reportar-cliente.component').then(m => m.ReportarClienteComponent) },
       { path: 'perfil',           loadComponent: () => import('./features/estilista/perfil.component').then(m => m.PerfilComponent) },
       { path: 'notificaciones',   loadComponent: () => import('./features/estilista/notificaciones.component').then(m => m.NotificacionesComponent) },

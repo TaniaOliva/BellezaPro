@@ -22,6 +22,8 @@ router.post('/api/auth/login',            authController.login);
 router.post('/api/auth/recuperar',        authController.solicitarRecuperacion);
 router.post('/api/auth/verificar-codigo', authController.verificarCodigo);
 router.post('/api/auth/nueva-password',   authController.nuevaPassword);
+// TEMPORAL - SOLO DESARROLLO: eliminar antes de produccion (ver auth.controller.js)
+router.post('/api/auth/dev-login-admin',  authController.devLoginAdmin);
 
 // Usuarios
 router.get('/api/usuarios/estilistas/admin', verificarToken, soloRol('admin'),    usuarioController.listarTodosEstilistas);
@@ -34,6 +36,7 @@ router.patch('/api/usuarios/:id/estado',     verificarToken, soloRol('admin'),  
 router.post('/api/usuarios/empleados',       verificarToken, soloRol('admin'),    usuarioController.crearEmpleado);
 router.put('/api/usuarios/empleados/:id',    verificarToken, soloRol('admin'),    usuarioController.actualizarEmpleado);
 router.delete('/api/usuarios/empleados/:id', verificarToken, soloRol('admin'),    usuarioController.eliminarEmpleado);
+router.patch('/api/usuarios/empleados/:id/resetear-password', verificarToken, soloRol('admin'), usuarioController.resetearPasswordEmpleado);
 
 // Categorías
 router.get('/api/categorias',            categoriaController.listar);

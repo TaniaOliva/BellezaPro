@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const Usuario = require('../models/Usuario');
+const { esEmailValido } = require('../utils/validadores');
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -14,6 +15,7 @@ const transporter = nodemailer.createTransport({
 const registrar = async (req, res) => {
   try {
     const { nombre, apellido, email, password, telefono } = req.body;
+    if (!esEmailValido(email)) return res.status(400).json({ mensaje: 'El correo electronico no es valido' });
     const existe = await Usuario.findOne({ email });
     if (existe) return res.status(400).json({ mensaje: 'El correo ya esta registrado' });
     const hash = await bcrypt.hash(password, 10);
@@ -107,6 +109,33 @@ const nuevaPassword = async (req, res) => {
   }
 };
 
+// =====================================================================
+// TEMPORAL - SOLO DESARROLLO. Entra directo como el admin de trabajo sin
+// pedir contrasena, para agilizar mientras se trabaja en el perfil admin.
+// Eliminar esta funcion, su ruta en router.js y el boton en el login
+// antes de pasar a produccion.
+// =====================================================================
+const DEV_ADMIN_EMAIL = 'admin@bellezapro.com';
+
+const devLoginAdmin = async (req, res) => {
+  try {
+    const usuario = await Usuario.findOne({ email: DEV_ADMIN_EMAIL, rol: 'admin' });
+    if (!usuario) return res.status(404).json({ mensaje: 'No existe el admin de desarrollo (admin@bellezapro.com)' });
+    const token = jwt.sign({ id: usuario._id, rol: usuario.rol }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    res.json({
+      token,
+      usuario: {
+        _id: usuario._id, id: usuario._id,
+        nombre: usuario.nombre, apellido: usuario.apellido,
+        email: usuario.email, rol: usuario.rol,
+        calificacionPromedio: usuario.calificacionPromedio
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ mensaje: err.message });
+  }
+};
+
 const setupAdmin = async (req, res) => {
   try {
     const existe = await Usuario.findOne({ rol: 'admin' });
@@ -129,4 +158,4 @@ const setupAdmin = async (req, res) => {
   }
 };
 
-module.exports = { registrar, login, solicitarRecuperacion, verificarCodigo, nuevaPassword, setupAdmin };
+module.exports = { registrar, login, solicitarRecuperacion, verificarCodigo, nuevaPassword, setupAdmin, devLoginAdmin };

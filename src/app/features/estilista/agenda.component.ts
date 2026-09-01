@@ -17,6 +17,8 @@ export class AgendaComponent implements OnInit {
 
   citasHoy: Cita[] = [];
   citasProximas: Cita[] = [];
+  citasHistorial: Cita[] = [];
+  mostrarTodoHistorial = false;
 
   citaACancelar: Cita | null = null;
   motivoCancelacion = '';
@@ -63,6 +65,16 @@ export class AgendaComponent implements OnInit {
     this.citasProximas = this.citas.filter(c =>
       c.fecha.slice(0, 10) > hoyStr && c.estado === 'confirmada'
     );
+
+    // Todo lo que no es de hoy ni futuro confirmado va al historial, para que
+    // ninguna cita quede sin aparecer en pantalla. Mas reciente primero.
+    this.citasHistorial = this.citas
+      .filter(c => !this.citasHoy.includes(c) && !this.citasProximas.includes(c))
+      .sort((a, b) => (b.fecha + b.hora).localeCompare(a.fecha + a.hora));
+  }
+
+  get historialVisible(): Cita[] {
+    return this.mostrarTodoHistorial ? this.citasHistorial : this.citasHistorial.slice(0, 5);
   }
 
   marcarTerminada(cita: Cita): void {
@@ -124,6 +136,7 @@ export class AgendaComponent implements OnInit {
     const map: Record<string, string> = {
       confirmada: `${base} bg-blue-100 text-blue-700`,
       terminada:  `${base} bg-green-100 text-green-700`,
+      cancelada:  `${base} bg-red-100 text-red-700`,
     };
     return map[estado] ?? `${base} bg-gray-100 text-gray-500`;
   }
@@ -132,6 +145,7 @@ export class AgendaComponent implements OnInit {
     const map: Record<string, string> = {
       confirmada: 'Confirmada',
       terminada:  'Terminada',
+      cancelada:  'Cancelada',
     };
     return map[estado] ?? estado;
   }

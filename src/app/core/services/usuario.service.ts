@@ -47,4 +47,8 @@ export class UsuarioService {
   eliminarEmpleado(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/empleados/${id}`);
   }
+
+  resetearPasswordEmpleado(id: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/empleados/${id}/resetear-password`, {});
+  }
 }

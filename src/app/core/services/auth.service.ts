@@ -37,6 +37,18 @@ export class AuthService {
     );
   }
 
+  // TEMPORAL - SOLO DESARROLLO: entra como admin@bellezapro.com sin contrasena.
+  // Eliminar junto con el boton en login.component y la ruta dev-login-admin.
+  devLoginAdmin(): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/dev-login-admin`, {}).pipe(
+      tap(res => {
+        localStorage.setItem('bellezapro_token', res.token);
+        localStorage.setItem('bellezapro_usuario', JSON.stringify(res.usuario));
+        this.usuarioSubject.next(res.usuario);
+      })
+    );
+  }
+
   solicitarRecuperacion(email: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/recuperar`, { email });
   }

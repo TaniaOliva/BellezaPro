@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 @Component({
   selector: 'app-registro',
   standalone: true,
@@ -26,6 +28,10 @@ export class RegistroComponent {
   registrar(): void {
     if (!this.nombre || !this.apellido || !this.email || !this.password || !this.confirmar) {
       this.error = 'Completa todos los campos';
+      return;
+    }
+    if (!EMAIL_REGEX.test(this.email.trim())) {
+      this.error = 'Ingresa un correo electrónico válido';
       return;
     }
     if (this.password !== this.confirmar) {

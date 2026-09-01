@@ -1,9 +1,13 @@
 const mongoose = require('mongoose');
+const { EMAIL_REGEX } = require('../utils/validadores');
 
 const usuarioSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
   apellido: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
+  email: {
+    type: String, required: true, unique: true, trim: true,
+    match: [EMAIL_REGEX, 'El correo electronico no es valido']
+  },
   password: { type: String, required: true },
   telefono: { type: String },
   rol: { type: String, enum: ['cliente', 'estilista', 'admin'], default: 'cliente' },

@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const Usuario = require('../models/Usuario');
+const { esEmailValido } = require('../utils/validadores');
 
 const listarEstilistas = async (req, res) => {
   try {
@@ -96,6 +97,7 @@ const actualizarEstado = async (req, res) => {
 const crearEmpleado = async (req, res) => {
   try {
     const { nombre, apellido, email, telefono, especialidades } = req.body;
+    if (!esEmailValido(email)) return res.status(400).json({ mensaje: 'El correo electronico no es valido' });
     const existe = await Usuario.findOne({ email });
     if (existe) return res.status(400).json({ mensaje: 'El correo ya esta registrado' });
     const hash = await bcrypt.hash('12345678', 10);
@@ -117,6 +119,7 @@ const actualizarEmpleado = async (req, res) => {
     if (nombre !== undefined) campos.nombre = nombre;
     if (apellido !== undefined) campos.apellido = apellido;
     if (email !== undefined) {
+      if (!esEmailValido(email)) return res.status(400).json({ mensaje: 'El correo electronico no es valido' });
       const existe = await Usuario.findOne({ email, _id: { $ne: req.params.id } });
       if (existe) return res.status(400).json({ mensaje: 'El correo ya esta en uso' });
       campos.email = email;
@@ -141,6 +144,20 @@ const eliminarEmpleado = async (req, res) => {
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
 };
 
+const PASSWORD_DEFAULT = '12345678';
+
+const resetearPasswordEmpleado = async (req, res) => {
+  try {
+    const hash = await bcrypt.hash(PASSWORD_DEFAULT, 10);
+    const usuario = await Usuario.findOneAndUpdate(
+      { _id: req.params.id, rol: 'estilista' },
+      { password: hash }
+    );
+    if (!usuario) return res.status(404).json({ mensaje: 'Estilista no encontrado' });
+    res.json({ mensaje: 'Contrasena restablecida a la de por defecto' });
+  } catch (err) { res.status(400).json({ mensaje: err.message }); }
+};
+
 module.exports = {
   listarEstilistas,
   listarTodosEstilistas,
@@ -151,5 +168,6 @@ module.exports = {
   actualizarEstado,
   crearEmpleado,
   actualizarEmpleado,
-  eliminarEmpleado
+  eliminarEmpleado,
+  resetearPasswordEmpleado
 };

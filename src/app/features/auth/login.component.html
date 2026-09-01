@@ -40,6 +40,15 @@
             Crear cuenta nueva
           </button>
         </div>
+
+        <!-- TEMPORAL - SOLO DESARROLLO: quitar este botón antes de producción -->
+        <div class="border-t border-dashed border-amber-300 pt-4">
+          <button (click)="entrarComoAdminDev()" [disabled]="cargando" type="button"
+            class="w-full border border-dashed border-amber-400 text-amber-700 bg-amber-50 font-semibold py-2.5 rounded-lg hover:bg-amber-100 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-lg">construction</span>
+            Entrar como Admin (temporal)
+          </button>
+        </div>
       </div>
     </div>
   </div>
