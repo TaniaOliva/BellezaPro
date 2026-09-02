@@ -34,16 +34,16 @@ export class CitaService {
     return this.http.get<{ todos: { hora: string; disponible: boolean }[]; bloqueado: string | null }>(`${this.apiUrl}/disponibilidad`, { params });
   }
 
-  cancelar(id: string, motivo: string): Observable<any> {
-    return this.http.patch<any>(`${this.apiUrl}/${id}/cancelar-cliente`, { motivo });
+  cancelar(id: string, motivo: string, detalle?: string): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/${id}/cancelar-cliente`, { motivo, detalle });
   }
 
   reagendar(id: string, fecha: string, hora: string): Observable<Cita> {
     return this.http.patch<Cita>(`${this.apiUrl}/${id}/reagendar`, { fecha, hora });
   }
 
-  cancelarComoEstilista(id: string, motivo: string): Observable<any> {
-    return this.http.patch<any>(`${this.apiUrl}/${id}/cancelar-estilista`, { motivo });
+  cancelarComoEstilista(id: string, motivo: string, detalle?: string): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/${id}/cancelar-estilista`, { motivo, detalle });
   }
 
   obtenerPorAdmin(id: string): Observable<Cita> {

@@ -64,7 +64,7 @@ export class ReportarClienteComponent implements OnInit {
         this.citasHoy = agenda
           .filter((c: Cita) =>
             c.fecha.slice(0, 10) === hoyStr &&
-            (c.estado === 'terminada' || c.estado === 'cancelada')
+            (c.estado === 'terminada' || c.estado === 'cancelada' || c.estado === 'no_asistio')
           )
           .map((c: Cita) => {
             const nombre = c.clienteId?.nombre ?? '';

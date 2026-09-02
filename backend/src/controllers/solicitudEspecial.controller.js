@@ -11,7 +11,17 @@ const POPULATE_OPTS = [
 
 const crear = async (req, res) => {
   try {
-    const solicitud = await SolicitudEspecial.create({ ...req.body, clienteId: req.usuario.id });
+    // C4: lista blanca de campos que acepta el cliente.
+    const { categoria, descripcion, imagenUrl, presupuesto, estilistaPreferida, fechaSugerida, horaSugerida } = req.body;
+    const solicitud = await SolicitudEspecial.create({
+      clienteId: req.usuario.id,
+      categoria, descripcion, imagenUrl,
+      presupuesto: presupuesto !== undefined && presupuesto !== null && presupuesto !== ''
+        ? Number(presupuesto)
+        : undefined,
+      estilistaPreferida: estilistaPreferida || undefined,
+      fechaSugerida, horaSugerida,
+    });
     const admins = await Usuario.find({ rol: 'admin' }).select('_id');
     for (const admin of admins) {
       await crearNotificacion(admin._id, 'Nueva solicitud especial',
@@ -83,7 +93,7 @@ const responder = async (req, res) => {
 
 const aceptarContraoferta = async (req, res) => {
   try {
-    const sol = await SolicitudEspecial.findById(req.params.id).populate('clienteId');
+    const sol = await SolicitudEspecial.findById(req.params.id).populate('clienteId', 'nombre apellido email');
     if (!sol || sol.estado !== 'contraoferta') {
       return res.status(400).json({ mensaje: 'La solicitud no tiene una contraoferta activa' });
     }

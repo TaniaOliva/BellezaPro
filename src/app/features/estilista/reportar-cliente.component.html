@@ -58,9 +58,9 @@
                 <span *ngIf="estaReportada(cita.id)"
                   class="text-xs font-bold text-green-600 shrink-0">✓ Reportado</span>
                 <span *ngIf="!estaReportada(cita.id)"
-                  [class]="cita.estado === 'terminada' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'"
+                  [class]="cita.estado === 'terminada' ? 'bg-green-100 text-green-700' : cita.estado === 'no_asistio' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'"
                   class="text-xs font-semibold px-2 py-0.5 rounded-full shrink-0">
-                  {{ cita.estado === 'terminada' ? 'Terminada' : 'Cancelada' }}
+                  {{ cita.estado === 'terminada' ? 'Terminada' : cita.estado === 'no_asistio' ? 'No asistió' : 'Cancelada' }}
                 </span>
               </div>
               <p class="text-xs text-gray-500 truncate pl-10">{{ cita.servicio }}</p>

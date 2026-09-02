@@ -5,6 +5,7 @@ import { UsuarioService } from '../../../core/services/usuario.service';
 import { CitaService } from '../../../core/services/cita.service';
 import { BloqueoService } from '../../../core/services/bloqueo.service';
 import { Usuario, Cita, Bloqueo, ConflictoBloqueo } from '../../../core/models';
+import { RAZONES_BLOQUEO, labelRazonBloqueo } from '../../../core/models/catalogos';
 
 type Vista = 'dia' | 'semana' | 'mes';
 
@@ -27,7 +28,9 @@ export class AgendaGeneralComponent implements OnInit {
   mostrarModalBloqueo = false;
   mostrarGestionBloqueos = false;
   editandoBloqueoId: string | null = null;
-  formBloqueo = { estilistaId: '', cierreTotalSalon: false, fechaInicio: '', fechaFin: '', razon: '' };
+  formBloqueo = { estilistaId: '', cierreTotalSalon: false, fechaInicio: '', fechaFin: '', razon: '', detalleRazon: '' };
+  readonly razonesBloqueo = RAZONES_BLOQUEO;
+  labelRazon = labelRazonBloqueo;
   conflictos: ConflictoBloqueo | null = null;
   verificandoConflictos = false;
   guardandoBloqueo = false;
@@ -213,7 +216,7 @@ export class AgendaGeneralComponent implements OnInit {
 
   abrirModalBloqueo(): void {
     this.editandoBloqueoId = null;
-    this.formBloqueo = { estilistaId: '', cierreTotalSalon: false, fechaInicio: '', fechaFin: '', razon: '' };
+    this.formBloqueo = { estilistaId: '', cierreTotalSalon: false, fechaInicio: '', fechaFin: '', razon: '', detalleRazon: '' };
     this.conflictos = null;
     this.errorModal = '';
     this.mostrarModalBloqueo = true;
@@ -226,7 +229,8 @@ export class AgendaGeneralComponent implements OnInit {
       cierreTotalSalon: b.cierreTotalSalon,
       fechaInicio: (b.fechaInicio as string).slice(0, 10),
       fechaFin: (b.fechaFin as string).slice(0, 10),
-      razon: b.razon ?? ''
+      razon: b.razon ?? '',
+      detalleRazon: b.detalleRazon ?? ''
     };
     this.conflictos = null;
     this.errorModal = '';
@@ -257,9 +261,9 @@ export class AgendaGeneralComponent implements OnInit {
   }
 
   confirmarBloqueo(): void {
-    const { estilistaId, cierreTotalSalon, fechaInicio, fechaFin, razon } = this.formBloqueo;
+    const { estilistaId, cierreTotalSalon, fechaInicio, fechaFin, razon, detalleRazon } = this.formBloqueo;
     this.guardandoBloqueo = true;
-    const datos = { fechaInicio, fechaFin, razon, cierreTotalSalon, estilistaId: cierreTotalSalon ? undefined : estilistaId };
+    const datos = { fechaInicio, fechaFin, razon, detalleRazon, cierreTotalSalon, estilistaId: cierreTotalSalon ? undefined : estilistaId };
     const op = this.editandoBloqueoId
       ? this.bloqueoSvc.actualizar(this.editandoBloqueoId, datos)
       : this.bloqueoSvc.crear(datos);

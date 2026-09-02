@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const solicitudEspecialSchema = new mongoose.Schema({
   clienteId:             { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
-  categoria:             { type: String, required: true },
-  descripcion:           { type: String, required: true },
-  imagenUrl:             { type: String },
-  presupuesto:           { type: String },
+  categoria:             { type: String, required: true, trim: true },
+  descripcion:           { type: String, required: true, trim: true },
+  imagenUrl:             { type: String, trim: true },
+  presupuesto:           { type: Number },
   estilistaPreferida:    { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   // Estados: pendiente → propuesta (admin) → contraoferta (cliente) → aceptada / rechazada / cancelada
   estado: {
@@ -13,7 +13,7 @@ const solicitudEspecialSchema = new mongoose.Schema({
     enum: ['pendiente', 'propuesta', 'contraoferta', 'aceptada', 'rechazada', 'cancelada'],
     default: 'pendiente'
   },
-  respuesta:             { type: String },
+  respuesta:             { type: String, trim: true },
   precioEstimado:        { type: Number },
   duracionEstimada:      { type: Number },
   // Propuesta del admin
@@ -27,7 +27,7 @@ const solicitudEspecialSchema = new mongoose.Schema({
   fechaContraoferta:     { type: String },
   horaContraoferta:      { type: String },
   estilistaContraoferta: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
-  mensajeContraoferta:   { type: String },
+  mensajeContraoferta:   { type: String, trim: true },
   creadoEn:              { type: Date, default: Date.now }
 });
 

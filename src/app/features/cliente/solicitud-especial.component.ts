@@ -21,7 +21,7 @@ export class SolicitudEspecialComponent implements OnInit {
   // Nueva solicitud
   currentStep = 1;
   selectedCategory = '';
-  presupuesto = '';
+  presupuesto: number | null = null;
   selectedStylistId = '';
   descripcion = '';
   fechaSugerida = '';
@@ -168,7 +168,7 @@ export class SolicitudEspecialComponent implements OnInit {
     const datos: any = {
       categoria: this.selectedCategory,
       descripcion: this.descripcion,
-      presupuesto: this.presupuesto || undefined,
+      presupuesto: this.presupuesto ?? undefined,
       estilistaPreferida: this.selectedStylistId || undefined,
       imagenUrl: this.imagenBase64 || undefined,
       fechaSugerida: this.fechaSugerida || undefined,
@@ -180,7 +180,7 @@ export class SolicitudEspecialComponent implements OnInit {
         this.exitoEnvio = true;
         this.currentStep = 1;
         this.selectedCategory = '';
-        this.presupuesto = '';
+        this.presupuesto = null;
         this.selectedStylistId = '';
         this.descripcion = '';
         this.fechaSugerida = '';

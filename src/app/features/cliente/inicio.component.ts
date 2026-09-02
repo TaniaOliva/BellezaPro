@@ -50,6 +50,7 @@ export class InicioComponent implements OnInit {
       confirmada: 'Confirmada',
       terminada:  'Completada',
       cancelada:  'Cancelada',
+      no_asistio: 'No asistió',
       pendiente:  'Pendiente',
     };
     return map[estado] ?? estado;
@@ -61,6 +62,7 @@ export class InicioComponent implements OnInit {
       confirmada: `${base} bg-blue-100 text-blue-700`,
       terminada:  `${base} bg-green-100 text-green-700`,
       cancelada:  `${base} bg-gray-100 text-gray-500`,
+      no_asistio: `${base} bg-amber-100 text-amber-700`,
       pendiente:  `${base} bg-yellow-100 text-yellow-700`,
     };
     return colores[estado] ?? `${base} bg-gray-100 text-gray-500`;
@@ -82,7 +84,7 @@ export class InicioComponent implements OnInit {
     });
 
     this.citaSvc.misCitas().subscribe((citas: Cita[]) => {
-      const validas = citas.filter((c: Cita) => ['confirmada', 'terminada', 'cancelada'].includes(c.estado));
+      const validas = citas.filter((c: Cita) => ['confirmada', 'terminada', 'cancelada', 'no_asistio'].includes(c.estado));
 
       const terminadas = validas.filter((c: Cita) => c.estado === 'terminada');
       const ordenadas = [...terminadas].sort((a, b) => (b._id > a._id ? 1 : -1));
@@ -94,7 +96,7 @@ export class InicioComponent implements OnInit {
       this.proximaCita = activas.sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())[0] ?? null;
 
       this.citasEsteMes = validas.filter((c: Cita) => {
-        if (c.estado === 'cancelada') return false;
+        if (c.estado === 'cancelada' || c.estado === 'no_asistio') return false;
         const f = new Date(c.fecha);
         return f.getMonth() === hoyDate.getMonth() && f.getFullYear() === hoyDate.getFullYear();
       }).length;

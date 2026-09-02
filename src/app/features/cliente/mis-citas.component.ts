@@ -6,6 +6,7 @@ import { CitaService } from '../../core/services/cita.service';
 import { ServicioService } from '../../core/services/servicio.service';
 import { BookingService } from '../../core/services/booking.service';
 import { Cita } from '../../core/models';
+import { MOTIVOS_CANCELACION_CLIENTE, labelMotivoCancelacion, labelEstadoCita, badgeEstadoCita } from '../../core/models/catalogos';
 
 @Component({
   selector: 'app-cliente-mis-citas',
@@ -22,9 +23,15 @@ export class MisCitasComponent implements OnInit {
   cargando = true;
 
   citaACancelar: Cita | null = null;
-  motivoCancelacion = '';
+  motivoSel = '';
+  detalleSel = '';
   cancelando = false;
   errorCancelar = '';
+
+  readonly motivosCliente = MOTIVOS_CANCELACION_CLIENTE;
+  labelMotivo = labelMotivoCancelacion;
+  labelEstado = labelEstadoCita;
+  badgeEstado = badgeEstadoCita;
 
   get hoyStr(): string {
     const hoy = new Date();
@@ -71,16 +78,20 @@ export class MisCitasComponent implements OnInit {
 
   abrirCancelar(cita: Cita): void {
     this.citaACancelar = cita;
-    this.motivoCancelacion = '';
+    this.motivoSel = '';
+    this.detalleSel = '';
     this.errorCancelar = '';
   }
 
   confirmarCancelacion(): void {
-    if (!this.motivoCancelacion.trim()) { this.errorCancelar = 'Por favor escribe un motivo'; return; }
+    if (!this.motivoSel) { this.errorCancelar = 'Elige un motivo'; return; }
+    if (this.motivoSel === 'otro' && !this.detalleSel.trim()) {
+      this.errorCancelar = 'Describe el motivo'; return;
+    }
     if (!this.citaACancelar) return;
     this.cancelando = true;
     this.errorCancelar = '';
-    this.citaSvc.cancelar(this.citaACancelar._id, this.motivoCancelacion).subscribe({
+    this.citaSvc.cancelar(this.citaACancelar._id, this.motivoSel, this.detalleSel.trim() || undefined).subscribe({
       next: () => { this.cancelando = false; this.citaACancelar = null; this.cargar(); },
       error: (err: any) => { this.errorCancelar = err.error?.mensaje || 'Error al cancelar'; this.cancelando = false; }
     });

@@ -62,7 +62,7 @@
                 {{ b.fechaInicio | date:'dd/MM/yyyy':'UTC' }}
                 <span class="mx-1 text-gray-300">→</span>
                 {{ b.fechaFin | date:'dd/MM/yyyy':'UTC' }}
-                <span *ngIf="b.razon" class="ml-1 text-gray-400">· {{ b.razon }}</span>
+                <span *ngIf="b.razon" class="ml-1 text-gray-400">· {{ labelRazon(b.razon) }}</span>
               </p>
             </div>
           </div>
@@ -193,7 +193,7 @@
         <div *ngIf="getBloqueoDia(dia) as bloqueo"
           class="flex items-center gap-1 text-xs text-gray-500 bg-gray-200 rounded px-1 py-0.5 mb-1">
           <span>🔒</span>
-          <span class="truncate">{{ bloqueo.cierreTotalSalon ? 'Cierre total' : bloqueo.razon }}</span>
+          <span class="truncate">{{ bloqueo.cierreTotalSalon ? 'Cierre total' : labelRazon(bloqueo.razon) }}</span>
         </div>
 
         <div *ngIf="getCitasDia(dia).length > 0 && !getBloqueoDia(dia)">
@@ -229,7 +229,7 @@
             <div *ngIf="getBloqueoDia(dia) as bloqueo"
               class="text-xs text-red-500 font-normal mt-0.5 flex items-center justify-center gap-1">
               <span>🔒</span>
-              <span class="truncate max-w-[100px]">{{ bloqueo.cierreTotalSalon ? 'Cierre total' : bloqueo.razon }}</span>
+              <span class="truncate max-w-[100px]">{{ bloqueo.cierreTotalSalon ? 'Cierre total' : labelRazon(bloqueo.razon) }}</span>
             </div>
           </th>
         </tr>
@@ -276,7 +276,7 @@
             <div *ngIf="getBloqueoPara(fechaBase, e._id) as bloqueo"
               class="text-xs text-red-500 font-normal flex items-center justify-center gap-1 mt-0.5">
               <span>🔒</span>
-              <span>{{ bloqueo.cierreTotalSalon ? 'Cierre total' : bloqueo.razon }}</span>
+              <span>{{ bloqueo.cierreTotalSalon ? 'Cierre total' : labelRazon(bloqueo.razon) }}</span>
             </div>
           </th>
         </tr>
@@ -358,9 +358,15 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Razón (opcional)</label>
-          <input type="text" [(ngModel)]="formBloqueo.razon" placeholder="Ej: Vacaciones, mantenimiento..."
+          <label class="block text-sm font-medium text-gray-700 mb-1">Razón</label>
+          <select [(ngModel)]="formBloqueo.razon"
             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-400">
+            <option value="" disabled>Selecciona una razón…</option>
+            <option *ngFor="let r of razonesBloqueo" [value]="r.valor">{{ r.label }}</option>
+          </select>
+          <input *ngIf="formBloqueo.razon === 'otro'" type="text" [(ngModel)]="formBloqueo.detalleRazon"
+            placeholder="Especifica la razón..."
+            class="mt-2 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-400">
         </div>
 
         <p *ngIf="errorModal" class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">

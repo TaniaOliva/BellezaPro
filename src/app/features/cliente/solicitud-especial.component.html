@@ -93,7 +93,7 @@
           </div>
 
           <div class="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-3">
-            <div *ngIf="s.presupuesto"><span class="text-gray-400">Presupuesto:</span> {{ s.presupuesto }}</div>
+            <div *ngIf="s.presupuesto"><span class="text-gray-400">Presupuesto:</span> L. {{ s.presupuesto }}</div>
             <div><span class="text-gray-400">Enviada:</span> {{ s.creadoEn | date:'dd/MM/yyyy' }}</div>
             <div *ngIf="s.fechaSugerida"><span class="text-gray-400">Fecha sugerida:</span> {{ s.fechaSugerida }}{{ s.horaSugerida ? ' · ' + s.horaSugerida : '' }}</div>
             <div *ngIf="s.precioEstimado"><span class="text-gray-400">Precio propuesto:</span> L. {{ s.precioEstimado }}</div>
@@ -205,8 +205,8 @@
 
           <!-- Presupuesto libre -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">¿Cuánto tienes de presupuesto? (opcional)</label>
-            <input type="text" [(ngModel)]="presupuesto" placeholder="Ej: L.500, entre L.300 y L.800..."
+            <label class="block text-sm font-semibold text-gray-700 mb-2">¿Cuánto tienes de presupuesto? (opcional, en L.)</label>
+            <input type="number" min="0" step="50" [(ngModel)]="presupuesto" placeholder="Ej: 500"
               class="w-full rounded-xl border border-gray-300 p-3 text-gray-700 focus:outline-none focus:border-red-500">
           </div>
 
@@ -308,7 +308,7 @@
             </div>
             <div *ngIf="presupuesto">
               <p class="text-gray-500 text-xs font-semibold uppercase">Presupuesto</p>
-              <p class="text-gray-800">{{ presupuesto }}</p>
+              <p class="text-gray-800">L. {{ presupuesto }}</p>
             </div>
             <div *ngIf="fechaSugerida">
               <p class="text-gray-500 text-xs font-semibold uppercase">Fecha preferida</p>

@@ -2,14 +2,14 @@ const mongoose = require('mongoose');
 const { EMAIL_REGEX } = require('../utils/validadores');
 
 const usuarioSchema = new mongoose.Schema({
-  nombre: { type: String, required: true },
-  apellido: { type: String, required: true },
+  nombre: { type: String, required: true, trim: true },
+  apellido: { type: String, required: true, trim: true },
   email: {
     type: String, required: true, unique: true, trim: true,
     match: [EMAIL_REGEX, 'El correo electronico no es valido']
   },
   password: { type: String, required: true },
-  telefono: { type: String },
+  telefono: { type: String, trim: true },
   rol: { type: String, enum: ['cliente', 'estilista', 'admin'], default: 'cliente' },
   especialidades: [String],
   horarioDisponible: {
@@ -20,7 +20,7 @@ const usuarioSchema = new mongoose.Schema({
     viernes: { inicio: String, fin: String },
     sabado: { inicio: String, fin: String }
   },
-  estado: { type: String, enum: ['activo', 'inactivo', 'suspendido', 'bloqueado'], default: 'activo' },
+  estado: { type: String, enum: ['activo', 'inactivo', 'suspendido', 'bloqueado', 'advertido'], default: 'activo' },
   suspensionFin: { type: Date, default: null },
   calificacionPromedio: { type: Number, default: 0 },
   totalCalificaciones: { type: Number, default: 0 },

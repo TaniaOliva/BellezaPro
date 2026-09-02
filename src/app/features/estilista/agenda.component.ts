@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CitaService } from '../../core/services/cita.service';
 import { Cita } from '../../core/models';
+import { MOTIVOS_CANCELACION_ESTILISTA, labelMotivoCancelacion, labelEstadoCita, badgeEstadoCita } from '../../core/models/catalogos';
 
 @Component({
   selector: 'app-estilista-agenda',
@@ -21,9 +22,13 @@ export class AgendaComponent implements OnInit {
   mostrarTodoHistorial = false;
 
   citaACancelar: Cita | null = null;
-  motivoCancelacion = '';
+  motivoSel = '';
+  detalleSel = '';
   enviandoCancelacion = false;
   errorCancelacion = '';
+
+  readonly motivosEstilista = MOTIVOS_CANCELACION_ESTILISTA;
+  labelMotivo = labelMotivoCancelacion;
 
   // Modal calificación cliente
   citaACalificar: Cita | null = null;
@@ -89,19 +94,24 @@ export class AgendaComponent implements OnInit {
 
   confirmarCancelar(cita: Cita): void {
     this.citaACancelar = cita;
-    this.motivoCancelacion = '';
+    this.motivoSel = '';
+    this.detalleSel = '';
     this.errorCancelacion = '';
   }
 
   ejecutarCancelacion(): void {
-    if (!this.citaACancelar || !this.motivoCancelacion.trim()) return;
+    if (!this.citaACancelar || !this.motivoSel) return;
+    if (this.motivoSel === 'otro' && !this.detalleSel.trim()) {
+      this.errorCancelacion = 'Describe el motivo'; return;
+    }
     this.enviandoCancelacion = true;
     this.errorCancelacion = '';
-    this.citaSvc.cancelarComoEstilista(this.citaACancelar._id, this.motivoCancelacion).subscribe({
+    this.citaSvc.cancelarComoEstilista(this.citaACancelar._id, this.motivoSel, this.detalleSel.trim() || undefined).subscribe({
       next: () => {
         this.enviandoCancelacion = false;
         this.citaACancelar = null;
-        this.motivoCancelacion = '';
+        this.motivoSel = '';
+        this.detalleSel = '';
         this.cargar();
       },
       error: (err: any) => {
@@ -132,21 +142,10 @@ export class AgendaComponent implements OnInit {
   }
 
   badgeEstado(estado: string): string {
-    const base = 'text-xs font-semibold px-2 py-0.5 rounded-full';
-    const map: Record<string, string> = {
-      confirmada: `${base} bg-blue-100 text-blue-700`,
-      terminada:  `${base} bg-green-100 text-green-700`,
-      cancelada:  `${base} bg-red-100 text-red-700`,
-    };
-    return map[estado] ?? `${base} bg-gray-100 text-gray-500`;
+    return `text-xs font-semibold px-2 py-0.5 rounded-full ${badgeEstadoCita(estado)}`;
   }
 
   etiquetaEstado(estado: string): string {
-    const map: Record<string, string> = {
-      confirmada: 'Confirmada',
-      terminada:  'Terminada',
-      cancelada:  'Cancelada',
-    };
-    return map[estado] ?? estado;
+    return labelEstadoCita(estado);
   }
 }

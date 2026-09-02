@@ -59,10 +59,13 @@ export interface Cita {
   fecha: string;
   hora: string;
   duracion: number;
-  estado: string;
+  estado: 'confirmada' | 'cancelada' | 'no_asistio' | 'terminada';
   precioFinal?: number;
   notas?: string;
   motivoCancelacion?: string;
+  canceladoPor?: 'cliente' | 'estilista' | 'admin' | 'sistema';
+  canceladoEn?: string;
+  detalleCancelacion?: string;
   creadoEn: string;
 }
 
@@ -72,7 +75,7 @@ export interface SolicitudEspecial {
   categoria: string;
   descripcion: string;
   imagenUrl?: string;
-  presupuesto?: string;
+  presupuesto?: number;
   estilistaPreferida?: any;
   estado: 'pendiente' | 'propuesta' | 'contraoferta' | 'aceptada' | 'rechazada' | 'cancelada';
   respuesta?: string;
@@ -127,6 +130,7 @@ export interface Bloqueo {
   fechaInicio: string;
   fechaFin: string;
   razon?: string;
+  detalleRazon?: string;
   cierreTotalSalon: boolean;
   createdAt?: string;
 }

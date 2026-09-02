@@ -21,6 +21,7 @@ export class BloqueoService {
     fechaInicio: string;
     fechaFin: string;
     razon?: string;
+    detalleRazon?: string;
     cierreTotalSalon?: boolean;
   }): Observable<Bloqueo> {
     return this.http.post<Bloqueo>(this.apiUrl, datos);
@@ -40,6 +41,7 @@ export class BloqueoService {
     fechaInicio: string;
     fechaFin: string;
     razon?: string;
+    detalleRazon?: string;
     cierreTotalSalon?: boolean;
   }): Observable<Bloqueo> {
     return this.http.put<Bloqueo>(`${this.apiUrl}/${id}`, datos);

@@ -1,6 +1,7 @@
 const Bloqueo = require('../models/Bloqueo');
 const Cita = require('../models/Cita');
 const { crearNotificacion } = require('./notificacion.controller');
+const { RAZONES_BLOQUEO } = require('../utils/catalogos');
 
 const verificarSuperposicion = async (fechaInicio, fechaFin, cierreTotalSalon, estilistaId, excluirId = null) => {
   const ini = new Date(fechaInicio);
@@ -31,9 +32,12 @@ const verificarSuperposicion = async (fechaInicio, fechaFin, cierreTotalSalon, e
 
 const crear = async (req, res) => {
   try {
-    const { cierreTotalSalon, estilistaId, fechaInicio, fechaFin, razon } = req.body;
+    const { cierreTotalSalon, estilistaId, fechaInicio, fechaFin, razon, detalleRazon } = req.body;
     if (!cierreTotalSalon && !estilistaId) {
       return res.status(400).json({ mensaje: 'Se requiere estilistaId o cierreTotalSalon' });
+    }
+    if (!RAZONES_BLOQUEO.includes(razon)) {
+      return res.status(400).json({ mensaje: 'Debes indicar una razón válida del catálogo' });
     }
     const conflicto = await verificarSuperposicion(fechaInicio, fechaFin, cierreTotalSalon, estilistaId);
     if (conflicto) return res.status(409).json({ mensaje: conflicto });
@@ -43,6 +47,7 @@ const crear = async (req, res) => {
       fechaInicio,
       fechaFin,
       razon,
+      detalleRazon: razon === 'otro' ? (detalleRazon || '').trim() : undefined,
       cierreTotalSalon: !!cierreTotalSalon
     });
 
@@ -52,14 +57,22 @@ const crear = async (req, res) => {
     };
     if (!cierreTotalSalon && estilistaId) citasQuery.estilistaId = estilistaId;
     const citasAfectadas = await Cita.find(citasQuery).populate('clienteId', '_id');
-    const motivoBloqueo = `${razon || 'El salón ha bloqueado este período.'} Te invitamos a reagendar tu cita.`;
+    const motivoCita = cierreTotalSalon ? 'cierre_salon' : 'ausencia_estilista';
     for (const cita of citasAfectadas) {
-      await Cita.findByIdAndUpdate(cita._id, { estado: 'cancelada', motivoCancelacion: motivoBloqueo });
+      await Cita.findByIdAndUpdate(cita._id, {
+        estado: 'cancelada',
+        motivoCancelacion: motivoCita,
+        canceladoPor: 'admin',
+        canceladoEn: new Date(),
+        detalleCancelacion: bloqueo.detalleRazon || undefined,
+      });
       if (cita.clienteId?._id) {
         await crearNotificacion(
           cita.clienteId._id,
           'Tu cita fue cancelada',
-          razon ? `${razon} Por favor reagenda tu cita.` : 'El salón bloqueó este período. Por favor reagenda tu cita.',
+          cierreTotalSalon
+            ? 'El salón bloqueó este período. Por favor reagenda tu cita.'
+            : 'Tu estilista no estará disponible ese día. Por favor reagenda tu cita.',
           'cita',
           'event_busy'
         );
@@ -119,13 +132,21 @@ const listarPorEstilista = async (req, res) => {
 
 const actualizar = async (req, res) => {
   try {
-    const { cierreTotalSalon, estilistaId, fechaInicio, fechaFin, razon } = req.body;
+    const { cierreTotalSalon, estilistaId, fechaInicio, fechaFin, razon, detalleRazon } = req.body;
+    if (!RAZONES_BLOQUEO.includes(razon)) {
+      return res.status(400).json({ mensaje: 'Debes indicar una razón válida del catálogo' });
+    }
     const conflicto = await verificarSuperposicion(fechaInicio, fechaFin, cierreTotalSalon, estilistaId, req.params.id);
     if (conflicto) return res.status(409).json({ mensaje: conflicto });
 
     const bloqueo = await Bloqueo.findByIdAndUpdate(
       req.params.id,
-      { estilistaId: cierreTotalSalon ? null : estilistaId, fechaInicio, fechaFin, razon, cierreTotalSalon: !!cierreTotalSalon },
+      {
+        estilistaId: cierreTotalSalon ? null : estilistaId,
+        fechaInicio, fechaFin, razon,
+        detalleRazon: razon === 'otro' ? (detalleRazon || '').trim() : undefined,
+        cierreTotalSalon: !!cierreTotalSalon
+      },
       { new: true }
     ).populate('estilistaId', 'nombre apellido');
     if (!bloqueo) return res.status(404).json({ mensaje: 'Bloqueo no encontrado' });

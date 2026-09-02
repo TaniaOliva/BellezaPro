@@ -48,3 +48,4 @@ Thumbs.db
 
 # Respaldo de base de datos (dump local, no versionar)
 /respaldo
+/respaldo/para-analisis/
