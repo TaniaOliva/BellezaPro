@@ -45,3 +45,6 @@ Thumbs.db
 
 # Claude Code
 .claude/
+
+# Respaldo de base de datos (dump local, no versionar)
+/respaldo
