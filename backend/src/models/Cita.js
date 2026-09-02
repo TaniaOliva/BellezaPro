@@ -21,4 +21,9 @@ const citaSchema = new mongoose.Schema({
   createdAt:   { type: Date, default: Date.now }
 });
 
+// Índices para agenda por estilista, historial por cliente y disponibilidad por día.
+citaSchema.index({ estilistaId: 1, estado: 1, fecha: 1, hora: 1 });
+citaSchema.index({ clienteId: 1, estado: 1, fecha: -1 });
+citaSchema.index({ fecha: 1, estado: 1 });
+
 module.exports = mongoose.model('Cita', citaSchema);

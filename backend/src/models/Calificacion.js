@@ -9,4 +9,8 @@ const calificacionSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// Promedio/listado por estilista; una sola calificación por cita.
+calificacionSchema.index({ estilistaId: 1 });
+calificacionSchema.index({ citaId: 1 }, { unique: true });
+
 module.exports = mongoose.model('Calificacion', calificacionSchema);

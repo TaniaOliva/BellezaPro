@@ -11,4 +11,9 @@ const reporteClienteSchema = new mongoose.Schema({
   creadoEn:     { type: Date, default: Date.now }
 });
 
+// Reportes por cliente, por estilista y filtro por estado (pendientes).
+reporteClienteSchema.index({ clienteId: 1 });
+reporteClienteSchema.index({ estilistaId: 1 });
+reporteClienteSchema.index({ estado: 1 });
+
 module.exports = mongoose.model('ReporteCliente', reporteClienteSchema);

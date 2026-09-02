@@ -19,4 +19,7 @@ const servicioSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// Catálogo público: servicios activos por categoría.
+servicioSchema.index({ activo: 1, categoria: 1 });
+
 module.exports = mongoose.model('Servicio', servicioSchema);

@@ -11,4 +11,8 @@ const bloqueoSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// Solapamiento de rango, con y sin filtro por estilista.
+bloqueoSchema.index({ estilistaId: 1, fechaInicio: 1, fechaFin: 1 });
+bloqueoSchema.index({ fechaInicio: 1, fechaFin: 1 });
+
 module.exports = mongoose.model('Bloqueo', bloqueoSchema);

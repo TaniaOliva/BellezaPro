@@ -31,4 +31,8 @@ const solicitudEspecialSchema = new mongoose.Schema({
   creadoEn:              { type: Date, default: Date.now }
 });
 
+// Solicitudes por cliente y filtro por estado (pendientes / contraoferta).
+solicitudEspecialSchema.index({ clienteId: 1 });
+solicitudEspecialSchema.index({ estado: 1 });
+
 module.exports = mongoose.model('SolicitudEspecial', solicitudEspecialSchema);

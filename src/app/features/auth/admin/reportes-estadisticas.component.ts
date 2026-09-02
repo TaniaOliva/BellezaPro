@@ -87,15 +87,19 @@ export class ReportesEstadisticasComponent implements OnInit {
   }
 
   private calcularBarMeses(citas: any[]): void {
+    // Se agrupa por mes calendario en UTC (así el bucket no se corre por la
+    // diferencia horaria de Honduras). Campo: createdAt, con fecha como respaldo.
     const ahora = new Date();
+    const anioAhora = ahora.getUTCFullYear();
+    const mesAhora = ahora.getUTCMonth();
     const meses: BarMes[] = [];
     for (let i = 5; i >= 0; i--) {
-      const d = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
-      meses.push({ mes: MESES[d.getMonth()], count: 0, pct: 0 });
+      const d = new Date(Date.UTC(anioAhora, mesAhora - i, 1));
+      meses.push({ mes: MESES[d.getUTCMonth()], count: 0, pct: 0 });
     }
     for (const c of citas) {
-      const fecha = new Date(c.creadoEn || c.fecha);
-      const diff = (ahora.getFullYear() - fecha.getFullYear()) * 12 + (ahora.getMonth() - fecha.getMonth());
+      const fecha = new Date(c.createdAt ?? c.fecha);
+      const diff = (anioAhora - fecha.getUTCFullYear()) * 12 + (mesAhora - fecha.getUTCMonth());
       if (diff >= 0 && diff < 6) meses[5 - diff].count++;
     }
     const max = Math.max(...meses.map(m => m.count), 1);

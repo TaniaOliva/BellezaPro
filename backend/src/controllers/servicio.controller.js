@@ -39,14 +39,30 @@ const actualizar = async (req, res) => {
   } catch (err) { res.status(400).json({ mensaje: err.message }); }
 };
 
-const listarPopulares = async (req, res) => {
+// El reset de contadores semanales corre a lo sumo una vez al día y fuera de la
+// ruta de lectura (fire-and-forget), no en cada visita a la página pública.
+const UN_DIA_MS = 24 * 60 * 60 * 1000;
+let ultimoResetSemanal = 0;
+
+const resetContadoresSemanales = async () => {
+  if (Date.now() - ultimoResetSemanal < UN_DIA_MS) return;
+  ultimoResetSemanal = Date.now();
   try {
-    const categoriasActivas = await Categoria.find({ activo: true }).distinct('nombre');
-    const hace7Dias = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const hace7Dias = new Date(Date.now() - 7 * UN_DIA_MS);
     await Servicio.updateMany(
       { semanaInicio: { $lt: hace7Dias } },
       { $set: { contadorSemana: 0, semanaInicio: new Date() } }
     );
+  } catch (e) {
+    console.error('Reset de contadores semanales falló:', e.message);
+    ultimoResetSemanal = 0; // que reintente en la próxima visita
+  }
+};
+
+const listarPopulares = async (req, res) => {
+  try {
+    resetContadoresSemanales(); // sin await: no bloquea la respuesta
+    const categoriasActivas = await Categoria.find({ activo: true }).distinct('nombre');
     const populares = await Servicio.find({ activo: true, categoria: { $in: categoriasActivas } })
       .sort({ contadorSemana: -1 })
       .limit(4);

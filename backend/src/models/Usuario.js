@@ -29,4 +29,7 @@ const usuarioSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// Listados filtrados por rol + estado (estilistas activas, clientes, admins).
+usuarioSchema.index({ rol: 1, estado: 1 });
+
 module.exports = mongoose.model('Usuario', usuarioSchema);

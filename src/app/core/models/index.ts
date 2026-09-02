@@ -66,7 +66,7 @@ export interface Cita {
   canceladoPor?: 'cliente' | 'estilista' | 'admin' | 'sistema';
   canceladoEn?: string;
   detalleCancelacion?: string;
-  creadoEn: string;
+  createdAt?: string;
 }
 
 export interface SolicitudEspecial {
